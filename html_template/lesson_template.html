@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>English Lesson Buttons</title>
+  <style>
+    :root {
+      --sky: #7dd3fc;
+      --sun: #fde047;
+      --melon: #fb7185;
+      --mint: #6ee7b7;
+      --berry: #38bdf8;
+      --ink: #1f2937;
+      --paper: #fffef5;
+      --shadow: rgba(31, 41, 55, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Trebuchet MS", "Comic Sans MS", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.8), transparent 28%),
+        radial-gradient(circle at top right, rgba(255, 255, 255, 0.65), transparent 22%),
+        linear-gradient(180deg, #8be9ff 0%, #7dd3fc 40%, #fef3c7 100%);
+    }
+
+    .page {
+      width: min(100%, 960px);
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      line-height: 1;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #0f172a;
+      text-shadow: 0 3px 0 rgba(255, 255, 255, 0.65);
+    }
+
+    .subtitle {
+      margin: 12px auto 0;
+      max-width: 34rem;
+      font-size: clamp(1rem, 3vw, 1.2rem);
+      line-height: 1.4;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 14px;
+    }
+
+    .sound-button {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      width: 100%;
+      border: none;
+      border-radius: 28px;
+      padding: 14px;
+      background: var(--button-color, var(--paper));
+      box-shadow: 0 10px 0 rgba(255, 255, 255, 0.6), 0 16px 32px var(--shadow);
+      cursor: pointer;
+      transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .sound-button::before {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.28);
+      z-index: -1;
+    }
+
+    .sound-button:active {
+      transform: translateY(6px) scale(0.98);
+      box-shadow: 0 4px 0 rgba(255, 255, 255, 0.65), 0 8px 18px var(--shadow);
+    }
+
+    .sound-button:focus-visible {
+      outline: 4px solid rgba(255, 255, 255, 0.85);
+      outline-offset: 3px;
+    }
+
+    .sound-button.is-playing {
+      filter: saturate(1.1);
+      transform: translateY(-4px) rotate(-1deg);
+    }
+
+    .button-inner {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-align: center;
+    }
+
+    .emoji {
+      font-size: clamp(2.6rem, 10vw, 4rem);
+      line-height: 1;
+    }
+
+    .label {
+      font-size: clamp(1rem, 3.6vw, 1.2rem);
+      line-height: 1.2;
+      font-weight: 700;
+      max-width: 10ch;
+    }
+
+    @media (min-width: 700px) {
+      .page {
+        padding-top: 36px;
+      }
+
+      .button-grid {
+        gap: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <h1 class="title">Tap And Listen</h1>
+      <p class="subtitle">Press a picture to hear the English sentence one time.</p>
+    </header>
+    <section class="button-grid" id="button-grid"></section>
+  </main>
+
+  <script>
+    const lessons = __LESSONS_JSON__;
+    const palette = ["#fde68a", "#fca5a5", "#86efac", "#93c5fd", "#f9a8d4", "#fdba74"];
+    const buttonGrid = document.getElementById("button-grid");
+    const player = new Audio();
+    let activeButton = null;
+
+    function clearPlayingState() {
+      if (activeButton) {
+        activeButton.classList.remove("is-playing");
+        activeButton = null;
+      }
+    }
+
+    player.addEventListener("ended", clearPlayingState);
+    player.addEventListener("pause", clearPlayingState);
+
+    lessons.forEach((lesson, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "sound-button";
+      button.style.setProperty("--button-color", palette[index % palette.length]);
+      button.setAttribute("aria-label", lesson.text);
+
+      button.innerHTML = `
+        <span class="button-inner">
+          <span class="emoji">${lesson.emoji}</span>
+          <span class="label">${lesson.text}</span>
+        </span>
+      `;
+
+      button.addEventListener("click", async () => {
+        clearPlayingState();
+        activeButton = button;
+        button.classList.add("is-playing");
+
+        player.pause();
+        player.currentTime = 0;
+        player.src = lesson.audio;
+
+        try {
+          await player.play();
+        } catch (error) {
+          clearPlayingState();
+          console.error("Unable to play audio", error);
+        }
+      });
+
+      buttonGrid.appendChild(button);
+    });
+  </script>
+</body>
+</html>
