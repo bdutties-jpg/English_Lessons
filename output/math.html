@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Math</title>
+  <style>
+    :root {
+      --ink: #1f2937;
+      --good: #16a34a;
+      --bad: #ef4444;
+      --shadow: rgba(31, 41, 55, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Trebuchet MS", "Comic Sans MS", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.85), transparent 25%),
+        radial-gradient(circle at top right, rgba(255, 255, 255, 0.7), transparent 20%),
+        linear-gradient(180deg, #a5f3fc 0%, #bfdbfe 40%, #fde68a 100%);
+    }
+
+    .page {
+      width: min(100%, 960px);
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 6px 18px rgba(31, 41, 55, 0.12);
+      color: #0f172a;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .back-link:focus-visible {
+      outline: 4px solid rgba(255, 255, 255, 0.85);
+      outline-offset: 3px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-top: 24px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(2.2rem, 8vw, 4rem);
+      line-height: 1;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #0f172a;
+      text-shadow: 0 3px 0 rgba(255, 255, 255, 0.65);
+    }
+
+    .subtitle {
+      margin: 12px auto 0;
+      font-size: clamp(1.1rem, 4vw, 1.35rem);
+      font-weight: 800;
+    }
+
+    .card {
+      margin: 28px auto 0;
+      max-width: 42rem;
+      padding: 22px 16px 20px;
+      border-radius: 32px;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 16px 32px var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+
+    .problem-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(90px, 112px);
+      gap: 14px;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    .problem-text {
+      min-width: 0;
+      font-size: clamp(2rem, 9vw, 4rem);
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-align: right;
+      white-space: nowrap;
+      padding-right: 6px;
+    }
+
+    .answers {
+      display: grid;
+      gap: 10px;
+      width: min(112px, 24vw);
+      min-width: 90px;
+    }
+
+    .answer-button {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      width: 100%;
+      border: none;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.15)),
+        var(--button-color, #fca5a5);
+      box-shadow: 0 8px 0 rgba(255, 255, 255, 0.7), 0 12px 22px rgba(31, 41, 55, 0.16);
+      color: #0f172a;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: clamp(1.8rem, 8vw, 2.6rem);
+      font-weight: 900;
+      transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease, background 120ms ease;
+      overflow: visible;
+    }
+
+    .answer-button:active {
+      transform: translateY(5px) scale(0.98);
+      box-shadow: 0 3px 0 rgba(255, 255, 255, 0.75), 0 8px 14px rgba(31, 41, 55, 0.18);
+    }
+
+    .answer-button:focus-visible {
+      outline: 4px solid rgba(255, 255, 255, 0.92);
+      outline-offset: 3px;
+    }
+
+    .answer-button.correct {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.18)), #86efac;
+      color: #14532d;
+    }
+
+    .answer-button.wrong {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.18)), #fca5a5;
+      color: #7f1d1d;
+      animation: wrong-shake 360ms ease;
+    }
+
+    .answer-button.correct {
+      animation: correct-dance 700ms ease;
+      transform-origin: center;
+      z-index: 2;
+    }
+
+    .answer-button.sparkle-burst .sparkle {
+      animation: sparkle-burst 620ms ease-out forwards;
+    }
+
+    .sparkle {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 14px;
+      height: 14px;
+      margin-left: -7px;
+      margin-top: -7px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, currentColor 45%, rgba(255, 255, 255, 0) 70%);
+      opacity: 0;
+      pointer-events: none;
+      transform: rotate(var(--angle)) translateY(0) scale(0.2);
+      color: var(--sparkle-color, #facc15);
+    }
+
+    .status {
+      min-height: 1.6em;
+      margin: 16px 0 0;
+      text-align: center;
+      font-size: clamp(1rem, 3.8vw, 1.15rem);
+      font-weight: 800;
+    }
+
+    .status.good {
+      color: var(--good);
+    }
+
+    .status.bad {
+      color: var(--bad);
+    }
+
+    .hint {
+      margin: 8px 0 0;
+      text-align: center;
+      font-size: clamp(0.95rem, 3.4vw, 1.05rem);
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    @keyframes wrong-shake {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(-10px) rotate(-3deg); }
+      40% { transform: translateX(10px) rotate(3deg); }
+      60% { transform: translateX(-8px) rotate(-2deg); }
+      80% { transform: translateX(8px) rotate(2deg); }
+      100% { transform: translateX(0); }
+    }
+
+    @keyframes correct-dance {
+      0% { transform: scale(1); }
+      18% { transform: scale(1.18) rotate(-7deg); }
+      36% { transform: scale(1.26) rotate(7deg); }
+      54% { transform: scale(1.2) rotate(-5deg); }
+      72% { transform: scale(1.1) rotate(4deg); }
+      100% { transform: scale(1.12) rotate(0deg); }
+    }
+
+    @keyframes sparkle-burst {
+      0% {
+        opacity: 0.2;
+        transform: rotate(var(--angle)) translateY(0) scale(0.2);
+      }
+      25% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: rotate(var(--angle)) translateY(-64px) scale(1.1);
+      }
+    }
+
+    @media (max-width: 420px) {
+      .problem-shell {
+        gap: 10px;
+      }
+
+      .problem-text {
+        font-size: clamp(1.8rem, 8.5vw, 2.6rem);
+      }
+
+      .answers {
+        width: min(96px, 27vw);
+        min-width: 84px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="topbar">
+      <a class="back-link" href="../index.html" aria-label="Back to home page">⬅️🏡</a>
+    </div>
+    <header class="hero">
+      <h1 class="title">Math</h1>
+      <p class="subtitle">toán học</p>
+    </header>
+    <section class="card">
+      <div class="problem-shell">
+        <div class="problem-text" id="problem-text">7 - 4 =</div>
+        <div class="answers" id="answers"></div>
+      </div>
+      <p class="status" id="status"></p>
+      <p class="hint">Tap the right answer to get a new problem.</p>
+    </section>
+  </main>
+
+  <script>
+    const answersElement = document.getElementById("answers");
+    const problemTextElement = document.getElementById("problem-text");
+    const statusElement = document.getElementById("status");
+    const palette = ["#fcd34d", "#93c5fd", "#f9a8d4"];
+    const sparklePalette = ["#facc15", "#fb7185", "#60a5fa", "#34d399", "#c084fc"];
+    let currentProblem = null;
+
+    function playCorrectSound() {
+      // Placeholder hook for future correct-answer audio.
+    }
+
+    function playWrongSound() {
+      // Placeholder hook for future wrong-answer audio.
+    }
+
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function shuffle(items) {
+      const copy = [...items];
+      for (let index = copy.length - 1; index > 0; index -= 1) {
+        const swapIndex = randomInt(0, index);
+        [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+      }
+      return copy;
+    }
+
+    function buildProblem() {
+      const operation = Math.random() < 0.5 ? "+" : "-";
+      const right = randomInt(1, 9);
+      const left = operation === "+" ? randomInt(1, 20) : randomInt(right + 1, 20);
+      const correctAnswer = operation === "+" ? left + right : left - right;
+      const choices = new Set([correctAnswer]);
+
+      while (choices.size < 3) {
+        const offset = randomInt(-3, 3);
+        const wrongAnswer = correctAnswer + offset;
+        if (wrongAnswer < 1 || wrongAnswer === correctAnswer) {
+          continue;
+        }
+        choices.add(wrongAnswer);
+      }
+
+      return {
+        text: `${left} ${operation} ${right} =`,
+        correctAnswer,
+        answers: shuffle([...choices]),
+      };
+    }
+
+    function setStatus(message, tone) {
+      statusElement.textContent = message;
+      statusElement.className = tone ? `status ${tone}` : "status";
+    }
+
+    function renderProblem() {
+      currentProblem = buildProblem();
+      problemTextElement.textContent = currentProblem.text;
+      answersElement.innerHTML = "";
+      setStatus("", "");
+
+      currentProblem.answers.forEach((answer, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "answer-button";
+        button.textContent = answer;
+        button.style.setProperty("--button-color", palette[index % palette.length]);
+        button.setAttribute("aria-label", `Answer ${answer}`);
+        button.addEventListener("click", () => handleAnswer(button, answer));
+        answersElement.appendChild(button);
+      });
+    }
+
+    function burstSparkles(button) {
+      button.classList.remove("sparkle-burst");
+      button.querySelectorAll(".sparkle").forEach((sparkle) => sparkle.remove());
+
+      for (let index = 0; index < 8; index += 1) {
+        const sparkle = document.createElement("span");
+        sparkle.className = "sparkle";
+        sparkle.style.setProperty("--angle", `${index * 45}deg`);
+        sparkle.style.setProperty(
+          "--sparkle-color",
+          sparklePalette[index % sparklePalette.length]
+        );
+        button.appendChild(sparkle);
+      }
+
+      button.classList.add("sparkle-burst");
+      window.setTimeout(() => {
+        button.classList.remove("sparkle-burst");
+        button.querySelectorAll(".sparkle").forEach((sparkle) => sparkle.remove());
+      }, 650);
+    }
+
+    function handleAnswer(button, answer) {
+      const buttons = [...answersElement.querySelectorAll(".answer-button")];
+      if (answer === currentProblem.correctAnswer) {
+        playCorrectSound();
+        button.classList.add("correct");
+        burstSparkles(button);
+        setStatus("Great job!", "good");
+        buttons.forEach((item) => {
+          item.disabled = true;
+        });
+        window.setTimeout(renderProblem, 850);
+        return;
+      }
+
+      playWrongSound();
+      button.classList.remove("wrong");
+      void button.offsetWidth;
+      button.classList.add("wrong");
+      button.disabled = true;
+      setStatus("Try again!", "bad");
+    }
+
+    renderProblem();
+  </script>
+</body>
+</html>
