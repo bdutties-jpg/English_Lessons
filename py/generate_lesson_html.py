@@ -10,8 +10,13 @@ from urllib.parse import quote
 ROOT_DIR = Path(__file__).resolve().parent.parent
 AUDIO_DIR = ROOT_DIR / "assets" / "audio"
 TEMPLATE_PATH = ROOT_DIR / "html_template" / "lesson_template.html"
-OUTPUT_PATH = ROOT_DIR / "output" / "lesson_buttons.html"
+HOME_TEMPLATE_PATH = ROOT_DIR / "html_template" / "home_template.html"
+MATH_TEMPLATE_PATH = ROOT_DIR / "html_template" / "math_template.html"
+OUTPUT_PATH = ROOT_DIR / "output" / "short_sentences.html"
+MATH_OUTPUT_PATH = ROOT_DIR / "output" / "math.html"
+INDEX_PATH = ROOT_DIR / "index.html"
 PLACEHOLDER = "__LESSONS_JSON__"
+MENU_PLACEHOLDER = "__MENU_JSON__"
 FILENAME_PATTERN = re.compile(r"^(?P<emoji>.+?)\s*-\s*(?P<text>.+)$")
 
 
@@ -54,12 +59,40 @@ def render_html(lessons: list[dict[str, str]]) -> str:
     return template.replace(PLACEHOLDER, lessons_json)
 
 
+def render_home_html() -> str:
+    template = HOME_TEMPLATE_PATH.read_text(encoding="utf-8")
+    menu_items = [
+        {
+            "emoji": "🗣️",
+            "title": "Short Sentences",
+            "subtitle": "Những câu ngắn",
+            "href": "output/short_sentences.html",
+        },
+        {
+            "emoji": "➕➖",
+            "title": "Math",
+            "subtitle": "toán học",
+            "href": "output/math.html",
+        }
+    ]
+    menu_json = json.dumps(menu_items, ensure_ascii=False, indent=2)
+    if MENU_PLACEHOLDER not in template:
+        raise ValueError(f"Template is missing placeholder {MENU_PLACEHOLDER}")
+    return template.replace(MENU_PLACEHOLDER, menu_json)
+
+
 def main() -> None:
     lessons = build_lessons()
-    html = render_html(lessons)
+    lesson_html = render_html(lessons)
+    home_html = render_home_html()
+    math_html = MATH_TEMPLATE_PATH.read_text(encoding="utf-8")
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT_PATH.write_text(html, encoding="utf-8")
+    OUTPUT_PATH.write_text(lesson_html, encoding="utf-8")
+    MATH_OUTPUT_PATH.write_text(math_html, encoding="utf-8")
+    INDEX_PATH.write_text(home_html, encoding="utf-8")
     print(f"Wrote {len(lessons)} buttons to {OUTPUT_PATH}")
+    print(f"Wrote math page to {MATH_OUTPUT_PATH}")
+    print(f"Wrote home page to {INDEX_PATH}")
 
 
 if __name__ == "__main__":

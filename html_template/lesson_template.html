@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>English Lesson Buttons</title>
+  <title>Short Sentences</title>
   <style>
     :root {
       --sky: #7dd3fc;
@@ -37,6 +37,31 @@
       padding: 24px 16px 40px;
     }
 
+    .topbar {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 6px 18px rgba(31, 41, 55, 0.12);
+      color: #0f172a;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .back-link:focus-visible {
+      outline: 4px solid rgba(255, 255, 255, 0.85);
+      outline-offset: 3px;
+    }
+
     .hero {
       text-align: center;
       margin-bottom: 20px;
@@ -57,6 +82,12 @@
       max-width: 34rem;
       font-size: clamp(1rem, 3vw, 1.2rem);
       line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .subtitle strong {
+      display: block;
+      font-size: clamp(1.05rem, 3.2vw, 1.3rem);
     }
 
     .button-grid {
@@ -139,9 +170,12 @@
 </head>
 <body>
   <main class="page">
+    <div class="topbar">
+      <a class="back-link" href="../index.html" aria-label="Back to home page">⬅️🏡</a>
+    </div>
     <header class="hero">
-      <h1 class="title">Tap And Listen</h1>
-      <p class="subtitle">Press a picture to hear the English sentence one time.</p>
+      <h1 class="title">Short Sentences</h1>
+      <p class="subtitle"><strong>Những câu ngắn</strong>Press a picture to hear the English sentence one time.</p>
     </header>
     <section class="button-grid" id="button-grid"></section>
   </main>

@@ -1,0 +1,34 @@
+I am making a simple English learning app for my 5 year old Vietnamese neice.
+
+
+I would like you to write me a python script that will generate a static HTML file based on the contents of the `assets/audio` directory.  The UI should be colorful, vibrant and fun for a child to look at.  You can use REACT or any tooling that you think will help make the UI easier to customize an manage.
+
+The HTML file will be used on both desktop and mobile, but primarily on mobile.  The UI should optimize for mobel.
+
+The python script should consist solely of large square buttons.  There should be one button for each audio file in the `assets/audio` directory.  The format of the file names is `f'{button_emoji} - {button_text}.m4a'`.  The buttons should have their text formatted center alligned like the below example:
+
+```
+################
+#              #
+# button_emoji #
+# button_text  #
+#              #
+################
+```
+
+When the buttons are clicked on, the audio should play once.
+
+Please put the python file(s) in the `py/` directory, and use the `html_template/` directory for any html templates, and use teh `output/` directroy for the python script to write the final static html file to.
+
+
+```
+        #####
+        # 3 #
+        #####
+        ##### 
+7 - 4 = # 2 #
+        #####
+        #####
+        # 5 #
+        #####
+```
