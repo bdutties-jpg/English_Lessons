@@ -223,113 +223,83 @@
 
   <script>
     const pageConfig = {
-  "title": "Short Sentences",
-  "subtitle": "Những câu ngắn",
-  "description": "Press a picture to hear the English sentence one time.",
+  "title": "Letter Sounds",
+  "subtitle": "âm của chữ cái",
+  "description": "Tap a button to hear each letter sound.",
   "backAudio": "../assets/audio/Menu/Back%20to%20home.m4a",
-  "titleUppercase": true,
-  "buttonStyle": "default"
+  "titleUppercase": false,
+  "buttonStyle": "letter-sounds"
 };
     const lessons = [
   {
-    "emoji": "☂️",
-    "text": "It’s an umbrella",
-    "audio": "../assets/audio/Short%20sentences/%E2%98%82%EF%B8%8F%20-%20It%E2%80%99s%20an%20umbrella.m4a"
+    "emoji": "",
+    "text": "A (soft)",
+    "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a",
+    "display": "A a",
+    "note": "(soft)"
   },
   {
-    "emoji": "⭕️",
-    "text": "It’s a circle",
-    "audio": "../assets/audio/Short%20sentences/%E2%AD%95%EF%B8%8F%20-%20It%E2%80%99s%20a%20circle.m4a"
+    "emoji": "",
+    "text": "B",
+    "audio": "../assets/audio/Letters/Learning/B.m4a",
+    "display": "B b",
+    "note": ""
   },
   {
-    "emoji": "🌧️",
-    "text": "It’s rainy",
-    "audio": "../assets/audio/Short%20sentences/%F0%9F%8C%A7%EF%B8%8F%20-%20It%E2%80%99s%20rainy.m4a"
+    "emoji": "",
+    "text": "C (hard)",
+    "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a",
+    "display": "C c",
+    "note": "(hard)"
   },
   {
-    "emoji": "🍄‍🟫",
-    "text": "I like mushrooms",
-    "audio": "../assets/audio/Short%20sentences/%F0%9F%8D%84%E2%80%8D%F0%9F%9F%AB%20-%20I%20like%20mushrooms.m4a"
+    "emoji": "",
+    "text": "D",
+    "audio": "../assets/audio/Letters/Learning/D.m4a",
+    "display": "D d",
+    "note": ""
   },
   {
-    "emoji": "🍇",
-    "text": "They are grapes",
-    "audio": "../assets/audio/Short%20sentences/%F0%9F%8D%87%20-%20They%20are%20grapes.m4a"
+    "emoji": "",
+    "text": "E",
+    "audio": "../assets/audio/Letters/Learning/E.m4a",
+    "display": "E e",
+    "note": ""
   },
   {
-    "emoji": "🍋",
-    "text": "It’s a lemon",
-    "audio": "../assets/audio/Short%20sentences/%F0%9F%8D%8B%20-%20It%E2%80%99s%20a%20lemon.m4a"
+    "emoji": "",
+    "text": "F",
+    "audio": "../assets/audio/Letters/Learning/F.m4a",
+    "display": "F f",
+    "note": ""
   },
   {
-    "emoji": "🍦🚫",
-    "text": "I don’t like ice cream",
-    "audio": "../assets/audio/Short%20sentences/%F0%9F%8D%A6%F0%9F%9A%AB%20-%20I%20don%E2%80%99t%20like%20ice%20cream.m4a"
+    "emoji": "",
+    "text": "G (hard)",
+    "audio": "../assets/audio/Letters/Learning/G%20%28hard%29.m4a",
+    "display": "G g",
+    "note": "(hard)"
   },
   {
-    "emoji": "🐇",
-    "text": "It’s a rabbit",
-    "audio": "../assets/audio/Short%20sentences/%F0%9F%90%87%20-%20It%E2%80%99s%20a%20rabbit.m4a"
+    "emoji": "",
+    "text": "H",
+    "audio": "../assets/audio/Letters/Learning/H.m4a",
+    "display": "H h",
+    "note": ""
   },
   {
-    "emoji": "🐎",
-    "text": "It’s a horse",
-    "audio": "../assets/audio/Short%20sentences/%F0%9F%90%8E%20-%20It%E2%80%99s%20a%20horse.m4a"
+    "emoji": "",
+    "text": "I (soft)",
+    "audio": "../assets/audio/Letters/Learning/I%20%28soft%29.m4a",
+    "display": "I i",
+    "note": "(soft)"
   },
   {
-    "emoji": "🐭",
-    "text": "It’s a mouse",
-    "audio": "../assets/audio/Short%20sentences/%F0%9F%90%AD%20-%20It%E2%80%99s%20a%20mouse.m4a"
-  },
-  {
-    "emoji": "👨🏻‍🏫",
-    "text": "I want to be a teacher",
-    "audio": "../assets/audio/Short%20sentences/%F0%9F%91%A8%F0%9F%8F%BB%E2%80%8D%F0%9F%8F%AB%20-%20I%20want%20to%20be%20a%20teacher.m4a"
-  },
-  {
-    "emoji": "👮🏻‍♀️",
-    "text": "I want to be a police officer",
-    "audio": "../assets/audio/Short%20sentences/%F0%9F%91%AE%F0%9F%8F%BB%E2%80%8D%E2%99%80%EF%B8%8F%20-%20I%20want%20to%20be%20a%20police%20officer.m4a"
-  },
-  {
-    "emoji": "👵🏼",
-    "text": "This is my grandma",
-    "audio": "../assets/audio/Short%20sentences/%F0%9F%91%B5%F0%9F%8F%BC%20-%20This%20is%20my%20grandma.m4a"
-  },
-  {
-    "emoji": "🔺",
-    "text": "This is a triangle",
-    "audio": "../assets/audio/Short%20sentences/%F0%9F%94%BA-%20This%20is%20a%20triangle.m4a"
-  },
-  {
-    "emoji": "🚞",
-    "text": "It’s a train",
-    "audio": "../assets/audio/Short%20sentences/%F0%9F%9A%9E%20-%20It%E2%80%99s%20a%20train.m4a"
-  },
-  {
-    "emoji": "🥔",
-    "text": "It’s a potato",
-    "audio": "../assets/audio/Short%20sentences/%F0%9F%A5%94%20-%20It%E2%80%99s%20a%20potato.m4a"
-  },
-  {
-    "emoji": "🥭",
-    "text": "I like mango",
-    "audio": "../assets/audio/Short%20sentences/%F0%9F%A5%AD%20-%20I%20like%20mango.m4a"
-  },
-  {
-    "emoji": "🧃",
-    "text": "I like juice",
-    "audio": "../assets/audio/Short%20sentences/%F0%9F%A7%83%20-%20I%20like%20juice.m4a"
-  },
-  {
-    "emoji": "🧑🏻‍🍼",
-    "text": "This is my baby",
-    "audio": "../assets/audio/Short%20sentences/%F0%9F%A7%91%F0%9F%8F%BB%E2%80%8D%F0%9F%8D%BC%20-%20This%20is%20my%20baby.m4a"
-  },
-  {
-    "emoji": "🧥",
-    "text": "It’s a jacket",
-    "audio": "../assets/audio/Short%20sentences/%F0%9F%A7%A5%20-%20It%E2%80%99s%20a%20jacket.m4a"
+    "emoji": "",
+    "text": "J",
+    "audio": "../assets/audio/Letters/Learning/J.m4a",
+    "display": "J j",
+    "note": ""
   }
 ];
     const palette = ["#fde68a", "#fca5a5", "#86efac", "#93c5fd", "#f9a8d4", "#fdba74"];

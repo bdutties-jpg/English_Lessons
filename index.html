@@ -137,32 +137,68 @@
     "emoji": "🗣️",
     "title": "Short Sentences",
     "subtitle": "Những câu ngắn",
-    "href": "output/short_sentences.html"
+    "href": "output/short_sentences.html",
+    "audio": "assets/audio/Menu/Short%20Sentences.m4a"
   },
   {
     "emoji": "➕➖",
     "title": "Math",
     "subtitle": "toán học",
-    "href": "output/math.html"
+    "href": "output/math.html",
+    "audio": "assets/audio/Menu/Math.m4a"
+  },
+  {
+    "emoji": "📖",
+    "title": "Reading",
+    "subtitle": "đọc",
+    "href": "output/reading.html",
+    "audio": "assets/audio/Menu/Reading.m4a"
   }
 ];
     const colors = ["#f9a8d4", "#93c5fd", "#86efac", "#fdba74", "#fcd34d", "#c4b5fd"];
     const menuGrid = document.getElementById("menu-grid");
+    const player = new Audio();
+
+    async function playThenNavigate(audioPath, href) {
+      if (!audioPath) {
+        window.location.href = href;
+        return;
+      }
+
+      player.pause();
+      player.currentTime = 0;
+      player.src = audioPath;
+
+      try {
+        await player.play();
+        player.addEventListener(
+          "ended",
+          () => {
+            window.location.href = href;
+          },
+          { once: true }
+        );
+      } catch (error) {
+        console.error("Unable to play menu audio", error);
+        window.location.href = href;
+      }
+    }
 
     pages.forEach((page, index) => {
-      const link = document.createElement("a");
-      link.className = "menu-card";
-      link.href = page.href;
-      link.style.setProperty("--card-color", colors[index % colors.length]);
-      link.setAttribute("aria-label", `${page.title} - ${page.subtitle}`);
-      link.innerHTML = `
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "menu-card";
+      button.style.setProperty("--card-color", colors[index % colors.length]);
+      button.setAttribute("aria-label", `${page.title} - ${page.subtitle}`);
+      button.innerHTML = `
         <span class="menu-inner">
           <span class="menu-icon">${page.emoji}</span>
           <span class="menu-title">${page.title}</span>
           <span class="menu-subtitle">${page.subtitle}</span>
         </span>
       `;
-      menuGrid.appendChild(link);
+      button.addEventListener("click", () => playThenNavigate(page.audio, page.href));
+      menuGrid.appendChild(button);
     });
   </script>
 </body>

@@ -77,6 +77,10 @@
       text-shadow: 0 3px 0 rgba(255, 255, 255, 0.65);
     }
 
+    .title.no-uppercase {
+      text-transform: none;
+    }
+
     .subtitle {
       margin: 12px auto 0;
       max-width: 34rem;
@@ -157,6 +161,43 @@
       max-width: 10ch;
     }
 
+    .sound-button.letter-sound-button {
+      padding: 12px 12px 18px;
+    }
+
+    .sound-button.letter-sound-button .button-inner {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .letter-pair {
+      font-size: clamp(1.55rem, 7vw, 2.4rem);
+      line-height: 1.05;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      font-family: "Chalkboard SE", "Marker Felt", "Comic Sans MS", "Trebuchet MS", sans-serif;
+      text-align: center;
+    }
+
+    .letter-note {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 10px;
+      font-size: clamp(0.86rem, 2.8vw, 1rem);
+      line-height: 1.1;
+      font-weight: 700;
+      color: rgba(31, 41, 55, 0.58);
+      text-align: center;
+    }
+
+    .letter-note.is-empty {
+      visibility: hidden;
+    }
+
     @media (min-width: 700px) {
       .page {
         padding-top: 36px;
@@ -174,18 +215,31 @@
       <a class="back-link" href="../index.html" aria-label="Back to home page">⬅️🏡</a>
     </div>
     <header class="hero">
-      <h1 class="title">Short Sentences</h1>
-      <p class="subtitle"><strong>Những câu ngắn</strong>Press a picture to hear the English sentence one time.</p>
+      <h1 class="title" id="page-title"></h1>
+      <p class="subtitle"><strong id="page-subtitle"></strong><span id="page-description"></span></p>
     </header>
     <section class="button-grid" id="button-grid"></section>
   </main>
 
   <script>
+    const pageConfig = __PAGE_CONFIG_JSON__;
     const lessons = __LESSONS_JSON__;
     const palette = ["#fde68a", "#fca5a5", "#86efac", "#93c5fd", "#f9a8d4", "#fdba74"];
     const buttonGrid = document.getElementById("button-grid");
+    const pageTitle = document.getElementById("page-title");
+    const pageSubtitle = document.getElementById("page-subtitle");
+    const pageDescription = document.getElementById("page-description");
+    const backLink = document.querySelector(".back-link");
     const player = new Audio();
+    const navigationPlayer = new Audio();
     let activeButton = null;
+
+    pageTitle.textContent = pageConfig.title;
+    pageSubtitle.textContent = pageConfig.subtitle;
+    pageDescription.textContent = pageConfig.description;
+    if (pageConfig.titleUppercase === false) {
+      pageTitle.classList.add("no-uppercase");
+    }
 
     function clearPlayingState() {
       if (activeButton) {
@@ -194,22 +248,64 @@
       }
     }
 
+    async function playThenNavigate(audioPath, href) {
+      if (!audioPath) {
+        window.location.href = href;
+        return;
+      }
+
+      navigationPlayer.pause();
+      navigationPlayer.currentTime = 0;
+      navigationPlayer.src = audioPath;
+
+      try {
+        await navigationPlayer.play();
+        navigationPlayer.addEventListener(
+          "ended",
+          () => {
+            window.location.href = href;
+          },
+          { once: true }
+        );
+      } catch (error) {
+        console.error("Unable to play back audio", error);
+        window.location.href = href;
+      }
+    }
+
     player.addEventListener("ended", clearPlayingState);
     player.addEventListener("pause", clearPlayingState);
+
+    backLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      playThenNavigate(pageConfig.backAudio, backLink.getAttribute("href"));
+    });
 
     lessons.forEach((lesson, index) => {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "sound-button";
+      if (pageConfig.buttonStyle === "letter-sounds") {
+        button.classList.add("letter-sound-button");
+      }
       button.style.setProperty("--button-color", palette[index % palette.length]);
       button.setAttribute("aria-label", lesson.text);
 
-      button.innerHTML = `
-        <span class="button-inner">
-          <span class="emoji">${lesson.emoji}</span>
-          <span class="label">${lesson.text}</span>
-        </span>
-      `;
+      if (pageConfig.buttonStyle === "letter-sounds") {
+        button.innerHTML = `
+          <span class="button-inner">
+            <span class="letter-pair">${lesson.display ?? lesson.text}</span>
+            <span class="letter-note ${lesson.note ? "" : "is-empty"}">${lesson.note || "(note)"}</span>
+          </span>
+        `;
+      } else {
+        button.innerHTML = `
+          <span class="button-inner">
+            <span class="emoji">${lesson.emoji}</span>
+            <span class="label">${lesson.text}</span>
+          </span>
+        `;
+      }
 
       button.addEventListener("click", async () => {
         clearPlayingState();

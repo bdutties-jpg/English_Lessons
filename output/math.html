@@ -278,9 +278,36 @@
     const answersElement = document.getElementById("answers");
     const problemTextElement = document.getElementById("problem-text");
     const statusElement = document.getElementById("status");
+    const backLink = document.querySelector(".back-link");
     const palette = ["#fcd34d", "#93c5fd", "#f9a8d4"];
     const sparklePalette = ["#facc15", "#fb7185", "#60a5fa", "#34d399", "#c084fc"];
+    const navigationPlayer = new Audio("../assets/audio/Menu/Back%20to%20home.m4a");
     let currentProblem = null;
+
+    async function playThenNavigate(audioPath, href) {
+      if (!audioPath) {
+        window.location.href = href;
+        return;
+      }
+
+      navigationPlayer.pause();
+      navigationPlayer.currentTime = 0;
+      navigationPlayer.src = audioPath;
+
+      try {
+        await navigationPlayer.play();
+        navigationPlayer.addEventListener(
+          "ended",
+          () => {
+            window.location.href = href;
+          },
+          { once: true }
+        );
+      } catch (error) {
+        console.error("Unable to play back audio", error);
+        window.location.href = href;
+      }
+    }
 
     function playCorrectSound() {
       // Placeholder hook for future correct-answer audio.
@@ -289,6 +316,11 @@
     function playWrongSound() {
       // Placeholder hook for future wrong-answer audio.
     }
+
+    backLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      playThenNavigate("../assets/audio/Menu/Back%20to%20home.m4a", backLink.getAttribute("href"));
+    });
 
     function randomInt(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
