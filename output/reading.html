@@ -7,8 +7,9 @@
   <style>
     :root {
       --ink: #1f2937;
-      --bubble: #ffffffcc;
-      --shadow: rgba(15, 23, 42, 0.18);
+      --good: #16a34a;
+      --bad: #ef4444;
+      --shadow: rgba(31, 41, 55, 0.18);
     }
 
     * {
@@ -21,15 +22,15 @@
       font-family: "Trebuchet MS", "Comic Sans MS", sans-serif;
       color: var(--ink);
       background:
-        radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.88), transparent 23%),
-        radial-gradient(circle at 84% 16%, rgba(255, 255, 255, 0.72), transparent 19%),
-        linear-gradient(180deg, #93c5fd 0%, #c4b5fd 42%, #fde68a 100%);
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.85), transparent 25%),
+        radial-gradient(circle at top right, rgba(255, 255, 255, 0.7), transparent 20%),
+        linear-gradient(180deg, #f9a8d4 0%, #93c5fd 45%, #fde68a 100%);
     }
 
     .page {
       width: min(100%, 960px);
       margin: 0 auto;
-      padding: 24px 16px 48px;
+      padding: 24px 16px 40px;
     }
 
     .topbar {
@@ -41,7 +42,7 @@
     .back-link {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
+      gap: 8px;
       padding: 10px 14px;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.82);
@@ -52,83 +53,220 @@
       font-weight: 800;
     }
 
+    .back-link:focus-visible {
+      outline: 4px solid rgba(255, 255, 255, 0.85);
+      outline-offset: 3px;
+    }
+
     .hero {
       text-align: center;
-      margin-bottom: 28px;
+      margin-top: 24px;
     }
 
     .title {
       margin: 0;
-      font-size: clamp(2.4rem, 8vw, 4.4rem);
-      line-height: 0.95;
-      letter-spacing: 0.04em;
+      font-size: clamp(2.2rem, 8vw, 4rem);
+      line-height: 1;
       text-transform: uppercase;
+      letter-spacing: 0.04em;
       color: #0f172a;
-      text-shadow: 0 4px 0 rgba(255, 255, 255, 0.65);
+      text-shadow: 0 3px 0 rgba(255, 255, 255, 0.65);
     }
 
     .subtitle {
       margin: 12px auto 0;
-      max-width: 28rem;
-      padding: 10px 16px;
+      font-size: clamp(1.1rem, 4vw, 1.35rem);
+      font-weight: 800;
+    }
+
+    .card {
+      margin: 28px auto 0;
+      max-width: 46rem;
+      padding: 22px 16px 20px;
+      border-radius: 32px;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 16px 32px var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+
+    .problem-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(90px, 112px);
+      gap: 14px;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    .letters-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+      min-width: 0;
+      padding-right: 6px;
+    }
+
+    .letter-button {
+      min-width: clamp(42px, 11vw, 66px);
+      aspect-ratio: 1 / 1;
+      border: none;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.18)), #fde68a;
+      box-shadow: 0 8px 0 rgba(255, 255, 255, 0.7), 0 12px 22px rgba(31, 41, 55, 0.16);
+      color: #0f172a;
+      cursor: pointer;
+      font-family: "Chalkboard SE", "Marker Felt", "Comic Sans MS", "Trebuchet MS", sans-serif;
+      font-size: clamp(1.4rem, 5.2vw, 2.2rem);
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+    }
+
+    .letter-button:active {
+      transform: translateY(5px) scale(0.98);
+      box-shadow: 0 3px 0 rgba(255, 255, 255, 0.75), 0 8px 14px rgba(31, 41, 55, 0.18);
+    }
+
+    .letter-button:focus-visible,
+    .emoji-button:focus-visible {
+      outline: 4px solid rgba(255, 255, 255, 0.92);
+      outline-offset: 3px;
+    }
+
+    .answers {
+      display: grid;
+      gap: 10px;
+      width: min(112px, 24vw);
+      min-width: 90px;
+    }
+
+    .emoji-button {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      width: 100%;
+      border: none;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.15)),
+        var(--button-color, #fca5a5);
+      box-shadow: 0 8px 0 rgba(255, 255, 255, 0.7), 0 12px 22px rgba(31, 41, 55, 0.16);
+      color: #0f172a;
+      cursor: pointer;
+      font-size: clamp(2.2rem, 9vw, 3.5rem);
+      transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease, background 120ms ease;
+      overflow: visible;
+    }
+
+    .emoji-button:active {
+      transform: translateY(5px) scale(0.98);
+      box-shadow: 0 3px 0 rgba(255, 255, 255, 0.75), 0 8px 14px rgba(31, 41, 55, 0.18);
+    }
+
+    .emoji-button.correct {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.18)), #86efac;
+      animation: correct-dance 700ms ease;
+      transform-origin: center;
+      z-index: 2;
+    }
+
+    .emoji-button.wrong {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.18)), #fca5a5;
+      color: #7f1d1d;
+      animation: wrong-shake 360ms ease;
+    }
+
+    .emoji-button.sparkle-burst .sparkle {
+      animation: sparkle-burst 620ms ease-out forwards;
+    }
+
+    .sparkle {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 14px;
+      height: 14px;
+      margin-left: -7px;
+      margin-top: -7px;
       border-radius: 999px;
-      background: var(--bubble);
-      font-size: clamp(1rem, 3.6vw, 1.2rem);
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, currentColor 45%, rgba(255, 255, 255, 0) 70%);
+      opacity: 0;
+      pointer-events: none;
+      transform: rotate(var(--angle)) translateY(0) scale(0.2);
+      color: var(--sparkle-color, #facc15);
+    }
+
+    .status {
+      min-height: 1.6em;
+      margin: 16px 0 0;
+      text-align: center;
+      font-size: clamp(1rem, 3.8vw, 1.15rem);
+      font-weight: 800;
+    }
+
+    .status.good {
+      color: var(--good);
+    }
+
+    .status.bad {
+      color: var(--bad);
+    }
+
+    .hint {
+      margin: 8px 0 0;
+      text-align: center;
+      font-size: clamp(0.95rem, 3.4vw, 1.05rem);
       line-height: 1.35;
       font-weight: 700;
     }
 
-    .menu-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 18px;
+    @keyframes wrong-shake {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(-10px) rotate(-3deg); }
+      40% { transform: translateX(10px) rotate(3deg); }
+      60% { transform: translateX(-8px) rotate(-2deg); }
+      80% { transform: translateX(8px) rotate(2deg); }
+      100% { transform: translateX(0); }
     }
 
-    .menu-card {
-      display: block;
-      min-height: 220px;
-      padding: 18px;
-      border: none;
-      border-radius: 32px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0.24)),
-        var(--card-color, #f9a8d4);
-      box-shadow: 0 12px 0 rgba(255, 255, 255, 0.6), 0 18px 34px var(--shadow);
-      color: inherit;
-      cursor: pointer;
-      text-decoration: none;
-      transition: transform 140ms ease, box-shadow 140ms ease;
+    @keyframes correct-dance {
+      0% { transform: scale(1); }
+      18% { transform: scale(1.18) rotate(-7deg); }
+      36% { transform: scale(1.26) rotate(7deg); }
+      54% { transform: scale(1.2) rotate(-5deg); }
+      72% { transform: scale(1.1) rotate(4deg); }
+      100% { transform: scale(1.12) rotate(0deg); }
     }
 
-    .menu-card:active {
-      transform: translateY(6px) scale(0.98);
-      box-shadow: 0 5px 0 rgba(255, 255, 255, 0.7), 0 10px 18px var(--shadow);
+    @keyframes sparkle-burst {
+      0% {
+        opacity: 0.2;
+        transform: rotate(var(--angle)) translateY(0) scale(0.2);
+      }
+      25% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: rotate(var(--angle)) translateY(-64px) scale(1.1);
+      }
     }
 
-    .menu-inner {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      text-align: center;
-    }
+    @media (max-width: 480px) {
+      .problem-shell {
+        gap: 10px;
+      }
 
-    .menu-icon {
-      font-size: clamp(3rem, 12vw, 4.5rem);
-      line-height: 1;
-    }
+      .letters-row {
+        gap: 6px;
+      }
 
-    .menu-title {
-      font-size: clamp(1.2rem, 4vw, 1.6rem);
-      line-height: 1.15;
-      font-weight: 800;
-    }
-
-    .menu-subtitle {
-      font-size: clamp(1rem, 3.4vw, 1.15rem);
-      line-height: 1.2;
-      font-weight: 700;
+      .answers {
+        width: min(96px, 27vw);
+        min-width: 84px;
+      }
     }
   </style>
 </head>
@@ -141,31 +279,323 @@
       <h1 class="title" id="page-title"></h1>
       <p class="subtitle" id="page-subtitle"></p>
     </header>
-    <section class="menu-grid" id="menu-grid"></section>
+    <section class="card">
+      <div class="problem-shell">
+        <div class="letters-row" id="letters-row"></div>
+        <div class="answers" id="answers"></div>
+      </div>
+      <p class="status" id="status"></p>
+      <p class="hint">Tap the letters to hear their sounds, then choose the matching picture.</p>
+    </section>
   </main>
 
   <script>
     const pageConfig = {
   "title": "Reading",
   "subtitle": "đọc",
-  "description": "Choose a reading activity.",
+  "description": "Tap the letters, then choose the matching picture.",
   "backAudio": "../assets/audio/Menu/Back%20to%20home.m4a",
-  "menuItems": [
+  "vocabulary": [
     {
-      "emoji": "🔤",
-      "title": "Letter Sounds",
-      "subtitle": "âm của chữ cái",
-      "href": "letter_sounds.html",
-      "audio": "../assets/audio/Menu/Letter%20sounds.m4a"
+      "word": "Car",
+      "emoji": "🚗",
+      "audio": "../assets/audio/Vocabulary/Car%20%F0%9F%9A%97.m4a",
+      "letters": [
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a"
+        }
+      ]
+    },
+    {
+      "word": "Cat",
+      "emoji": "🐱",
+      "audio": "../assets/audio/Vocabulary/Cat%20%F0%9F%90%B1.m4a",
+      "letters": [
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a"
+        },
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a"
+        }
+      ]
+    },
+    {
+      "word": "Corn",
+      "emoji": "🌽",
+      "audio": "../assets/audio/Vocabulary/Corn%20%F0%9F%8C%BD.m4a",
+      "letters": [
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a"
+        },
+        {
+          "label": "N",
+          "audio": "../assets/audio/Letters/Learning/N.m4a"
+        }
+      ]
+    },
+    {
+      "word": "Cow",
+      "emoji": "🐮",
+      "audio": "../assets/audio/Vocabulary/Cow%20%F0%9F%90%AE.m4a",
+      "letters": [
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a"
+        },
+        {
+          "label": "W",
+          "audio": "../assets/audio/Letters/Learning/W.m4a"
+        }
+      ]
+    },
+    {
+      "word": "Dog",
+      "emoji": "🐶",
+      "audio": "../assets/audio/Vocabulary/Dog%20%F0%9F%90%B6.m4a",
+      "letters": [
+        {
+          "label": "D",
+          "audio": "../assets/audio/Letters/Learning/D.m4a"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a"
+        },
+        {
+          "label": "G",
+          "audio": "../assets/audio/Letters/Learning/G%20%28hard%29.m4a"
+        }
+      ]
+    },
+    {
+      "word": "Fox",
+      "emoji": "🦊",
+      "audio": "../assets/audio/Vocabulary/Fox%20%F0%9F%A6%8A.m4a",
+      "letters": [
+        {
+          "label": "F",
+          "audio": "../assets/audio/Letters/Learning/F.m4a"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a"
+        },
+        {
+          "label": "X",
+          "audio": "../assets/audio/Letters/Learning/X.m4a"
+        }
+      ]
+    },
+    {
+      "word": "Frog",
+      "emoji": "🐸",
+      "audio": "../assets/audio/Vocabulary/Frog%20%F0%9F%90%B8.m4a",
+      "letters": [
+        {
+          "label": "F",
+          "audio": "../assets/audio/Letters/Learning/F.m4a"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a"
+        },
+        {
+          "label": "G",
+          "audio": "../assets/audio/Letters/Learning/G%20%28hard%29.m4a"
+        }
+      ]
+    },
+    {
+      "word": "Hand",
+      "emoji": "🤚🏼",
+      "audio": "../assets/audio/Vocabulary/Hand%20%F0%9F%A4%9A%F0%9F%8F%BC.m4a",
+      "letters": [
+        {
+          "label": "H",
+          "audio": "../assets/audio/Letters/Learning/H.m4a"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a"
+        },
+        {
+          "label": "N",
+          "audio": "../assets/audio/Letters/Learning/N.m4a"
+        },
+        {
+          "label": "D",
+          "audio": "../assets/audio/Letters/Learning/D.m4a"
+        }
+      ]
+    },
+    {
+      "word": "Hat",
+      "emoji": "👒",
+      "audio": "../assets/audio/Vocabulary/Hat%20%F0%9F%91%92.m4a",
+      "letters": [
+        {
+          "label": "H",
+          "audio": "../assets/audio/Letters/Learning/H.m4a"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a"
+        },
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a"
+        }
+      ]
+    },
+    {
+      "word": "Jar",
+      "emoji": "🫙",
+      "audio": "../assets/audio/Vocabulary/Jar%20%F0%9F%AB%99.m4a",
+      "letters": [
+        {
+          "label": "J",
+          "audio": "../assets/audio/Letters/Learning/J.m4a"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a"
+        }
+      ]
+    },
+    {
+      "word": "Milk",
+      "emoji": "🥛",
+      "audio": "../assets/audio/Vocabulary/Milk%20%F0%9F%A5%9B.m4a",
+      "letters": [
+        {
+          "label": "M",
+          "audio": "../assets/audio/Letters/Learning/M.m4a"
+        },
+        {
+          "label": "I",
+          "audio": "../assets/audio/Letters/Learning/I%20%28soft%29.m4a"
+        },
+        {
+          "label": "L",
+          "audio": "../assets/audio/Letters/Learning/L.m4a"
+        },
+        {
+          "label": "K",
+          "audio": "../assets/audio/Letters/Learning/K.m4a"
+        }
+      ]
+    },
+    {
+      "word": "Owl",
+      "emoji": "🦉",
+      "audio": "../assets/audio/Vocabulary/Owl%20%F0%9F%A6%89.m4a",
+      "letters": [
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a"
+        },
+        {
+          "label": "W",
+          "audio": "../assets/audio/Letters/Learning/W.m4a"
+        },
+        {
+          "label": "L",
+          "audio": "../assets/audio/Letters/Learning/L.m4a"
+        }
+      ]
+    },
+    {
+      "word": "Pig",
+      "emoji": "🐷",
+      "audio": "../assets/audio/Vocabulary/Pig%20%F0%9F%90%B7.m4a",
+      "letters": [
+        {
+          "label": "P",
+          "audio": "../assets/audio/Letters/Learning/P.m4a"
+        },
+        {
+          "label": "I",
+          "audio": "../assets/audio/Letters/Learning/I%20%28soft%29.m4a"
+        },
+        {
+          "label": "G",
+          "audio": "../assets/audio/Letters/Learning/G%20%28hard%29.m4a"
+        }
+      ]
+    },
+    {
+      "word": "Sun",
+      "emoji": "☀️",
+      "audio": "../assets/audio/Vocabulary/Sun%20%E2%98%80%EF%B8%8F.m4a",
+      "letters": [
+        {
+          "label": "S",
+          "audio": "../assets/audio/Letters/Learning/S.m4a"
+        },
+        {
+          "label": "U",
+          "audio": "../assets/audio/Letters/Learning/U%20%28soft%29.m4a"
+        },
+        {
+          "label": "N",
+          "audio": "../assets/audio/Letters/Learning/N.m4a"
+        }
+      ]
     }
   ]
 };
-    const colors = ["#f9a8d4", "#93c5fd", "#86efac", "#fdba74", "#fcd34d", "#c4b5fd"];
-    const menuGrid = document.getElementById("menu-grid");
     const pageTitle = document.getElementById("page-title");
     const pageSubtitle = document.getElementById("page-subtitle");
+    const lettersRow = document.getElementById("letters-row");
+    const answersElement = document.getElementById("answers");
+    const statusElement = document.getElementById("status");
     const backLink = document.querySelector(".back-link");
-    const player = new Audio();
+    const answerPalette = ["#fcd34d", "#93c5fd", "#f9a8d4"];
+    const sparklePalette = ["#facc15", "#fb7185", "#60a5fa", "#34d399", "#c084fc"];
+    const navigationPlayer = new Audio();
+    const letterPlayer = new Audio();
+    const wordPlayer = new Audio();
+    let currentProblem = null;
+    const recentWords = [];
+
+    pageTitle.textContent = pageConfig.title;
+    pageSubtitle.textContent = `${pageConfig.subtitle} · ${pageConfig.description}`;
 
     async function playThenNavigate(audioPath, href) {
       if (!audioPath) {
@@ -173,13 +603,13 @@
         return;
       }
 
-      player.pause();
-      player.currentTime = 0;
-      player.src = audioPath;
+      navigationPlayer.pause();
+      navigationPlayer.currentTime = 0;
+      navigationPlayer.src = audioPath;
 
       try {
-        await player.play();
-        player.addEventListener(
+        await navigationPlayer.play();
+        navigationPlayer.addEventListener(
           "ended",
           () => {
             window.location.href = href;
@@ -187,35 +617,167 @@
           { once: true }
         );
       } catch (error) {
-        console.error("Unable to play menu audio", error);
+        console.error("Unable to play back audio", error);
         window.location.href = href;
       }
     }
-
-    pageTitle.textContent = pageConfig.title;
-    pageSubtitle.textContent = `${pageConfig.subtitle} · ${pageConfig.description}`;
 
     backLink.addEventListener("click", (event) => {
       event.preventDefault();
       playThenNavigate(pageConfig.backAudio, backLink.getAttribute("href"));
     });
 
-    pageConfig.menuItems.forEach((page, index) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "menu-card";
-      button.style.setProperty("--card-color", colors[index % colors.length]);
-      button.setAttribute("aria-label", `${page.title} - ${page.subtitle}`);
-      button.innerHTML = `
-        <span class="menu-inner">
-          <span class="menu-icon">${page.emoji}</span>
-          <span class="menu-title">${page.title}</span>
-          <span class="menu-subtitle">${page.subtitle}</span>
-        </span>
-      `;
-      button.addEventListener("click", () => playThenNavigate(page.audio, page.href));
-      menuGrid.appendChild(button);
-    });
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function shuffle(items) {
+      const copy = [...items];
+      for (let index = copy.length - 1; index > 0; index -= 1) {
+        const swapIndex = randomInt(0, index);
+        [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+      }
+      return copy;
+    }
+
+    function setStatus(message, tone) {
+      statusElement.textContent = message;
+      statusElement.className = tone ? `status ${tone}` : "status";
+    }
+
+    function playCorrectSound() {
+      // Placeholder hook for future correct-answer audio.
+    }
+
+    function playWrongSound() {
+      // Placeholder hook for future wrong-answer audio.
+    }
+
+    function playLetterSound(audioPath) {
+      letterPlayer.pause();
+      letterPlayer.currentTime = 0;
+      letterPlayer.src = audioPath;
+      letterPlayer.play().catch((error) => {
+        console.error("Unable to play letter audio", error);
+      });
+    }
+
+    async function playWordSound(audioPath) {
+      if (!audioPath) {
+        return;
+      }
+
+      wordPlayer.pause();
+      wordPlayer.currentTime = 0;
+      wordPlayer.src = audioPath;
+
+      try {
+        await wordPlayer.play();
+        await new Promise((resolve) => {
+          wordPlayer.addEventListener("ended", resolve, { once: true });
+        });
+      } catch (error) {
+        console.error("Unable to play word audio", error);
+      }
+    }
+
+    function buildProblem() {
+      const vocabulary = pageConfig.vocabulary;
+      const eligibleWords = vocabulary.filter((item) => !recentWords.includes(item.word));
+      const pool = eligibleWords.length > 0 ? eligibleWords : vocabulary;
+      const correctItem = pool[randomInt(0, pool.length - 1)];
+      recentWords.push(correctItem.word);
+      if (recentWords.length > 3) {
+        recentWords.shift();
+      }
+      const distractors = shuffle(vocabulary.filter((item) => item.word !== correctItem.word)).slice(0, 2);
+      const answers = shuffle([
+        { emoji: correctItem.emoji, isCorrect: true },
+        ...distractors.map((item) => ({ emoji: item.emoji, isCorrect: false })),
+      ]);
+
+      return {
+        letters: correctItem.letters,
+        audio: correctItem.audio,
+        answers,
+      };
+    }
+
+    function burstSparkles(button) {
+      button.classList.remove("sparkle-burst");
+      button.querySelectorAll(".sparkle").forEach((sparkle) => sparkle.remove());
+
+      for (let index = 0; index < 8; index += 1) {
+        const sparkle = document.createElement("span");
+        sparkle.className = "sparkle";
+        sparkle.style.setProperty("--angle", `${index * 45}deg`);
+        sparkle.style.setProperty(
+          "--sparkle-color",
+          sparklePalette[index % sparklePalette.length]
+        );
+        button.appendChild(sparkle);
+      }
+
+      button.classList.add("sparkle-burst");
+      window.setTimeout(() => {
+        button.classList.remove("sparkle-burst");
+        button.querySelectorAll(".sparkle").forEach((sparkle) => sparkle.remove());
+      }, 650);
+    }
+
+    function renderProblem() {
+      currentProblem = buildProblem();
+      lettersRow.innerHTML = "";
+      answersElement.innerHTML = "";
+      setStatus("", "");
+
+      currentProblem.letters.forEach((letter) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "letter-button";
+        button.textContent = letter.label;
+        button.setAttribute("aria-label", `Letter ${letter.label}`);
+        button.addEventListener("click", () => playLetterSound(letter.audio));
+        lettersRow.appendChild(button);
+      });
+
+      currentProblem.answers.forEach((answer, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "emoji-button";
+        button.textContent = answer.emoji;
+        button.style.setProperty("--button-color", answerPalette[index % answerPalette.length]);
+        button.setAttribute("aria-label", `Emoji ${answer.emoji}`);
+        button.addEventListener("click", () => handleAnswer(button, answer.isCorrect));
+        answersElement.appendChild(button);
+      });
+    }
+
+    async function handleAnswer(button, isCorrect) {
+      const buttons = [...answersElement.querySelectorAll(".emoji-button")];
+      if (isCorrect) {
+        playCorrectSound();
+        const wordPlayback = playWordSound(currentProblem.audio);
+        button.classList.add("correct");
+        burstSparkles(button);
+        setStatus("Great job!", "good");
+        buttons.forEach((item) => {
+          item.disabled = true;
+        });
+        await wordPlayback;
+        window.setTimeout(renderProblem, 250);
+        return;
+      }
+
+      playWrongSound();
+      button.classList.remove("wrong");
+      void button.offsetWidth;
+      button.classList.add("wrong");
+      button.disabled = true;
+      setStatus("Try again!", "bad");
+    }
+
+    renderProblem();
   </script>
 </body>
 </html>

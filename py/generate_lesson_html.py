@@ -11,6 +11,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 SHORT_SENTENCES_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Short sentences"
 LETTER_SOUNDS_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Letters" / "Learning"
 MENU_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Menu"
+VOCABULARY_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Vocabulary"
 TEMPLATE_PATH = ROOT_DIR / "html_template" / "lesson_template.html"
 HOME_TEMPLATE_PATH = ROOT_DIR / "html_template" / "home_template.html"
 MATH_TEMPLATE_PATH = ROOT_DIR / "html_template" / "math_template.html"
@@ -24,6 +25,7 @@ PLACEHOLDER = "__LESSONS_JSON__"
 MENU_PLACEHOLDER = "__MENU_JSON__"
 PAGE_CONFIG_PLACEHOLDER = "__PAGE_CONFIG_JSON__"
 FILENAME_PATTERN = re.compile(r"^(?P<emoji>.+?)\s*-\s*(?P<text>.+)$")
+VOCABULARY_PATTERN = re.compile(r"^(?P<word>.+?)\s+(?P<emoji>\S+)$")
 
 
 @dataclass(frozen=True)
@@ -40,6 +42,13 @@ class GridButton:
     audio: str
 
 
+@dataclass(frozen=True)
+class VocabularyItem:
+    word: str
+    emoji: str
+    audio: str
+
+
 def encode_relative_path(path: Path, *, from_output_dir: bool = True) -> str:
     relative_path = path.relative_to(ROOT_DIR)
     encoded_path = "/".join(quote(part) for part in relative_path.parts)
@@ -51,6 +60,41 @@ def build_menu_audio_map() -> dict[str, str]:
         audio_path.stem.casefold(): encode_relative_path(audio_path, from_output_dir=False)
         for audio_path in MENU_AUDIO_DIR.glob("*.m4a")
     }
+
+
+def build_letter_audio_map(*, from_output_dir: bool = True) -> dict[str, str]:
+    preferred_notes = {
+        "a": "soft",
+        "c": "hard",
+        "e": "soft",
+        "i": "soft",
+        "o": "soft",
+        "u": "soft",
+        "g": "hard",
+    }
+    candidates: dict[str, dict[str, str]] = {}
+
+    for audio_path in sorted(LETTER_SOUNDS_AUDIO_DIR.rglob("*.m4a"), key=lambda path: path.stem.casefold()):
+        label = audio_path.stem.strip()
+        match = re.match(r"^(?P<letter>.+?)\s*\((?P<note>hard|soft)\)$", label, re.IGNORECASE)
+        base_letter = match.group("letter").strip() if match else label
+        note = match.group("note").strip().lower() if match else "default"
+        candidates.setdefault(base_letter.casefold(), {})[note] = encode_relative_path(
+            audio_path,
+            from_output_dir=from_output_dir,
+        )
+
+    audio_map: dict[str, str] = {}
+    for letter, options in candidates.items():
+        preferred_note = preferred_notes.get(letter)
+        if preferred_note and preferred_note in options:
+            audio_map[letter] = options[preferred_note]
+        elif "default" in options:
+            audio_map[letter] = options["default"]
+        else:
+            audio_map[letter] = options.get("soft") or options.get("hard") or next(iter(options.values()))
+
+    return audio_map
 
 
 def parse_audio_file(audio_path: Path) -> LessonButton:
@@ -116,6 +160,30 @@ def build_letter_sounds() -> list[dict[str, str]]:
     return buttons
 
 
+def build_vocabulary() -> list[dict[str, str]]:
+    audio_files = sorted(VOCABULARY_AUDIO_DIR.glob("*.m4a"), key=lambda path: path.stem.casefold())
+    if not audio_files:
+        raise FileNotFoundError(f"No .m4a files found in {VOCABULARY_AUDIO_DIR}")
+
+    items: list[dict[str, str]] = []
+    for audio_path in audio_files:
+        label = audio_path.stem.strip()
+        match = VOCABULARY_PATTERN.match(label)
+        if not match:
+            raise ValueError(
+                f"Vocabulary file '{audio_path.name}' must follow the pattern 'Word emoji.m4a'."
+            )
+        items.append(
+            VocabularyItem(
+                word=match.group("word").strip(),
+                emoji=match.group("emoji").strip(),
+                audio=encode_relative_path(audio_path),
+            ).__dict__
+        )
+
+    return items
+
+
 def render_audio_grid_page(
     items: list[dict[str, str]],
     *,
@@ -162,6 +230,13 @@ def render_home_html() -> str:
             "audio": menu_audio.get("short sentences", ""),
         },
         {
+            "emoji": "🔤",
+            "title": "Letter Sounds",
+            "subtitle": "âm của chữ cái",
+            "href": "output/letter_sounds.html",
+            "audio": menu_audio.get("letter sounds", ""),
+        },
+        {
             "emoji": "➕➖",
             "title": "Math",
             "subtitle": "toán học",
@@ -184,22 +259,24 @@ def render_home_html() -> str:
 
 def render_reading_html() -> str:
     template = READING_TEMPLATE_PATH.read_text(encoding="utf-8")
-    menu_audio = build_menu_audio_map()
-    menu_items = [
-        {
-            "emoji": "🔤",
-            "title": "Letter Sounds",
-            "subtitle": "âm của chữ cái",
-            "href": "letter_sounds.html",
-            "audio": encode_relative_path(MENU_AUDIO_DIR / "Letter sounds.m4a"),
-        }
-    ]
+    vocabulary = build_vocabulary()
+    letter_audio_map = build_letter_audio_map()
+
+    for item in vocabulary:
+        letter_buttons: list[dict[str, str]] = []
+        for letter in item["word"]:
+            audio = letter_audio_map.get(letter.casefold())
+            if not audio:
+                raise ValueError(f"No letter sound audio found for '{letter}' in word '{item['word']}'.")
+            letter_buttons.append({"label": letter.upper(), "audio": audio})
+        item["letters"] = letter_buttons
+
     page_config = {
         "title": "Reading",
         "subtitle": "đọc",
-        "description": "Choose a reading activity.",
+        "description": "Tap the letters, then choose the matching picture.",
         "backAudio": encode_relative_path(MENU_AUDIO_DIR / "Back to home.m4a"),
-        "menuItems": menu_items,
+        "vocabulary": vocabulary,
     }
     if PAGE_CONFIG_PLACEHOLDER not in template:
         raise ValueError(f"Template is missing placeholder {PAGE_CONFIG_PLACEHOLDER}")
