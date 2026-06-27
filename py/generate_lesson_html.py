@@ -286,7 +286,12 @@ def render_math_html() -> str:
     template = apply_app_version(MATH_TEMPLATE_PATH.read_text(encoding="utf-8"))
     if MATH_CONFIG_PLACEHOLDER not in template:
         raise ValueError(f"Template is missing placeholder {MATH_CONFIG_PLACEHOLDER}")
-    return template.replace(MATH_CONFIG_PLACEHOLDER, json.dumps(MATH_CONFIG, ensure_ascii=False, indent=2))
+    math_config = dict(MATH_CONFIG)
+    for key in ("correct_answer", "wrong_answer", "star_celebration"):
+        audio_path = math_config.get(key)
+        if audio_path:
+            math_config[key] = encode_relative_path(ROOT_DIR / audio_path)
+    return template.replace(MATH_CONFIG_PLACEHOLDER, json.dumps(math_config, ensure_ascii=False, indent=2))
 
 
 def render_reading_html() -> str:

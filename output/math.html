@@ -8,9 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="English Playtime" />
   <meta name="application-name" content="English Playtime" />
   <meta name="theme-color" content="#a5f3fc" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
+  <meta name="app-version" content="20260627025719" />
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="../assets/icons/icon-512.png" />
@@ -497,13 +495,16 @@
   </main>
 
   <script>
-    const appVersion = "20260627020629";
+    const appVersion = "20260627025719";
     const versionInfoPath = "../app_version.json";
     const mathConfig = {
   "base_max_number": 10,
   "base_min_number": 1,
   "star_max_boost": 1,
-  "star_min_boost": 0
+  "star_min_boost": 0,
+  "correct_answer": "../assets/audio/UI_Sounds/ding%20sparkle.m4a",
+  "wrong_answer": "../assets/audio/UI_Sounds/Uuugh.m4a",
+  "star_celebration": "../assets/audio/UI_Sounds/Magic%20ga.m4a"
 };
     const answersElement = document.getElementById("answers");
     const problemTextElement = document.getElementById("problem-text");
@@ -517,9 +518,9 @@
     const navigationPlayer = new Audio("../assets/audio/Menu/Back%20to%20home.m4a");
     const uiPlayer = new Audio();
     const magicPlayer = new Audio();
-    const correctAudio = "../assets/audio/UI_Sounds/ding%20sparkle.m4a";
-    const wrongAudio = "../assets/audio/UI_Sounds/Cartoon%20fail.m4a";
-    const magicAudio = "../assets/audio/UI_Sounds/Magic%20ga.m4a";
+    const correctAudio = mathConfig.correct_answer;
+    const wrongAudio = mathConfig.wrong_answer;
+    const magicAudio = mathConfig.star_celebration;
     let currentProblem = null;
     let streakCount = 0;
     let isResolving = false;
