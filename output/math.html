@@ -100,13 +100,176 @@
 
     .problem-shell {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(90px, 112px);
+      grid-template-columns: minmax(0, 1fr) minmax(90px, 112px) 74px;
       gap: 14px;
       align-items: center;
       justify-content: center;
       width: fit-content;
       max-width: 100%;
       margin: 0 auto;
+    }
+
+    .game-rail {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 74px;
+      align-self: stretch;
+      justify-content: center;
+    }
+
+    .goal-star-shell {
+      position: relative;
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      filter: drop-shadow(0 6px 10px rgba(31, 41, 55, 0.18));
+    }
+
+    .goal-star {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 2.45rem;
+      line-height: 1;
+      transition: opacity 240ms ease, transform 240ms ease, filter 240ms ease;
+    }
+
+    .goal-star-off {
+      color: #d1d5db;
+      text-shadow: 0 3px 0 rgba(255, 255, 255, 0.72);
+    }
+
+    .goal-star-on {
+      color: #fde047;
+      opacity: 0;
+      transform: scale(0.72);
+      text-shadow: 0 0 18px rgba(250, 204, 21, 0.92), 0 0 34px rgba(255, 255, 255, 0.92);
+    }
+
+    .goal-star-shell.lit .goal-star-on {
+      opacity: 1;
+      transform: scale(1.08);
+    }
+
+    .goal-star-shell.lit .goal-star-off {
+      opacity: 0.24;
+      transform: scale(0.88);
+    }
+
+    .thermo {
+      position: relative;
+      width: 38px;
+      height: 186px;
+      padding: 7px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(226, 232, 240, 0.94));
+      box-shadow: inset 0 3px 8px rgba(255, 255, 255, 0.92), 0 10px 20px rgba(31, 41, 55, 0.18);
+    }
+
+    .thermo-track {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #f3f4f6 0%, #d1d5db 100%);
+      border: 2px solid rgba(148, 163, 184, 0.55);
+    }
+
+    .thermo-fill {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 0%;
+      border-radius: 999px 999px 18px 18px;
+      background: linear-gradient(180deg, #fcd34d 0%, #fb7185 52%, #f97316 100%);
+      box-shadow: inset 0 -4px 8px rgba(255, 255, 255, 0.3), 0 0 14px rgba(251, 113, 133, 0.42);
+      transition: height 440ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease;
+    }
+
+    .thermo-bulb {
+      position: absolute;
+      left: 50%;
+      bottom: -12px;
+      width: 54px;
+      height: 54px;
+      border-radius: 999px;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(226, 232, 240, 0.94));
+      box-shadow: inset 0 4px 8px rgba(255, 255, 255, 0.92), 0 10px 18px rgba(31, 41, 55, 0.18);
+    }
+
+    .thermo-bulb::before {
+      content: "";
+      position: absolute;
+      inset: 7px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 35% 30%, #fde68a 0%, #fb7185 58%, #f97316 100%);
+      opacity: var(--bulb-glow, 0.22);
+      transition: opacity 220ms ease;
+    }
+
+    .star-bank-section {
+      margin-top: 18px;
+      padding: 14px 10px 4px;
+    }
+
+    .star-bank-label {
+      margin-bottom: 8px;
+      text-align: left;
+      font-size: clamp(0.95rem, 3.4vw, 1.05rem);
+      font-weight: 900;
+      color: #475569;
+      letter-spacing: 0.03em;
+    }
+
+    .stars-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 10px;
+      justify-content: flex-start;
+      align-items: flex-start;
+      min-height: 58px;
+    }
+
+    .star-token {
+      display: inline-grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      font-size: 2rem;
+      line-height: 1;
+      filter: drop-shadow(0 5px 10px rgba(250, 204, 21, 0.45));
+      animation: bank-star-dance 1700ms ease-in-out infinite;
+      animation-delay: var(--dance-delay, 0ms);
+    }
+
+    .star-token.placeholder {
+      opacity: 0;
+      animation: none;
+    }
+
+    .floating-star {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 40;
+      font-size: 2.3rem;
+      line-height: 1;
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(1.1) rotate(0deg);
+      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 18px rgba(250, 204, 21, 0.7));
+      transition: left 1180ms cubic-bezier(0.22, 1, 0.36, 1), top 1180ms cubic-bezier(0.22, 1, 0.36, 1), transform 1180ms cubic-bezier(0.22, 1, 0.36, 1), opacity 1180ms ease;
+      animation: falling-star-wiggle 260ms ease-in-out infinite alternate, falling-star-sparkle 520ms ease-in-out infinite;
+    }
+
+    .floating-star.is-dropping {
+      transform: translate(-50%, -50%) scale(0.86) rotate(540deg);
     }
 
     .problem-text {
@@ -248,9 +411,27 @@
       }
     }
 
+    @keyframes bank-star-dance {
+      0% { transform: translateX(-1px) rotate(-4deg) translateY(0); }
+      50% { transform: translateX(1px) rotate(4deg) translateY(-3px); }
+      100% { transform: translateX(-1px) rotate(-4deg) translateY(0); }
+    }
+
+    @keyframes falling-star-wiggle {
+      0% { margin-left: -2px; }
+      100% { margin-left: 2px; }
+    }
+
+    @keyframes falling-star-sparkle {
+      0% { opacity: 0.9; }
+      50% { opacity: 1; }
+      100% { opacity: 0.86; }
+    }
+
     @media (max-width: 420px) {
       .problem-shell {
         gap: 10px;
+        grid-template-columns: minmax(0, 1fr) minmax(82px, 96px) 62px;
       }
 
       .problem-text {
@@ -260,6 +441,20 @@
       .answers {
         width: min(96px, 27vw);
         min-width: 84px;
+      }
+
+       .game-rail {
+        width: 62px;
+      }
+
+      .thermo {
+        width: 32px;
+        height: 164px;
+      }
+
+      .thermo-bulb {
+        width: 46px;
+        height: 46px;
       }
     }
   </style>
@@ -277,21 +472,53 @@
       <div class="problem-shell">
         <div class="problem-text" id="problem-text">7 - 4 =</div>
         <div class="answers" id="answers"></div>
+        <div class="game-rail" aria-label="Streak progress">
+          <div class="goal-star-shell" id="goal-star-shell" aria-hidden="true">
+            <span class="goal-star goal-star-off">★</span>
+            <span class="goal-star goal-star-on">★</span>
+          </div>
+          <div class="thermo" aria-hidden="true">
+            <div class="thermo-track">
+              <div class="thermo-fill" id="thermo-fill"></div>
+            </div>
+            <div class="thermo-bulb"></div>
+          </div>
+        </div>
       </div>
       <p class="status" id="status"></p>
-      <p class="hint">Tap the right answer to get a new problem.</p>
+    </section>
+    <section class="star-bank-section" aria-label="Collected stars">
+      <div class="star-bank-label">Star Parade</div>
+      <div class="stars-bank" id="stars-bank"></div>
     </section>
   </main>
 
   <script>
+    const mathConfig = {
+  "base_max_number": 10,
+  "base_min_number": 1,
+  "star_max_boost": 1,
+  "star_min_boost": 0
+};
     const answersElement = document.getElementById("answers");
     const problemTextElement = document.getElementById("problem-text");
     const statusElement = document.getElementById("status");
     const backLink = document.querySelector(".back-link");
+    const thermoFill = document.getElementById("thermo-fill");
+    const goalStarShell = document.getElementById("goal-star-shell");
+    const starsBank = document.getElementById("stars-bank");
     const palette = ["#fcd34d", "#93c5fd", "#f9a8d4"];
     const sparklePalette = ["#facc15", "#fb7185", "#60a5fa", "#34d399", "#c084fc"];
     const navigationPlayer = new Audio("../assets/audio/Menu/Back%20to%20home.m4a");
+    const uiPlayer = new Audio();
+    const magicPlayer = new Audio();
+    const correctAudio = "../assets/audio/UI_Sounds/ding%20sparkle.m4a";
+    const wrongAudio = "../assets/audio/UI_Sounds/Cartoon%20fail.m4a";
+    const magicAudio = "../assets/audio/UI_Sounds/Magic%20ga.m4a";
     let currentProblem = null;
+    let streakCount = 0;
+    let isResolving = false;
+    let roundFirstTry = true;
 
     async function playThenNavigate(audioPath, href) {
       if (!audioPath) {
@@ -318,12 +545,120 @@
       }
     }
 
-    function playCorrectSound() {
-      // Placeholder hook for future correct-answer audio.
+    async function playSound(audioPath, waitForEnd = false) {
+      if (!audioPath) {
+        return;
+      }
+
+      uiPlayer.pause();
+      uiPlayer.currentTime = 0;
+      uiPlayer.src = audioPath;
+
+      try {
+        await uiPlayer.play();
+        if (waitForEnd) {
+          await new Promise((resolve) => {
+            uiPlayer.addEventListener("ended", resolve, { once: true });
+          });
+        }
+      } catch (error) {
+        console.error("Unable to play UI audio", error);
+      }
+    }
+
+    async function playMagicSound() {
+      if (!magicAudio) {
+        return;
+      }
+
+      magicPlayer.pause();
+      magicPlayer.currentTime = 0;
+      magicPlayer.src = magicAudio;
+
+      try {
+        await magicPlayer.play();
+        await new Promise((resolve) => {
+          magicPlayer.addEventListener("ended", resolve, { once: true });
+        });
+      } catch (error) {
+        console.error("Unable to play magic audio", error);
+      }
+    }
+
+    function setMeterProgress(stepCount) {
+      const clamped = Math.max(0, Math.min(stepCount, 3));
+      const ratio = clamped / 3;
+      thermoFill.style.height = `${ratio * 100}%`;
+      goalStarShell.classList.toggle("lit", ratio >= 1);
+      document.documentElement.style.setProperty("--bulb-glow", String(0.22 + ratio * 0.58));
+    }
+
+    function wait(ms) {
+      return new Promise((resolve) => {
+        window.setTimeout(resolve, ms);
+      });
+    }
+
+    function addBankPlaceholder() {
+      const placeholder = document.createElement("span");
+      placeholder.className = "star-token placeholder";
+      placeholder.textContent = "⭐";
+      starsBank.appendChild(placeholder);
+      return placeholder;
+    }
+
+    function finalizeBankStar(placeholder) {
+      placeholder.classList.remove("placeholder");
+      placeholder.style.setProperty("--dance-delay", `${(starsBank.children.length - 1) * 90}ms`);
+    }
+
+    async function celebrateMilestone() {
+      const placeholder = addBankPlaceholder();
+      const startRect = goalStarShell.getBoundingClientRect();
+      const endRect = placeholder.getBoundingClientRect();
+      const floatingStar = document.createElement("span");
+      floatingStar.className = "floating-star";
+      floatingStar.textContent = "⭐";
+      floatingStar.style.left = `${startRect.left + startRect.width / 2}px`;
+      floatingStar.style.top = `${startRect.top + startRect.height / 2}px`;
+      document.body.appendChild(floatingStar);
+
+      const animationPromise = new Promise((resolve) => {
+        let settled = false;
+        const finish = () => {
+          if (settled) {
+            return;
+          }
+          settled = true;
+          resolve();
+        };
+
+        floatingStar.addEventListener("transitionend", finish, { once: true });
+        window.setTimeout(finish, 1300);
+      });
+
+      requestAnimationFrame(() => {
+        floatingStar.classList.add("is-dropping");
+        floatingStar.style.left = `${endRect.left + endRect.width / 2}px`;
+        floatingStar.style.top = `${endRect.top + endRect.height / 2}px`;
+      });
+
+      const magicPlayback = playMagicSound();
+      await animationPromise;
+      floatingStar.remove();
+      finalizeBankStar(placeholder);
+      streakCount = 0;
+      setMeterProgress(0);
+      await magicPlayback;
+      await wait(120);
     }
 
     function playWrongSound() {
-      // Placeholder hook for future wrong-answer audio.
+      return playSound(wrongAudio, true);
+    }
+
+    function playCorrectSound() {
+      return playSound(correctAudio, true);
     }
 
     backLink.addEventListener("click", (event) => {
@@ -344,17 +679,45 @@
       return copy;
     }
 
+    function getStarCount() {
+      return starsBank.querySelectorAll(".star-token:not(.placeholder)").length;
+    }
+
+    function getDifficultyBounds() {
+      const starCount = getStarCount();
+      const minNumber = mathConfig.base_min_number + starCount * mathConfig.star_min_boost;
+      const maxNumber = mathConfig.base_max_number + starCount * mathConfig.star_max_boost;
+      return {
+        minNumber,
+        maxNumber: Math.max(minNumber + 1, maxNumber),
+      };
+    }
+
     function buildProblem() {
+      const { minNumber, maxNumber } = getDifficultyBounds();
       const operation = Math.random() < 0.5 ? "+" : "-";
-      const right = randomInt(1, 9);
-      const left = operation === "+" ? randomInt(1, 20) : randomInt(right + 1, 20);
-      const correctAnswer = operation === "+" ? left + right : left - right;
+
+      let left;
+      let right;
+      let correctAnswer;
+
+      if (operation === "+") {
+        correctAnswer = randomInt(minNumber + 1, maxNumber);
+        const maxRight = Math.min(9, correctAnswer - minNumber);
+        right = randomInt(1, Math.max(1, maxRight));
+        left = correctAnswer - right;
+      } else {
+        left = randomInt(minNumber + 1, maxNumber);
+        correctAnswer = randomInt(minNumber, left - 1);
+        right = left - correctAnswer;
+      }
+
       const choices = new Set([correctAnswer]);
 
       while (choices.size < 3) {
         const offset = randomInt(-3, 3);
         const wrongAnswer = correctAnswer + offset;
-        if (wrongAnswer < 1 || wrongAnswer === correctAnswer) {
+        if (wrongAnswer < minNumber || wrongAnswer === correctAnswer) {
           continue;
         }
         choices.add(wrongAnswer);
@@ -374,6 +737,7 @@
 
     function renderProblem() {
       currentProblem = buildProblem();
+      roundFirstTry = true;
       problemTextElement.textContent = currentProblem.text;
       answersElement.innerHTML = "";
       setStatus("", "");
@@ -412,28 +776,56 @@
       }, 650);
     }
 
-    function handleAnswer(button, answer) {
+    async function handleAnswer(button, answer) {
+      if (isResolving || button.disabled) {
+        return;
+      }
+
       const buttons = [...answersElement.querySelectorAll(".answer-button")];
       if (answer === currentProblem.correctAnswer) {
-        playCorrectSound();
+        isResolving = true;
+        if (roundFirstTry) {
+          streakCount = Math.min(streakCount + 1, 3);
+          setMeterProgress(streakCount);
+        } else {
+          streakCount = 0;
+          setMeterProgress(0);
+        }
         button.classList.add("correct");
         burstSparkles(button);
         setStatus("Great job!", "good");
         buttons.forEach((item) => {
           item.disabled = true;
         });
-        window.setTimeout(renderProblem, 850);
+        await playCorrectSound();
+        if (streakCount === 3) {
+          setStatus("Star earned!", "good");
+          await celebrateMilestone();
+        }
+        isResolving = false;
+        renderProblem();
         return;
       }
 
-      playWrongSound();
+      isResolving = true;
+      roundFirstTry = false;
+      streakCount = 0;
+      setMeterProgress(0);
       button.classList.remove("wrong");
       void button.offsetWidth;
       button.classList.add("wrong");
-      button.disabled = true;
+      buttons.forEach((item) => {
+        item.disabled = true;
+      });
       setStatus("Try again!", "bad");
+      await playWrongSound();
+      buttons.forEach((item) => {
+        item.disabled = item === button;
+      });
+      isResolving = false;
     }
 
+    setMeterProgress(0);
     renderProblem();
   </script>
 </body>

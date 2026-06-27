@@ -2,15 +2,22 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import quote
 
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
+from config import MATH_CONFIG
+
 SHORT_SENTENCES_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Short sentences"
 LETTER_SOUNDS_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Letters" / "Learning"
 MENU_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Menu"
+UI_SOUNDS_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "UI_Sounds"
 VOCABULARY_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Vocabulary"
 TEMPLATE_PATH = ROOT_DIR / "html_template" / "lesson_template.html"
 HOME_TEMPLATE_PATH = ROOT_DIR / "html_template" / "home_template.html"
@@ -24,6 +31,7 @@ INDEX_PATH = ROOT_DIR / "index.html"
 PLACEHOLDER = "__LESSONS_JSON__"
 MENU_PLACEHOLDER = "__MENU_JSON__"
 PAGE_CONFIG_PLACEHOLDER = "__PAGE_CONFIG_JSON__"
+MATH_CONFIG_PLACEHOLDER = "__MATH_CONFIG_JSON__"
 FILENAME_PATTERN = re.compile(r"^(?P<emoji>.+?)\s*-\s*(?P<text>.+)$")
 VOCABULARY_PATTERN = re.compile(r"^(?P<word>.+?)\s+(?P<emoji>\S+)$")
 
@@ -59,6 +67,13 @@ def build_menu_audio_map() -> dict[str, str]:
     return {
         audio_path.stem.casefold(): encode_relative_path(audio_path, from_output_dir=False)
         for audio_path in MENU_AUDIO_DIR.glob("*.m4a")
+    }
+
+
+def build_ui_sound_map(*, from_output_dir: bool = True) -> dict[str, str]:
+    return {
+        audio_path.stem.casefold(): encode_relative_path(audio_path, from_output_dir=from_output_dir)
+        for audio_path in UI_SOUNDS_AUDIO_DIR.glob("*.m4a")
     }
 
 
@@ -257,10 +272,18 @@ def render_home_html() -> str:
     return template.replace(MENU_PLACEHOLDER, menu_json)
 
 
+def render_math_html() -> str:
+    template = MATH_TEMPLATE_PATH.read_text(encoding="utf-8")
+    if MATH_CONFIG_PLACEHOLDER not in template:
+        raise ValueError(f"Template is missing placeholder {MATH_CONFIG_PLACEHOLDER}")
+    return template.replace(MATH_CONFIG_PLACEHOLDER, json.dumps(MATH_CONFIG, ensure_ascii=False, indent=2))
+
+
 def render_reading_html() -> str:
     template = READING_TEMPLATE_PATH.read_text(encoding="utf-8")
     vocabulary = build_vocabulary()
     letter_audio_map = build_letter_audio_map()
+    ui_sounds = build_ui_sound_map()
 
     for item in vocabulary:
         letter_buttons: list[dict[str, str]] = []
@@ -276,6 +299,9 @@ def render_reading_html() -> str:
         "subtitle": "đọc",
         "description": "Tap the letters, then choose the matching picture.",
         "backAudio": encode_relative_path(MENU_AUDIO_DIR / "Back to home.m4a"),
+        "correctAudio": ui_sounds.get("ding sparkle", ""),
+        "wrongAudio": ui_sounds.get("cartoon fail", ""),
+        "magicAudio": ui_sounds.get("magic ga", ""),
         "vocabulary": vocabulary,
     }
     if PAGE_CONFIG_PLACEHOLDER not in template:
@@ -304,7 +330,7 @@ def main() -> None:
         button_style="letter-sounds",
     )
     home_html = render_home_html()
-    math_html = MATH_TEMPLATE_PATH.read_text(encoding="utf-8")
+    math_html = render_math_html()
     reading_html = render_reading_html()
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_PATH.write_text(lesson_html, encoding="utf-8")
