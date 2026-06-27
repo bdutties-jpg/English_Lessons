@@ -8,6 +8,9 @@
   <meta name="apple-mobile-web-app-title" content="English Playtime" />
   <meta name="application-name" content="English Playtime" />
   <meta name="theme-color" content="#7dd3fc" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="../assets/icons/icon-512.png" />
@@ -231,6 +234,8 @@
   </main>
 
   <script>
+    const appVersion = "__APP_VERSION__";
+    const versionInfoPath = "../app_version.json";
     const pageConfig = __PAGE_CONFIG_JSON__;
     const lessons = __LESSONS_JSON__;
     const palette = ["#fde68a", "#fca5a5", "#86efac", "#93c5fd", "#f9a8d4", "#fdba74"];
@@ -242,6 +247,30 @@
     const player = new Audio();
     const navigationPlayer = new Audio();
     let activeButton = null;
+
+    function withVersion(href, version = appVersion) {
+      const url = new URL(href, window.location.href);
+      url.searchParams.set("v", version);
+      return url.toString();
+    }
+
+    async function ensureLatestVersion() {
+      try {
+        const response = await fetch(`${versionInfoPath}?t=${Date.now()}`, { cache: "no-store" });
+        if (!response.ok) {
+          return;
+        }
+
+        const latest = await response.json();
+        if (!latest.version || latest.version === appVersion) {
+          return;
+        }
+
+        window.location.replace(withVersion(window.location.pathname + window.location.search + window.location.hash, latest.version));
+      } catch (error) {
+        console.error("Unable to check app version", error);
+      }
+    }
 
     pageTitle.textContent = pageConfig.title;
     pageSubtitle.textContent = pageConfig.subtitle;
@@ -258,8 +287,9 @@
     }
 
     async function playThenNavigate(audioPath, href) {
+      const destination = withVersion(href);
       if (!audioPath) {
-        window.location.href = href;
+        window.location.href = destination;
         return;
       }
 
@@ -272,15 +302,17 @@
         navigationPlayer.addEventListener(
           "ended",
           () => {
-            window.location.href = href;
+            window.location.href = destination;
           },
           { once: true }
         );
       } catch (error) {
         console.error("Unable to play back audio", error);
-        window.location.href = href;
+        window.location.href = destination;
       }
     }
+
+    void ensureLatestVersion();
 
     player.addEventListener("ended", clearPlayingState);
     player.addEventListener("pause", clearPlayingState);

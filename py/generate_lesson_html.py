@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
 import json
 import re
 import sys
@@ -28,12 +29,15 @@ MATH_OUTPUT_PATH = ROOT_DIR / "output" / "math.html"
 READING_OUTPUT_PATH = ROOT_DIR / "output" / "reading.html"
 LETTER_SOUNDS_OUTPUT_PATH = ROOT_DIR / "output" / "letter_sounds.html"
 INDEX_PATH = ROOT_DIR / "index.html"
+APP_VERSION_PATH = ROOT_DIR / "app_version.json"
 PLACEHOLDER = "__LESSONS_JSON__"
 MENU_PLACEHOLDER = "__MENU_JSON__"
 PAGE_CONFIG_PLACEHOLDER = "__PAGE_CONFIG_JSON__"
 MATH_CONFIG_PLACEHOLDER = "__MATH_CONFIG_JSON__"
+APP_VERSION_PLACEHOLDER = "__APP_VERSION__"
 FILENAME_PATTERN = re.compile(r"^(?P<emoji>.+?)\s*-\s*(?P<text>.+)$")
 VOCABULARY_PATTERN = re.compile(r"^(?P<word>.+?)\s+(?P<emoji>\S+)$")
+APP_VERSION = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
 
 
 @dataclass(frozen=True)
@@ -61,6 +65,12 @@ def encode_relative_path(path: Path, *, from_output_dir: bool = True) -> str:
     relative_path = path.relative_to(ROOT_DIR)
     encoded_path = "/".join(quote(part) for part in relative_path.parts)
     return f"../{encoded_path}" if from_output_dir else encoded_path
+
+
+def apply_app_version(template: str) -> str:
+    if APP_VERSION_PLACEHOLDER not in template:
+        raise ValueError(f"Template is missing placeholder {APP_VERSION_PLACEHOLDER}")
+    return template.replace(APP_VERSION_PLACEHOLDER, APP_VERSION)
 
 
 def build_menu_audio_map() -> dict[str, str]:
@@ -209,7 +219,7 @@ def render_audio_grid_page(
     title_uppercase: bool = True,
     button_style: str = "default",
 ) -> str:
-    template = TEMPLATE_PATH.read_text(encoding="utf-8")
+    template = apply_app_version(TEMPLATE_PATH.read_text(encoding="utf-8"))
     lessons_json = json.dumps(items, ensure_ascii=False, indent=2)
     page_config = json.dumps(
         {
@@ -234,7 +244,7 @@ def render_audio_grid_page(
 
 
 def render_home_html() -> str:
-    template = HOME_TEMPLATE_PATH.read_text(encoding="utf-8")
+    template = apply_app_version(HOME_TEMPLATE_PATH.read_text(encoding="utf-8"))
     menu_audio = build_menu_audio_map()
     menu_items = [
         {
@@ -273,14 +283,14 @@ def render_home_html() -> str:
 
 
 def render_math_html() -> str:
-    template = MATH_TEMPLATE_PATH.read_text(encoding="utf-8")
+    template = apply_app_version(MATH_TEMPLATE_PATH.read_text(encoding="utf-8"))
     if MATH_CONFIG_PLACEHOLDER not in template:
         raise ValueError(f"Template is missing placeholder {MATH_CONFIG_PLACEHOLDER}")
     return template.replace(MATH_CONFIG_PLACEHOLDER, json.dumps(MATH_CONFIG, ensure_ascii=False, indent=2))
 
 
 def render_reading_html() -> str:
-    template = READING_TEMPLATE_PATH.read_text(encoding="utf-8")
+    template = apply_app_version(READING_TEMPLATE_PATH.read_text(encoding="utf-8"))
     vocabulary = build_vocabulary()
     letter_audio_map = build_letter_audio_map()
     ui_sounds = build_ui_sound_map()
@@ -338,11 +348,13 @@ def main() -> None:
     READING_OUTPUT_PATH.write_text(reading_html, encoding="utf-8")
     LETTER_SOUNDS_OUTPUT_PATH.write_text(letter_sounds_html, encoding="utf-8")
     INDEX_PATH.write_text(home_html, encoding="utf-8")
+    APP_VERSION_PATH.write_text(json.dumps({"version": APP_VERSION}, indent=2), encoding="utf-8")
     print(f"Wrote {len(lessons)} buttons to {OUTPUT_PATH}")
     print(f"Wrote math page to {MATH_OUTPUT_PATH}")
     print(f"Wrote reading page to {READING_OUTPUT_PATH}")
     print(f"Wrote {len(letter_sounds)} buttons to {LETTER_SOUNDS_OUTPUT_PATH}")
     print(f"Wrote home page to {INDEX_PATH}")
+    print(f"Wrote app version to {APP_VERSION_PATH}")
 
 
 if __name__ == "__main__":
