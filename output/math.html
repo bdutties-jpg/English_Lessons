@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="English Playtime" />
   <meta name="application-name" content="English Playtime" />
   <meta name="theme-color" content="#a5f3fc" />
-  <meta name="app-version" content="20260627221624" />
+  <meta name="app-version" content="20260627223829" />
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="../assets/icons/icon-512.png" />
@@ -545,12 +545,12 @@
   </main>
 
   <script>
-    const appVersion = "20260627221624";
+    const appVersion = "20260627223829";
     const versionInfoPath = "../app_version.json";
     const mathConfig = {
   "base_max_number": 10,
   "base_min_number": 1,
-  "correct_answer_per_star": 1,
+  "correct_answer_per_star": 3,
   "star_max_boost": 1,
   "star_min_boost": 0,
   "correct_answer": "../assets/audio/UI_Sounds/ding%20sparkle.m4a",
@@ -974,12 +974,12 @@
       });
 
       const magicPlayback = playMagicSound();
+  streakCount = 0;
+  setMeterProgress(0);
       await animationPromise;
       floatingStar.remove();
       finalizeBankStar(placeholder);
       const totalStars = getStarCount();
-      streakCount = 0;
-      setMeterProgress(0);
       await magicPlayback;
       await wait(120);
       return totalStars;
@@ -1132,11 +1132,15 @@
         await playCorrectSound();
         if (streakCount === correctAnswersPerStar) {
           setStatus("Star earned!", "good");
-          const totalStars = await celebrateMilestone();
+          const milestonePromise = celebrateMilestone();
+          renderProblem();
+          const totalStars = await milestonePromise;
           if (totalStars > 0 && totalStars % 7 === 0) {
             setStatus("Star party!", "good");
             await runStarParty();
           }
+          isResolving = false;
+          return;
         }
         isResolving = false;
         renderProblem();

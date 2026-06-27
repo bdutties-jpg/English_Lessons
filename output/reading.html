@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="English Playtime" />
   <meta name="application-name" content="English Playtime" />
   <meta name="theme-color" content="#f9a8d4" />
-  <meta name="app-version" content="20260627221624" />
+  <meta name="app-version" content="20260627223829" />
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="../assets/icons/icon-512.png" />
@@ -588,7 +588,7 @@
   </main>
 
   <script>
-    const appVersion = "20260627221624";
+    const appVersion = "20260627223829";
     const versionInfoPath = "../app_version.json";
     const pageConfig = {
   "title": "Reading",
@@ -1362,12 +1362,12 @@
       });
 
       const magicPlayback = playMagicSound();
+  streakCount = 0;
+  setMeterProgress(0);
       await animationPromise;
       floatingStar.remove();
       finalizeBankStar(placeholder);
       const totalStars = getStarCount();
-      streakCount = 0;
-      setMeterProgress(0);
       await magicPlayback;
       await wait(120);
       return totalStars;
@@ -1590,11 +1590,15 @@
         await playback;
         if (streakCount === correctAnswersPerStar) {
           setStatus("Star earned!", "good");
-          const totalStars = await celebrateMilestone();
+          const milestonePromise = celebrateMilestone();
+          renderProblem();
+          const totalStars = await milestonePromise;
           if (totalStars > 0 && totalStars % 7 === 0) {
             setStatus("Star party!", "good");
             await runStarParty();
           }
+          isResolving = false;
+          return;
         }
         isResolving = false;
         window.setTimeout(renderProblem, 250);

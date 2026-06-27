@@ -964,12 +964,12 @@
       });
 
       const magicPlayback = playMagicSound();
+  streakCount = 0;
+  setMeterProgress(0);
       await animationPromise;
       floatingStar.remove();
       finalizeBankStar(placeholder);
       const totalStars = getStarCount();
-      streakCount = 0;
-      setMeterProgress(0);
       await magicPlayback;
       await wait(120);
       return totalStars;
@@ -1122,11 +1122,15 @@
         await playCorrectSound();
         if (streakCount === correctAnswersPerStar) {
           setStatus("Star earned!", "good");
-          const totalStars = await celebrateMilestone();
+          const milestonePromise = celebrateMilestone();
+          renderProblem();
+          const totalStars = await milestonePromise;
           if (totalStars > 0 && totalStars % 7 === 0) {
             setStatus("Star party!", "good");
             await runStarParty();
           }
+          isResolving = false;
+          return;
         }
         isResolving = false;
         renderProblem();
