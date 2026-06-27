@@ -1,10 +1,8 @@
-MATH_CONFIG = {
+READING_CONFIG = {
     # Progressive Difficulty
-    "base_max_number": 10,
-    "base_min_number": 1,
 
     # Star Mechanics
-    "correct_answer_per_star": 3,
+    "correct_answer_per_star": 1,
     "star_max_boost": 1,
     "star_min_boost": 0,
 
@@ -13,4 +11,7 @@ MATH_CONFIG = {
     "wrong_answer": "assets/audio/UI_Sounds/Uuugh.m4a",
     "star_celebration": "assets/audio/UI_Sounds/Magic ga.m4a",
     "star_party": "assets/audio/UI_Sounds/rocket-road.m4a",
+
+    # UI Mechanics
+    "iteration_delay_ms": 1000,
 }

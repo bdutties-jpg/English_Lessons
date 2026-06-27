@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="English Playtime" />
   <meta name="application-name" content="English Playtime" />
   <meta name="theme-color" content="#f9a8d4" />
-  <meta name="app-version" content="20260627025719" />
+  <meta name="app-version" content="20260627221624" />
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="../assets/icons/icon-512.png" />
@@ -273,6 +273,45 @@
       transform: translate(-50%, -50%) scale(0.86) rotate(540deg);
     }
 
+    .party-mode .hero,
+    .party-mode .card,
+    .party-mode .topbar,
+    .party-mode .letters-row,
+    .party-mode .answers,
+    .party-mode .game-rail,
+    .party-mode .star-bank-section {
+      animation: party-sway 860ms ease-in-out infinite alternate;
+      transform-origin: center;
+    }
+
+    .party-star {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 50;
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      font-size: 2.25rem;
+      line-height: 1;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.98)) drop-shadow(0 0 18px rgba(250, 204, 21, 0.82));
+      animation: party-star-twinkle 420ms ease-in-out infinite alternate;
+      will-change: left, top, transform;
+    }
+
+    .party-star.returning {
+      transition: left 980ms cubic-bezier(0.22, 1, 0.36, 1), top 980ms cubic-bezier(0.22, 1, 0.36, 1), transform 980ms cubic-bezier(0.22, 1, 0.36, 1), opacity 980ms ease;
+      transform: translate(-50%, -50%) scale(0.88);
+    }
+
+    .star-token.return-slot {
+      opacity: 0;
+      animation: none;
+    }
+
     .letters-row {
       display: flex;
       align-items: center;
@@ -299,9 +338,20 @@
       transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
     }
 
+    .letter-button.is-playing {
+      transform: translateY(-5px) scale(1.18);
+      box-shadow: 0 12px 0 rgba(255, 255, 255, 0.78), 0 18px 28px rgba(31, 41, 55, 0.24);
+      filter: saturate(1.12) brightness(1.05);
+      animation: letter-rock 90ms ease-in-out infinite alternate;
+    }
+
     .letter-button:active {
       transform: translateY(5px) scale(0.98);
       box-shadow: 0 3px 0 rgba(255, 255, 255, 0.75), 0 8px 14px rgba(31, 41, 55, 0.18);
+    }
+
+    .letter-button:disabled {
+      cursor: default;
     }
 
     .letter-button:focus-visible,
@@ -351,8 +401,26 @@
       animation: wrong-shake 360ms ease;
     }
 
+    .emoji-button.is-playing {
+      transform: translateY(-5px) scale(1.18);
+      box-shadow: 0 12px 0 rgba(255, 255, 255, 0.78), 0 18px 28px rgba(31, 41, 55, 0.24);
+      filter: saturate(1.12) brightness(1.05);
+      animation: letter-rock 90ms ease-in-out infinite alternate;
+      z-index: 2;
+    }
+
     .emoji-button.sparkle-burst .sparkle {
       animation: sparkle-burst 620ms ease-out forwards;
+    }
+
+    @keyframes letter-rock {
+      from {
+        transform: translateY(-5px) scale(1.18) rotate(-6deg);
+      }
+
+      to {
+        transform: translateY(-5px) scale(1.18) rotate(6deg);
+      }
     }
 
     .sparkle {
@@ -444,6 +512,16 @@
       100% { opacity: 0.86; }
     }
 
+    @keyframes party-sway {
+      from { transform: rotate(-1.7deg) scale(1); }
+      to { transform: rotate(1.7deg) scale(1.02); }
+    }
+
+    @keyframes party-star-twinkle {
+      from { transform: translate(-50%, -50%) scale(0.92) rotate(-10deg); }
+      to { transform: translate(-50%, -50%) scale(1.12) rotate(10deg); }
+    }
+
     @media (max-width: 480px) {
       .problem-shell {
         gap: 10px;
@@ -510,16 +588,23 @@
   </main>
 
   <script>
-    const appVersion = "20260627025719";
+    const appVersion = "20260627221624";
     const versionInfoPath = "../app_version.json";
     const pageConfig = {
   "title": "Reading",
   "subtitle": "đọc",
   "description": "Tap the letters, then choose the matching picture.",
   "backAudio": "../assets/audio/Menu/Back%20to%20home.m4a",
-  "correctAudio": "../assets/audio/UI_Sounds/ding%20sparkle.m4a",
-  "wrongAudio": "../assets/audio/UI_Sounds/Cartoon%20fail.m4a",
-  "magicAudio": "../assets/audio/UI_Sounds/Magic%20ga.m4a",
+  "readingConfig": {
+    "correct_answer_per_star": 1,
+    "star_max_boost": 1,
+    "star_min_boost": 0,
+    "correct_answer": "../assets/audio/UI_Sounds/ding%20sparkle.m4a",
+    "wrong_answer": "../assets/audio/UI_Sounds/Uuugh.m4a",
+    "star_celebration": "../assets/audio/UI_Sounds/Magic%20ga.m4a",
+    "star_party": "../assets/audio/UI_Sounds/rocket-road.m4a",
+    "iteration_delay_ms": 1000
+  },
   "vocabulary": [
     {
       "word": "Cat",
@@ -618,6 +703,9 @@
     }
   ]
 };
+    const readingConfig = pageConfig.readingConfig || {};
+    const correctAnswersPerStar = Math.max(1, Number(readingConfig.correct_answer_per_star) || 1);
+    const iterationDelayMs = Math.max(0, Number(readingConfig.iteration_delay_ms) || 0);
     const pageTitle = document.getElementById("page-title");
     const pageSubtitle = document.getElementById("page-subtitle");
     const lettersRow = document.getElementById("letters-row");
@@ -633,12 +721,24 @@
     const uiPlayer = new Audio();
     const magicPlayer = new Audio();
     const letterPlayer = new Audio();
+    const partyPlayer = new Audio();
     const wordPlayer = new Audio();
+    const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+    let letterAudioContext = null;
+    const letterAudioBufferCache = new Map();
     let currentProblem = null;
     const recentWords = [];
     let streakCount = 0;
     let isResolving = false;
     let roundFirstTry = true;
+    let letterSequenceRunId = 0;
+    let letterSequenceFinishTimer = 0;
+    let activeLetterSources = [];
+    let activeLetterAnimationTimers = [];
+    let isLetterSequencePlaying = false;
+    let activePreviewSequenceRunId = 0;
+    let flyingPartyStars = [];
+    let partyAnimationFrame = null;
 
     function withVersion(href, version = appVersion) {
       const url = new URL(href, window.location.href);
@@ -738,21 +838,21 @@
     }
 
     async function playCorrectSound() {
-      await playUiSound(pageConfig.correctAudio);
+      await playUiSound(readingConfig.correct_answer);
     }
 
     async function playWrongSound() {
-      await playUiSound(pageConfig.wrongAudio);
+      await playUiSound(readingConfig.wrong_answer);
     }
 
     async function playMagicSound() {
-      if (!pageConfig.magicAudio) {
+      if (!readingConfig.star_celebration) {
         return;
       }
 
       magicPlayer.pause();
       magicPlayer.currentTime = 0;
-      magicPlayer.src = pageConfig.magicAudio;
+      magicPlayer.src = readingConfig.star_celebration;
 
       try {
         await magicPlayer.play();
@@ -764,12 +864,256 @@
       }
     }
 
+    async function getAudioDuration(audioPath) {
+      if (!audioPath) {
+        return 0;
+      }
+
+      return await new Promise((resolve) => {
+        const probe = new Audio();
+        const finish = (value) => {
+          probe.src = "";
+          resolve(value);
+        };
+
+        probe.preload = "metadata";
+        probe.src = audioPath;
+        if (probe.readyState >= 1 && Number.isFinite(probe.duration)) {
+          finish(probe.duration);
+          return;
+        }
+
+        probe.addEventListener(
+          "loadedmetadata",
+          () => {
+            finish(Number.isFinite(probe.duration) ? probe.duration : 0);
+          },
+          { once: true }
+        );
+        probe.addEventListener("error", () => finish(0), { once: true });
+      });
+    }
+
+    async function playPartySound() {
+      if (!readingConfig.star_party) {
+        return;
+      }
+
+      partyPlayer.pause();
+      partyPlayer.currentTime = 0;
+      partyPlayer.src = readingConfig.star_party;
+
+      try {
+        await partyPlayer.play();
+        await new Promise((resolve) => {
+          partyPlayer.addEventListener("ended", resolve, { once: true });
+        });
+      } catch (error) {
+        console.error("Unable to play party audio", error);
+      }
+    }
+
     function setMeterProgress(stepCount) {
-      const clamped = Math.max(0, Math.min(stepCount, 3));
-      const ratio = clamped / 3;
+      const clamped = Math.max(0, Math.min(stepCount, correctAnswersPerStar));
+      const ratio = clamped / correctAnswersPerStar;
       thermoFill.style.height = `${ratio * 100}%`;
       goalStarShell.classList.toggle("lit", ratio >= 1);
       document.documentElement.style.setProperty("--bulb-glow", String(0.22 + ratio * 0.58));
+    }
+
+    function clearLetterAnimationTimers() {
+      activeLetterAnimationTimers.forEach((timerId) => {
+        window.clearTimeout(timerId);
+      });
+      activeLetterAnimationTimers = [];
+    }
+
+    function clearLetterSequenceFinishTimer() {
+      if (letterSequenceFinishTimer) {
+        window.clearTimeout(letterSequenceFinishTimer);
+        letterSequenceFinishTimer = 0;
+      }
+    }
+
+    function setLetterButtonsDisabled(disabled) {
+      lettersRow.querySelectorAll(".letter-button").forEach((button) => {
+        button.disabled = disabled;
+      });
+    }
+
+    function clearLetterButtonAnimation() {
+      lettersRow.querySelectorAll(".letter-button.is-playing").forEach((button) => {
+        button.classList.remove("is-playing");
+      });
+    }
+
+    function clearEmojiPreviewAnimation() {
+      answersElement.querySelectorAll(".emoji-button.is-playing").forEach((button) => {
+        button.classList.remove("is-playing");
+      });
+    }
+
+    function finishLetterSequence(runId) {
+      if (runId !== letterSequenceRunId) {
+        return;
+      }
+
+      clearLetterSequenceFinishTimer();
+      clearLetterAnimationTimers();
+      clearLetterButtonAnimation();
+      activeLetterSources = [];
+      isLetterSequencePlaying = false;
+      setLetterButtonsDisabled(false);
+    }
+
+    function stopLetterSequencePlayback(cancelPreview = true) {
+      letterSequenceRunId += 1;
+      if (cancelPreview) {
+        activePreviewSequenceRunId += 1;
+      }
+      clearLetterSequenceFinishTimer();
+      clearLetterAnimationTimers();
+      clearLetterButtonAnimation();
+      clearEmojiPreviewAnimation();
+      activeLetterSources.forEach((source) => {
+        try {
+          source.stop();
+        } catch (error) {
+          void error;
+        }
+      });
+      activeLetterSources = [];
+      letterPlayer.pause();
+      letterPlayer.currentTime = 0;
+      wordPlayer.pause();
+      wordPlayer.currentTime = 0;
+      isLetterSequencePlaying = false;
+      setLetterButtonsDisabled(false);
+    }
+
+    function scheduleLetterButtonAnimation(button, startDelayMs, durationMs, runId) {
+      const startTimer = window.setTimeout(() => {
+        if (runId !== letterSequenceRunId || !button) {
+          return;
+        }
+
+        button.classList.add("is-playing");
+      }, Math.max(0, startDelayMs));
+
+      const stopTimer = window.setTimeout(() => {
+        if (runId !== letterSequenceRunId || !button) {
+          return;
+        }
+
+        button.classList.remove("is-playing");
+      }, Math.max(0, startDelayMs + durationMs));
+
+      activeLetterAnimationTimers.push(startTimer, stopTimer);
+    }
+
+    function getLetterAudioContext() {
+      if (!AudioContextCtor) {
+        return null;
+      }
+
+      if (!letterAudioContext) {
+        letterAudioContext = new AudioContextCtor();
+      }
+
+      return letterAudioContext;
+    }
+
+    async function getLetterAudioBuffer(audioPath) {
+      const audioContext = getLetterAudioContext();
+      if (!audioContext || !audioPath) {
+        return null;
+      }
+
+      let bufferPromise = letterAudioBufferCache.get(audioPath);
+      if (!bufferPromise) {
+        bufferPromise = (async () => {
+          const response = await fetch(audioPath, { cache: "force-cache" });
+          if (!response.ok) {
+            throw new Error(`Unable to fetch letter audio: ${audioPath}`);
+          }
+
+          const audioBytes = await response.arrayBuffer();
+          return audioContext.decodeAudioData(audioBytes);
+        })();
+        letterAudioBufferCache.set(audioPath, bufferPromise);
+      }
+
+      return bufferPromise;
+    }
+
+    function primeLetterAudioBuffers(letters) {
+      if (!AudioContextCtor) {
+        return;
+      }
+
+      letters.forEach((letter) => {
+        void getLetterAudioBuffer(letter.audio).catch((error) => {
+          console.error("Unable to preload letter audio", error);
+        });
+      });
+    }
+
+    async function playLetterSequenceFallback(letters, letterButtons, runId) {
+      try {
+        for (let index = 0; index < letters.length; index += 1) {
+          if (runId !== letterSequenceRunId) {
+            return;
+          }
+
+          const letter = letters[index];
+          const button = letterButtons[index];
+          button?.classList.add("is-playing");
+          await playLetterSound(letter.audio);
+          button?.classList.remove("is-playing");
+        }
+      } finally {
+        finishLetterSequence(runId);
+      }
+    }
+
+    async function playPromptSequence() {
+      if (!currentProblem || !currentProblem.answers.length || isLetterSequencePlaying) {
+        return;
+      }
+
+      const previewRunId = activePreviewSequenceRunId + 1;
+      activePreviewSequenceRunId = previewRunId;
+      const answerButtons = [...answersElement.querySelectorAll(".emoji-button")];
+
+      setLetterButtonsDisabled(true);
+
+      try {
+        for (let index = 0; index < currentProblem.answers.length; index += 1) {
+          if (previewRunId !== activePreviewSequenceRunId) {
+            return;
+          }
+
+          await playLetterSequence(false);
+          if (previewRunId !== activePreviewSequenceRunId) {
+            return;
+          }
+
+          const answer = currentProblem.answers[index];
+          const answerButton = answerButtons[index];
+          answerButton?.classList.add("is-playing");
+          await playWordSound(answer.audio);
+          answerButton?.classList.remove("is-playing");
+
+          if (index < currentProblem.answers.length - 1) {
+            await wait(iterationDelayMs);
+          }
+        }
+      } finally {
+        clearEmojiPreviewAnimation();
+        if (previewRunId === activePreviewSequenceRunId) {
+          setLetterButtonsDisabled(false);
+        }
+      }
     }
 
     function wait(ms) {
@@ -789,6 +1133,201 @@
     function finalizeBankStar(placeholder) {
       placeholder.classList.remove("placeholder");
       placeholder.style.setProperty("--dance-delay", `${(starsBank.children.length - 1) * 90}ms`);
+    }
+
+    function getVisibleStarTokens() {
+      return [...starsBank.querySelectorAll(".star-token:not(.placeholder):not(.return-slot)")];
+    }
+
+    function animateBankCompaction(removedToken, durationMs) {
+      const tokens = getVisibleStarTokens();
+      const beforeRects = new Map(tokens.map((token) => [token, token.getBoundingClientRect()]));
+      removedToken.remove();
+      getVisibleStarTokens().forEach((token) => {
+        const beforeRect = beforeRects.get(token);
+        const afterRect = token.getBoundingClientRect();
+        const dx = beforeRect.left - afterRect.left;
+        const dy = beforeRect.top - afterRect.top;
+        if (dx === 0 && dy === 0) {
+          return;
+        }
+
+        token.animate(
+          [
+            { transform: `translate(${dx}px, ${dy}px)` },
+            { transform: "translate(0, 0)" },
+          ],
+          {
+            duration: durationMs,
+            easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+            fill: "both",
+          }
+        );
+      });
+    }
+
+    function createPartyStarFromToken(token) {
+      const rect = token.getBoundingClientRect();
+      const star = document.createElement("span");
+      star.className = "party-star";
+      star.textContent = "⭐";
+      document.body.appendChild(star);
+
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 220 * (0.8 + Math.random() * 0.4);
+
+      return {
+        element: star,
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: Math.max(rect.width, 40),
+      };
+    }
+
+    function renderPartyStar(star) {
+      star.element.style.left = `${star.x}px`;
+      star.element.style.top = `${star.y}px`;
+    }
+
+    function startPartyPhysics() {
+      let lastTime = performance.now();
+
+      const step = (now) => {
+        const dt = Math.min((now - lastTime) / 1000, 0.04);
+        lastTime = now;
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        flyingPartyStars.forEach((star) => {
+          star.x += star.vx * dt;
+          star.y += star.vy * dt;
+
+          const half = star.size / 2;
+          if (star.x <= half) {
+            star.x = half;
+            star.vx = Math.abs(star.vx);
+          } else if (star.x >= viewportWidth - half) {
+            star.x = viewportWidth - half;
+            star.vx = -Math.abs(star.vx);
+          }
+
+          if (star.y <= half) {
+            star.y = half;
+            star.vy = Math.abs(star.vy);
+          } else if (star.y >= viewportHeight - half) {
+            star.y = viewportHeight - half;
+            star.vy = -Math.abs(star.vy);
+          }
+
+          renderPartyStar(star);
+        });
+
+        partyAnimationFrame = window.requestAnimationFrame(step);
+      };
+
+      if (partyAnimationFrame) {
+        window.cancelAnimationFrame(partyAnimationFrame);
+      }
+      partyAnimationFrame = window.requestAnimationFrame(step);
+    }
+
+    function stopPartyPhysics() {
+      if (partyAnimationFrame) {
+        window.cancelAnimationFrame(partyAnimationFrame);
+        partyAnimationFrame = null;
+      }
+    }
+
+    function createReturnSlots(count) {
+      const slots = [];
+      for (let index = 0; index < count; index += 1) {
+        const slot = document.createElement("span");
+        slot.className = "star-token return-slot";
+        slot.textContent = "⭐";
+        starsBank.appendChild(slot);
+        slots.push(slot);
+      }
+      return slots;
+    }
+
+    async function returnPartyStars(slots) {
+      const animations = flyingPartyStars.map((star, index) => {
+        const slot = slots[index];
+        const rect = slot.getBoundingClientRect();
+        return new Promise((resolve) => {
+          let settled = false;
+          const finish = () => {
+            if (settled) {
+              return;
+            }
+            settled = true;
+            resolve();
+          };
+
+          star.element.addEventListener("transitionend", finish, { once: true });
+          window.setTimeout(finish, 1100);
+          star.element.classList.add("returning");
+          star.element.style.left = `${rect.left + rect.width / 2}px`;
+          star.element.style.top = `${rect.top + rect.height / 2}px`;
+        });
+      });
+
+      await Promise.all(animations);
+
+      flyingPartyStars.forEach((star) => {
+        star.element.remove();
+      });
+      flyingPartyStars = [];
+
+      slots.forEach((slot, index) => {
+        slot.classList.remove("return-slot");
+        slot.style.setProperty("--dance-delay", `${index * 90}ms`);
+      });
+    }
+
+    function getStarCount() {
+      return starsBank.querySelectorAll(".star-token:not(.placeholder)").length;
+    }
+
+    async function runStarParty() {
+      const starCount = getStarCount();
+      if (!readingConfig.star_party || starCount === 0) {
+        return;
+      }
+
+      document.body.classList.add("party-mode");
+      const totalDurationMs = Math.max(await getAudioDuration(readingConfig.star_party) * 1000, 1000);
+      const intervalMs = starCount > 1 ? totalDurationMs / (starCount + 2) : totalDurationMs;
+      const compactionDuration = Math.max(90, Math.min(540, intervalMs * 0.78));
+      const playback = playPartySound();
+
+      startPartyPhysics();
+
+      for (let index = 0; index < starCount; index += 1) {
+        const token = getVisibleStarTokens()[0];
+        if (!token) {
+          break;
+        }
+
+        const partyStar = createPartyStarFromToken(token);
+        flyingPartyStars.push(partyStar);
+        renderPartyStar(partyStar);
+        animateBankCompaction(token, compactionDuration);
+
+        if (index < starCount - 1) {
+          await wait(intervalMs);
+        }
+      }
+
+      await playback;
+      stopPartyPhysics();
+
+      const slots = createReturnSlots(starCount);
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      await returnPartyStars(slots);
+      document.body.classList.remove("party-mode");
     }
 
     async function celebrateMilestone() {
@@ -826,19 +1365,103 @@
       await animationPromise;
       floatingStar.remove();
       finalizeBankStar(placeholder);
+      const totalStars = getStarCount();
       streakCount = 0;
       setMeterProgress(0);
       await magicPlayback;
       await wait(120);
+      return totalStars;
     }
 
-    function playLetterSound(audioPath) {
+    async function playLetterSound(audioPath) {
+      if (!audioPath) {
+        return;
+      }
+
       letterPlayer.pause();
       letterPlayer.currentTime = 0;
       letterPlayer.src = audioPath;
-      letterPlayer.play().catch((error) => {
+
+      try {
+        await letterPlayer.play();
+        await new Promise((resolve) => {
+          const finish = () => {
+            letterPlayer.removeEventListener("ended", finish);
+            letterPlayer.removeEventListener("error", finish);
+            resolve();
+          };
+
+          letterPlayer.addEventListener("ended", finish, { once: true });
+          letterPlayer.addEventListener("error", finish, { once: true });
+        });
+      } catch (error) {
         console.error("Unable to play letter audio", error);
-      });
+      }
+    }
+
+    async function playLetterSequence(cancelPreview = true) {
+      if (!currentProblem || !currentProblem.letters.length || isLetterSequencePlaying) {
+        return;
+      }
+
+      stopLetterSequencePlayback(cancelPreview);
+      const runId = letterSequenceRunId;
+      const letters = currentProblem.letters;
+      const letterButtons = [...lettersRow.querySelectorAll(".letter-button")];
+      isLetterSequencePlaying = true;
+      setLetterButtonsDisabled(true);
+
+      const audioContext = getLetterAudioContext();
+      if (!audioContext) {
+        await playLetterSequenceFallback(letters, letterButtons, runId);
+        return;
+      }
+
+      try {
+        if (audioContext.state === "suspended") {
+          await audioContext.resume();
+        }
+
+        const sequence = await Promise.all(
+          letters.map(async (letter, index) => ({
+            button: letterButtons[index],
+            buffer: await getLetterAudioBuffer(letter.audio),
+          }))
+        );
+
+        if (runId !== letterSequenceRunId) {
+          return;
+        }
+
+        const startAt = audioContext.currentTime + 0.02;
+        let accumulatedDuration = 0;
+
+        sequence.forEach(({ button, buffer }) => {
+          if (!buffer) {
+            return;
+          }
+
+          scheduleLetterButtonAnimation(button, accumulatedDuration * 1000, buffer.duration * 1000, runId);
+          const source = audioContext.createBufferSource();
+          source.buffer = buffer;
+          source.connect(audioContext.destination);
+          source.start(startAt + accumulatedDuration);
+          activeLetterSources.push(source);
+          accumulatedDuration += buffer.duration;
+        });
+
+        if (accumulatedDuration <= 0) {
+          await playLetterSequenceFallback(letters, letterButtons, runId);
+          return;
+        }
+
+        letterSequenceFinishTimer = window.setTimeout(() => {
+          finishLetterSequence(runId);
+        }, Math.max(0, accumulatedDuration * 1000 + 60));
+      } catch (error) {
+        console.error("Unable to play letter sequence", error);
+        await playLetterSequenceFallback(letters, letterButtons, runId);
+      }
     }
 
     async function playWordSound(audioPath) {
@@ -871,8 +1494,8 @@
       }
       const distractors = shuffle(vocabulary.filter((item) => item.word !== correctItem.word)).slice(0, 2);
       const answers = shuffle([
-        { emoji: correctItem.emoji, isCorrect: true },
-        ...distractors.map((item) => ({ emoji: item.emoji, isCorrect: false })),
+        { emoji: correctItem.emoji, audio: correctItem.audio, isCorrect: true },
+        ...distractors.map((item) => ({ emoji: item.emoji, audio: item.audio, isCorrect: false })),
       ]);
 
       return {
@@ -905,6 +1528,7 @@
     }
 
     function renderProblem() {
+      stopLetterSequencePlayback();
       currentProblem = buildProblem();
       roundFirstTry = true;
       lettersRow.innerHTML = "";
@@ -917,9 +1541,13 @@
         button.className = "letter-button";
         button.textContent = letter.label;
         button.setAttribute("aria-label", `Letter ${letter.label}`);
-        button.addEventListener("click", () => playLetterSound(letter.audio));
+        button.addEventListener("click", () => {
+          void playPromptSequence();
+        });
         lettersRow.appendChild(button);
       });
+
+      primeLetterAudioBuffers(currentProblem.letters);
 
       currentProblem.answers.forEach((answer, index) => {
         const button = document.createElement("button");
@@ -941,8 +1569,9 @@
       const buttons = [...answersElement.querySelectorAll(".emoji-button")];
       if (isCorrect) {
         isResolving = true;
+        stopLetterSequencePlayback();
         if (roundFirstTry) {
-          streakCount = Math.min(streakCount + 1, 3);
+          streakCount = Math.min(streakCount + 1, correctAnswersPerStar);
           setMeterProgress(streakCount);
         } else {
           streakCount = 0;
@@ -959,9 +1588,13 @@
           item.disabled = true;
         });
         await playback;
-        if (streakCount === 3) {
+        if (streakCount === correctAnswersPerStar) {
           setStatus("Star earned!", "good");
-          await celebrateMilestone();
+          const totalStars = await celebrateMilestone();
+          if (totalStars > 0 && totalStars % 7 === 0) {
+            setStatus("Star party!", "good");
+            await runStarParty();
+          }
         }
         isResolving = false;
         window.setTimeout(renderProblem, 250);
@@ -969,7 +1602,8 @@
       }
 
       isResolving = true;
-  roundFirstTry = false;
+    stopLetterSequencePlayback();
+    roundFirstTry = false;
       streakCount = 0;
       setMeterProgress(0);
       const playback = (async () => {

@@ -13,7 +13,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from config import MATH_CONFIG
+from config import MATH_CONFIG, READING_CONFIG
 
 SHORT_SENTENCES_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Short sentences"
 LETTER_SOUNDS_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Letters" / "Learning"
@@ -287,7 +287,7 @@ def render_math_html() -> str:
     if MATH_CONFIG_PLACEHOLDER not in template:
         raise ValueError(f"Template is missing placeholder {MATH_CONFIG_PLACEHOLDER}")
     math_config = dict(MATH_CONFIG)
-    for key in ("correct_answer", "wrong_answer", "star_celebration"):
+    for key in ("correct_answer", "wrong_answer", "star_celebration", "star_party"):
         audio_path = math_config.get(key)
         if audio_path:
             math_config[key] = encode_relative_path(ROOT_DIR / audio_path)
@@ -298,7 +298,12 @@ def render_reading_html() -> str:
     template = apply_app_version(READING_TEMPLATE_PATH.read_text(encoding="utf-8"))
     vocabulary = build_vocabulary()
     letter_audio_map = build_letter_audio_map()
-    ui_sounds = build_ui_sound_map()
+    reading_config = dict(READING_CONFIG)
+
+    for key in ("correct_answer", "wrong_answer", "star_celebration", "star_party"):
+        audio_path = reading_config.get(key)
+        if audio_path:
+            reading_config[key] = encode_relative_path(ROOT_DIR / audio_path)
 
     for item in vocabulary:
         letter_buttons: list[dict[str, str]] = []
@@ -314,9 +319,7 @@ def render_reading_html() -> str:
         "subtitle": "đọc",
         "description": "Tap the letters, then choose the matching picture.",
         "backAudio": encode_relative_path(MENU_AUDIO_DIR / "Back to home.m4a"),
-        "correctAudio": ui_sounds.get("ding sparkle", ""),
-        "wrongAudio": ui_sounds.get("cartoon fail", ""),
-        "magicAudio": ui_sounds.get("magic ga", ""),
+        "readingConfig": reading_config,
         "vocabulary": vocabulary,
     }
     if PAGE_CONFIG_PLACEHOLDER not in template:
