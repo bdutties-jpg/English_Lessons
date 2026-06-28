@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="English Playtime" />
   <meta name="application-name" content="English Playtime" />
   <meta name="theme-color" content="#f9a8d4" />
-  <meta name="app-version" content="20260627235147" />
+  <meta name="app-version" content="20260628033158" />
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="../assets/icons/icon-512.png" />
@@ -588,7 +588,7 @@
   </main>
 
   <script>
-    const appVersion = "20260627235147";
+    const appVersion = "20260628033158";
     const versionInfoPath = "../app_version.json";
     const pageConfig = {
   "title": "Reading",
@@ -735,10 +735,13 @@
     let roundFirstTry = true;
     let letterSequenceRunId = 0;
     let letterSequenceFinishTimer = 0;
+    let letterSequenceComplete = null;
     let activeLetterSources = [];
     let activeLetterAnimationTimers = [];
     let isLetterSequencePlaying = false;
     let activePreviewSequenceRunId = 0;
+    let areLetterButtonsSuppressed = false;
+    let isMilestonePending = false;
     let flyingPartyStars = [];
     let partyAnimationFrame = null;
 
@@ -825,9 +828,7 @@
     }
 
     function applyInteractionLock() {
-      lettersRow.querySelectorAll(".letter-button").forEach((button) => {
-        button.disabled = isPartyLockActive;
-      });
+      syncLetterButtonsDisabled();
       answersElement.querySelectorAll(".emoji-button").forEach((button) => {
         button.disabled = isPartyLockActive;
       });
@@ -961,10 +962,31 @@
       }
     }
 
-    function setLetterButtonsDisabled(disabled) {
+    function syncLetterButtonsDisabled() {
+      const shouldDisable =
+        areLetterButtonsSuppressed ||
+        isPartyLockActive ||
+        isResolving ||
+        isMilestonePending;
+
       lettersRow.querySelectorAll(".letter-button").forEach((button) => {
-        button.disabled = disabled;
+        button.disabled = shouldDisable;
       });
+    }
+
+    function setLetterButtonsDisabled(disabled) {
+      areLetterButtonsSuppressed = disabled;
+      syncLetterButtonsDisabled();
+    }
+
+    function setResolvingState(resolving) {
+      isResolving = resolving;
+      syncLetterButtonsDisabled();
+    }
+
+    function setMilestonePending(pending) {
+      isMilestonePending = pending;
+      syncLetterButtonsDisabled();
     }
 
     function clearLetterButtonAnimation() {
@@ -984,15 +1006,20 @@
         return;
       }
 
+      const complete = letterSequenceComplete;
+      letterSequenceComplete = null;
       clearLetterSequenceFinishTimer();
       clearLetterAnimationTimers();
       clearLetterButtonAnimation();
       activeLetterSources = [];
       isLetterSequencePlaying = false;
       setLetterButtonsDisabled(false);
+      complete?.();
     }
 
     function stopLetterSequencePlayback(cancelPreview = true) {
+      const complete = letterSequenceComplete;
+      letterSequenceComplete = null;
       letterSequenceRunId += 1;
       if (cancelPreview) {
         activePreviewSequenceRunId += 1;
@@ -1015,6 +1042,7 @@
       wordPlayer.currentTime = 0;
       isLetterSequencePlaying = false;
       setLetterButtonsDisabled(false);
+      complete?.();
     }
 
     function scheduleLetterButtonAnimation(button, startDelayMs, durationMs, runId) {
@@ -1103,7 +1131,8 @@
     }
 
     async function playPromptSequence() {
-      if (!currentProblem || !currentProblem.answers.length || isLetterSequencePlaying) {
+      const problem = currentProblem;
+      if (!problem || !problem.answers.length || isLetterSequencePlaying) {
         return;
       }
 
@@ -1114,7 +1143,7 @@
       setLetterButtonsDisabled(true);
 
       try {
-        for (let index = 0; index < currentProblem.answers.length; index += 1) {
+        for (let index = 0; index < problem.answers.length; index += 1) {
           if (previewRunId !== activePreviewSequenceRunId) {
             return;
           }
@@ -1124,14 +1153,21 @@
             return;
           }
 
-          const answer = currentProblem.answers[index];
+          const answer = problem.answers[index];
           const answerButton = answerButtons[index];
           answerButton?.classList.add("is-playing");
           await playWordSound(answer.audio);
           answerButton?.classList.remove("is-playing");
 
-          if (index < currentProblem.answers.length - 1) {
+          if (previewRunId !== activePreviewSequenceRunId) {
+            return;
+          }
+
+          if (index < problem.answers.length - 1) {
             await wait(iterationDelayMs);
+            if (previewRunId !== activePreviewSequenceRunId) {
+              return;
+            }
           }
         }
       } finally {
@@ -1437,57 +1473,7 @@
       isLetterSequencePlaying = true;
       setLetterButtonsDisabled(true);
 
-      const audioContext = getLetterAudioContext();
-      if (!audioContext) {
-        await playLetterSequenceFallback(letters, letterButtons, runId);
-        return;
-      }
-
-      try {
-        if (audioContext.state === "suspended") {
-          await audioContext.resume();
-        }
-
-        const sequence = await Promise.all(
-          letters.map(async (letter, index) => ({
-            button: letterButtons[index],
-            buffer: await getLetterAudioBuffer(letter.audio),
-          }))
-        );
-
-        if (runId !== letterSequenceRunId) {
-          return;
-        }
-
-        const startAt = audioContext.currentTime + 0.02;
-        let accumulatedDuration = 0;
-
-        sequence.forEach(({ button, buffer }) => {
-          if (!buffer) {
-            return;
-          }
-
-          scheduleLetterButtonAnimation(button, accumulatedDuration * 1000, buffer.duration * 1000, runId);
-          const source = audioContext.createBufferSource();
-          source.buffer = buffer;
-          source.connect(audioContext.destination);
-          source.start(startAt + accumulatedDuration);
-          activeLetterSources.push(source);
-          accumulatedDuration += buffer.duration;
-        });
-
-        if (accumulatedDuration <= 0) {
-          await playLetterSequenceFallback(letters, letterButtons, runId);
-          return;
-        }
-
-        letterSequenceFinishTimer = window.setTimeout(() => {
-          finishLetterSequence(runId);
-        }, Math.max(0, accumulatedDuration * 1000 + 60));
-      } catch (error) {
-        console.error("Unable to play letter sequence", error);
-        await playLetterSequenceFallback(letters, letterButtons, runId);
-      }
+      await playLetterSequenceFallback(letters, letterButtons, runId);
     }
 
     async function playWordSound(audioPath) {
@@ -1502,7 +1488,18 @@
       try {
         await wordPlayer.play();
         await new Promise((resolve) => {
-          wordPlayer.addEventListener("ended", resolve, { once: true });
+          const finish = () => {
+            wordPlayer.removeEventListener("ended", finish);
+            wordPlayer.removeEventListener("error", finish);
+            wordPlayer.removeEventListener("pause", finish);
+            wordPlayer.removeEventListener("emptied", finish);
+            resolve();
+          };
+
+          wordPlayer.addEventListener("ended", finish, { once: true });
+          wordPlayer.addEventListener("error", finish, { once: true });
+          wordPlayer.addEventListener("pause", finish, { once: true });
+          wordPlayer.addEventListener("emptied", finish, { once: true });
         });
       } catch (error) {
         console.error("Unable to play word audio", error);
@@ -1598,7 +1595,7 @@
       const resolutionId = ++activeResolutionId;
       const buttons = [...answersElement.querySelectorAll(".emoji-button")];
       if (isCorrect) {
-        isResolving = true;
+        setResolvingState(true);
         stopLetterSequencePlayback();
         if (roundFirstTry) {
           streakCount = Math.min(streakCount + 1, correctAnswersPerStar);
@@ -1621,12 +1618,19 @@
         if (streakCount === correctAnswersPerStar) {
           setStatus("Star earned!", "good");
           const willTriggerParty = (getStarCount() + 1) % 7 === 0;
-          const milestonePromise = celebrateMilestone();
+          setMilestonePending(true);
+          const milestonePromise = (async () => {
+            try {
+              return await celebrateMilestone();
+            } finally {
+              setMilestonePending(false);
+            }
+          })();
           renderProblem();
           if (willTriggerParty) {
             setPartyInteractionLock(true);
           } else {
-            isResolving = false;
+            setResolvingState(false);
           }
           const totalStars = await milestonePromise;
           if (resolutionId !== activeResolutionId) {
@@ -1638,20 +1642,20 @@
           }
           if (willTriggerParty) {
             setPartyInteractionLock(false);
-            isResolving = false;
+            setResolvingState(false);
           }
           return;
         }
         if (resolutionId === activeResolutionId) {
-          isResolving = false;
+          setResolvingState(false);
         }
         window.setTimeout(renderProblem, 250);
         return;
       }
 
-      isResolving = true;
-    stopLetterSequencePlayback();
-    roundFirstTry = false;
+      setResolvingState(true);
+      stopLetterSequencePlayback();
+      roundFirstTry = false;
       streakCount = 0;
       setMeterProgress(0);
       const playback = (async () => {
@@ -1670,7 +1674,7 @@
         item.disabled = item === button;
       });
       if (resolutionId === activeResolutionId) {
-        isResolving = false;
+        setResolvingState(false);
       }
     }
 
