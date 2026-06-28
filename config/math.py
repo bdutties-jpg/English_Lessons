@@ -1,7 +1,7 @@
 MATH_CONFIG = {
     # Progressive Difficulty
     "base_max_number": 10,
-    "base_min_number": 1,
+    "base_min_number": 0,
 
     # Star Mechanics
     "correct_answer_per_star": 3,

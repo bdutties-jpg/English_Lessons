@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="English Playtime" />
   <meta name="application-name" content="English Playtime" />
   <meta name="theme-color" content="#a5f3fc" />
-  <meta name="app-version" content="20260627223829" />
+  <meta name="app-version" content="20260627235147" />
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="../assets/icons/icon-512.png" />
@@ -545,11 +545,11 @@
   </main>
 
   <script>
-    const appVersion = "20260627223829";
+    const appVersion = "20260627235147";
     const versionInfoPath = "../app_version.json";
     const mathConfig = {
   "base_max_number": 10,
-  "base_min_number": 1,
+  "base_min_number": 0,
   "correct_answer_per_star": 3,
   "star_max_boost": 1,
   "star_min_boost": 0,
@@ -579,6 +579,8 @@
     let currentProblem = null;
     let streakCount = 0;
     let isResolving = false;
+    let activeResolutionId = 0;
+    let isPartyLockActive = false;
     let roundFirstTry = true;
     let partyAnimationFrame = null;
     let flyingPartyStars = [];
@@ -608,6 +610,10 @@
     }
 
     async function playThenNavigate(audioPath, href) {
+      if (isPartyLockActive) {
+        return;
+      }
+
       const destination = withVersion(href);
       if (!audioPath) {
         window.location.href = destination;
@@ -673,6 +679,11 @@
       } catch (error) {
         console.error("Unable to play magic audio", error);
       }
+    }
+
+    function stopMagicSound() {
+      magicPlayer.pause();
+      magicPlayer.currentTime = 0;
     }
 
     async function getAudioDuration(audioPath) {
@@ -1027,44 +1038,81 @@
 
     function buildProblem() {
       const { minNumber, maxNumber } = getDifficultyBounds();
-      const operation = Math.random() < 0.5 ? "+" : "-";
+      const problemBuilders = [];
 
-      let left;
-      let right;
-      let correctAnswer;
+      if (minNumber <= maxNumber - minNumber) {
+        problemBuilders.push(() => {
+          const left = randomInt(minNumber, maxNumber - minNumber);
+          const right = randomInt(minNumber, maxNumber - left);
+          return {
+            text: `${left} + ${right} =`,
+            correctAnswer: left + right,
+          };
+        });
 
-      if (operation === "+") {
-        correctAnswer = randomInt(minNumber + 1, maxNumber);
-        const maxRight = Math.min(9, correctAnswer - minNumber);
-        right = randomInt(1, Math.max(1, maxRight));
-        left = correctAnswer - right;
-      } else {
-        left = randomInt(minNumber + 1, maxNumber);
-        correctAnswer = randomInt(minNumber, left - 1);
-        right = left - correctAnswer;
+        problemBuilders.push(() => {
+          const correctAnswer = randomInt(minNumber, maxNumber - minNumber);
+          const right = randomInt(minNumber, maxNumber - correctAnswer);
+          return {
+            text: `${correctAnswer + right} - ${right} =`,
+            correctAnswer,
+          };
+        });
       }
 
+      if (problemBuilders.length === 0) {
+        throw new Error(`No valid math problems for bounds ${minNumber}-${maxNumber}`);
+      }
+
+      const { text, correctAnswer } = problemBuilders[randomInt(0, problemBuilders.length - 1)]();
       const choices = new Set([correctAnswer]);
 
-      while (choices.size < 3) {
-        const offset = randomInt(-3, 3);
+      for (const offset of shuffle([-3, -2, -1, 1, 2, 3])) {
         const wrongAnswer = correctAnswer + offset;
-        if (wrongAnswer < minNumber || wrongAnswer === correctAnswer) {
+        if (wrongAnswer < minNumber || wrongAnswer > maxNumber) {
           continue;
         }
         choices.add(wrongAnswer);
+        if (choices.size === 3) {
+          break;
+        }
       }
 
+      if (choices.size < 3) {
+        for (const value of shuffle([...Array(maxNumber - minNumber + 1).keys()].map((offset) => minNumber + offset))) {
+          if (value !== correctAnswer) {
+            choices.add(value);
+          }
+          if (choices.size === 3) {
+            break;
+          }
+        }
+      }
+
+      const answers = shuffle([...choices]);
+
       return {
-        text: `${left} ${operation} ${right} =`,
+        text,
         correctAnswer,
-        answers: shuffle([...choices]),
+        answers,
       };
     }
 
     function setStatus(message, tone) {
       statusElement.textContent = message;
       statusElement.className = tone ? `status ${tone}` : "status";
+    }
+
+    function applyInteractionLock() {
+      answersElement.querySelectorAll(".answer-button").forEach((button) => {
+        button.disabled = isPartyLockActive;
+      });
+      backLink.setAttribute("aria-disabled", String(isPartyLockActive));
+    }
+
+    function setPartyInteractionLock(locked) {
+      isPartyLockActive = locked;
+      applyInteractionLock();
     }
 
     function renderProblem() {
@@ -1084,6 +1132,8 @@
         button.addEventListener("click", () => handleAnswer(button, answer));
         answersElement.appendChild(button);
       });
+
+      applyInteractionLock();
     }
 
     function burstSparkles(button) {
@@ -1109,10 +1159,12 @@
     }
 
     async function handleAnswer(button, answer) {
-      if (isResolving || button.disabled) {
+      if (isResolving || isPartyLockActive || button.disabled) {
         return;
       }
 
+      stopMagicSound();
+      const resolutionId = ++activeResolutionId;
       const buttons = [...answersElement.querySelectorAll(".answer-button")];
       if (answer === currentProblem.correctAnswer) {
         isResolving = true;
@@ -1132,17 +1184,31 @@
         await playCorrectSound();
         if (streakCount === correctAnswersPerStar) {
           setStatus("Star earned!", "good");
+          const willTriggerParty = (getStarCount() + 1) % 7 === 0;
           const milestonePromise = celebrateMilestone();
           renderProblem();
+          if (willTriggerParty) {
+            setPartyInteractionLock(true);
+          } else {
+            isResolving = false;
+          }
           const totalStars = await milestonePromise;
-          if (totalStars > 0 && totalStars % 7 === 0) {
+          if (resolutionId !== activeResolutionId) {
+            return;
+          }
+          if (willTriggerParty && totalStars > 0 && totalStars % 7 === 0) {
             setStatus("Star party!", "good");
             await runStarParty();
           }
-          isResolving = false;
+          if (willTriggerParty) {
+            setPartyInteractionLock(false);
+            isResolving = false;
+          }
           return;
         }
-        isResolving = false;
+        if (resolutionId === activeResolutionId) {
+          isResolving = false;
+        }
         renderProblem();
         return;
       }
@@ -1162,7 +1228,9 @@
       buttons.forEach((item) => {
         item.disabled = item === button;
       });
-      isResolving = false;
+      if (resolutionId === activeResolutionId) {
+        isResolving = false;
+      }
     }
 
     setMeterProgress(0);

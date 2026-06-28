@@ -618,6 +618,8 @@
     const recentWords = [];
     let streakCount = 0;
     let isResolving = false;
+    let activeResolutionId = 0;
+    let isPartyLockActive = false;
     let roundFirstTry = true;
     let letterSequenceRunId = 0;
     let letterSequenceFinishTimer = 0;
@@ -656,6 +658,10 @@
     pageSubtitle.textContent = `${pageConfig.subtitle} · ${pageConfig.description}`;
 
     async function playThenNavigate(audioPath, href) {
+      if (isPartyLockActive) {
+        return;
+      }
+
       const destination = withVersion(href);
       if (!audioPath) {
         window.location.href = destination;
@@ -706,6 +712,21 @@
       statusElement.className = tone ? `status ${tone}` : "status";
     }
 
+    function applyInteractionLock() {
+      lettersRow.querySelectorAll(".letter-button").forEach((button) => {
+        button.disabled = isPartyLockActive;
+      });
+      answersElement.querySelectorAll(".emoji-button").forEach((button) => {
+        button.disabled = isPartyLockActive;
+      });
+      backLink.setAttribute("aria-disabled", String(isPartyLockActive));
+    }
+
+    function setPartyInteractionLock(locked) {
+      isPartyLockActive = locked;
+      applyInteractionLock();
+    }
+
     async function playUiSound(audioPath) {
       if (!audioPath) {
         return;
@@ -750,6 +771,11 @@
       } catch (error) {
         console.error("Unable to play magic audio", error);
       }
+    }
+
+    function stopMagicSound() {
+      magicPlayer.pause();
+      magicPlayer.currentTime = 0;
     }
 
     async function getAudioDuration(audioPath) {
@@ -1447,13 +1473,17 @@
         button.addEventListener("click", () => handleAnswer(button, answer.isCorrect));
         answersElement.appendChild(button);
       });
+
+      applyInteractionLock();
     }
 
     async function handleAnswer(button, isCorrect) {
-      if (isResolving || button.disabled) {
+      if (isResolving || isPartyLockActive || button.disabled) {
         return;
       }
 
+      stopMagicSound();
+      const resolutionId = ++activeResolutionId;
       const buttons = [...answersElement.querySelectorAll(".emoji-button")];
       if (isCorrect) {
         isResolving = true;
@@ -1478,17 +1508,31 @@
         await playback;
         if (streakCount === correctAnswersPerStar) {
           setStatus("Star earned!", "good");
+          const willTriggerParty = (getStarCount() + 1) % 7 === 0;
           const milestonePromise = celebrateMilestone();
           renderProblem();
+          if (willTriggerParty) {
+            setPartyInteractionLock(true);
+          } else {
+            isResolving = false;
+          }
           const totalStars = await milestonePromise;
-          if (totalStars > 0 && totalStars % 7 === 0) {
+          if (resolutionId !== activeResolutionId) {
+            return;
+          }
+          if (willTriggerParty && totalStars > 0 && totalStars % 7 === 0) {
             setStatus("Star party!", "good");
             await runStarParty();
           }
-          isResolving = false;
+          if (willTriggerParty) {
+            setPartyInteractionLock(false);
+            isResolving = false;
+          }
           return;
         }
-        isResolving = false;
+        if (resolutionId === activeResolutionId) {
+          isResolving = false;
+        }
         window.setTimeout(renderProblem, 250);
         return;
       }
@@ -1513,7 +1557,9 @@
       buttons.forEach((item) => {
         item.disabled = item === button;
       });
-      isResolving = false;
+      if (resolutionId === activeResolutionId) {
+        isResolving = false;
+      }
     }
 
     setMeterProgress(0);
