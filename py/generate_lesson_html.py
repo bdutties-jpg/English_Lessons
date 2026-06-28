@@ -38,6 +38,8 @@ APP_VERSION_PLACEHOLDER = "__APP_VERSION__"
 FILENAME_PATTERN = re.compile(r"^(?P<emoji>.+?)\s*-\s*(?P<text>.+)$")
 VOCABULARY_PATTERN = re.compile(r"^(?P<word>.+?)\s+(?P<emoji>\S+)$")
 APP_VERSION = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+# Bump this only when audio files change and you need clients to fetch them again.
+AUDIO_ASSET_VERSION = "20260628-1"
 
 
 @dataclass(frozen=True)
@@ -67,6 +69,10 @@ def encode_relative_path(path: Path, *, from_output_dir: bool = True) -> str:
     return f"../{encoded_path}" if from_output_dir else encoded_path
 
 
+def encode_audio_path(path: Path, *, from_output_dir: bool = True) -> str:
+    return f"{encode_relative_path(path, from_output_dir=from_output_dir)}?v={AUDIO_ASSET_VERSION}"
+
+
 def apply_app_version(template: str) -> str:
     if APP_VERSION_PLACEHOLDER not in template:
         raise ValueError(f"Template is missing placeholder {APP_VERSION_PLACEHOLDER}")
@@ -75,14 +81,14 @@ def apply_app_version(template: str) -> str:
 
 def build_menu_audio_map() -> dict[str, str]:
     return {
-        audio_path.stem.casefold(): encode_relative_path(audio_path, from_output_dir=False)
+        audio_path.stem.casefold(): encode_audio_path(audio_path, from_output_dir=False)
         for audio_path in MENU_AUDIO_DIR.glob("*.m4a")
     }
 
 
 def build_ui_sound_map(*, from_output_dir: bool = True) -> dict[str, str]:
     return {
-        audio_path.stem.casefold(): encode_relative_path(audio_path, from_output_dir=from_output_dir)
+        audio_path.stem.casefold(): encode_audio_path(audio_path, from_output_dir=from_output_dir)
         for audio_path in UI_SOUNDS_AUDIO_DIR.glob("*.m4a")
     }
 
@@ -104,7 +110,7 @@ def build_letter_audio_map(*, from_output_dir: bool = True) -> dict[str, str]:
         match = re.match(r"^(?P<letter>.+?)\s*\((?P<note>hard|soft)\)$", label, re.IGNORECASE)
         base_letter = match.group("letter").strip() if match else label
         note = match.group("note").strip().lower() if match else "default"
-        candidates.setdefault(base_letter.casefold(), {})[note] = encode_relative_path(
+        candidates.setdefault(base_letter.casefold(), {})[note] = encode_audio_path(
             audio_path,
             from_output_dir=from_output_dir,
         )
@@ -132,7 +138,7 @@ def parse_audio_file(audio_path: Path) -> LessonButton:
     return LessonButton(
         emoji=match.group("emoji").strip(),
         text=match.group("text").strip(),
-        audio=encode_relative_path(audio_path),
+        audio=encode_audio_path(audio_path),
     )
 
 
@@ -176,7 +182,7 @@ def build_letter_sounds() -> list[dict[str, str]]:
             {
                 "emoji": "",
                 "text": label,
-                "audio": encode_relative_path(audio_path),
+                "audio": encode_audio_path(audio_path),
                 "display": f"{letter.upper()} {letter.lower()}",
                 "note": f"({note})" if note else "",
             }
@@ -202,7 +208,7 @@ def build_vocabulary() -> list[dict[str, str]]:
             VocabularyItem(
                 word=match.group("word").strip(),
                 emoji=match.group("emoji").strip(),
-                audio=encode_relative_path(audio_path),
+                audio=encode_audio_path(audio_path),
             ).__dict__
         )
 
@@ -290,7 +296,7 @@ def render_math_html() -> str:
     for key in ("correct_answer", "wrong_answer", "star_celebration", "star_party"):
         audio_path = math_config.get(key)
         if audio_path:
-            math_config[key] = encode_relative_path(ROOT_DIR / audio_path)
+            math_config[key] = encode_audio_path(ROOT_DIR / audio_path)
     return template.replace(MATH_CONFIG_PLACEHOLDER, json.dumps(math_config, ensure_ascii=False, indent=2))
 
 
@@ -303,7 +309,7 @@ def render_reading_html() -> str:
     for key in ("correct_answer", "wrong_answer", "star_celebration", "star_party"):
         audio_path = reading_config.get(key)
         if audio_path:
-            reading_config[key] = encode_relative_path(ROOT_DIR / audio_path)
+            reading_config[key] = encode_audio_path(ROOT_DIR / audio_path)
 
     for item in vocabulary:
         letter_buttons: list[dict[str, str]] = []
@@ -318,7 +324,7 @@ def render_reading_html() -> str:
         "title": "Reading",
         "subtitle": "đọc",
         "description": "Tap the letters, then choose the matching picture.",
-        "backAudio": encode_relative_path(MENU_AUDIO_DIR / "Back to home.m4a"),
+        "backAudio": encode_audio_path(MENU_AUDIO_DIR / "Back to home.m4a"),
         "readingConfig": reading_config,
         "vocabulary": vocabulary,
     }
@@ -330,7 +336,7 @@ def render_reading_html() -> str:
 def main() -> None:
     lessons = build_lessons()
     letter_sounds = build_letter_sounds()
-    back_audio = encode_relative_path(MENU_AUDIO_DIR / "Back to home.m4a")
+    back_audio = encode_audio_path(MENU_AUDIO_DIR / "Back to home.m4a")
     lesson_html = render_audio_grid_page(
         lessons,
         title="Short Sentences",
@@ -356,7 +362,10 @@ def main() -> None:
     READING_OUTPUT_PATH.write_text(reading_html, encoding="utf-8")
     LETTER_SOUNDS_OUTPUT_PATH.write_text(letter_sounds_html, encoding="utf-8")
     INDEX_PATH.write_text(home_html, encoding="utf-8")
-    APP_VERSION_PATH.write_text(json.dumps({"version": APP_VERSION}, indent=2), encoding="utf-8")
+    APP_VERSION_PATH.write_text(
+        json.dumps({"version": APP_VERSION, "audio_version": AUDIO_ASSET_VERSION}, indent=2),
+        encoding="utf-8",
+    )
     print(f"Wrote {len(lessons)} buttons to {OUTPUT_PATH}")
     print(f"Wrote math page to {MATH_OUTPUT_PATH}")
     print(f"Wrote reading page to {READING_OUTPUT_PATH}")
