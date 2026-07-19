@@ -251,6 +251,7 @@
       transform: scale(0.8);
       pointer-events: none;
       animation: none;
+      cursor: default;
     }
 
     .drag-ghost {
@@ -602,6 +603,8 @@
     let isPartyLockActive = false;
     let roundFirstTry = true;
     let activeDrag = null;
+    let hasUnlockedAudio = false;
+    let audioUnlockPromise = null;
     let flyingPartyStars = [];
     let partyAnimationFrame = null;
 
@@ -659,9 +662,63 @@
 
     void ensureLatestVersion();
 
+    async function primeAudioPlayer(player, audioPath) {
+      if (!audioPath) {
+        return;
+      }
+
+      const previousSrc = player.src;
+      const previousMuted = player.muted;
+      const previousCurrentTime = player.currentTime;
+
+      try {
+        player.pause();
+        player.currentTime = 0;
+        player.src = audioPath;
+        player.muted = true;
+        await player.play();
+        player.pause();
+        player.currentTime = 0;
+      } catch (error) {
+        void error;
+      } finally {
+        player.muted = previousMuted;
+        player.src = previousSrc;
+        try {
+          player.currentTime = previousCurrentTime;
+        } catch (error) {
+          void error;
+        }
+      }
+    }
+
+    async function unlockAudioPlayers() {
+      if (hasUnlockedAudio) {
+        return;
+      }
+
+      if (!audioUnlockPromise) {
+        audioUnlockPromise = (async () => {
+          const currentWordAudio = currentProblem?.audio || vocabulary[0]?.audio || "";
+          await Promise.all([
+            primeAudioPlayer(uiPlayer, spellingConfig.correct_answer || spellingConfig.wrong_answer || currentWordAudio),
+            primeAudioPlayer(wordPlayer, currentWordAudio),
+            primeAudioPlayer(magicPlayer, spellingConfig.star_celebration || currentWordAudio),
+            primeAudioPlayer(partyPlayer, spellingConfig.star_party || currentWordAudio),
+          ]);
+          hasUnlockedAudio = true;
+        })();
+      }
+
+      await audioUnlockPromise;
+    }
+
     backLink.addEventListener("click", (event) => {
       event.preventDefault();
-      playThenNavigate(pageConfig.backAudio, backLink.getAttribute("href"));
+      void (async () => {
+        await unlockAudioPlayers();
+        await playThenNavigate(pageConfig.backAudio, backLink.getAttribute("href"));
+      })();
     });
 
     function randomInt(min, max) {
@@ -1197,6 +1254,10 @@
       slot?.classList.add("drop-target");
     }
 
+    function isChoiceStillNeededElsewhere(label) {
+      return currentProblem.slots.some((slot) => slot.missing && !slot.filled && slot.label === label);
+    }
+
     async function handleWrongPlacement(choiceButton) {
       clearActiveDrag();
       const resolutionId = ++activeResolutionId;
@@ -1204,11 +1265,12 @@
       roundFirstTry = false;
       streakCount = 0;
       setMeterProgress(0);
-      choiceButton.classList.add("is-gone");
-      choiceButton.disabled = true;
+      if (!isChoiceStillNeededElsewhere(choiceButton.dataset.label)) {
+        choiceButton.classList.add("is-gone");
+        choiceButton.disabled = true;
+      }
       setStatus("Try again!", "bad");
       await playWrongSound();
-      choiceButton.remove();
       if (resolutionId === activeResolutionId) {
         setResolvingState(false);
       }
@@ -1228,7 +1290,6 @@
 
       setStatus(roundFirstTry ? "Great job!" : "You fixed the word!", roundFirstTry ? "good" : "");
 
-      await playCorrectSound();
       await playWordSound(currentProblem.audio);
 
       if (roundFirstTry && streakCount === correctAnswersPerStar) {
@@ -1255,17 +1316,17 @@
       }
     }
 
-    function maybeFinishProblem() {
+    async function maybeFinishProblem() {
       const allFilled = currentProblem.slots.every((slot) => slot.filled);
       if (!allFilled) {
         setStatus("Nice!", "good");
         return;
       }
 
-      void finishSolvedProblem();
+      await finishSolvedProblem();
     }
 
-    function placeChoiceInSlot(choiceButton, slotButton) {
+    async function placeChoiceInSlot(choiceButton, slotButton) {
       clearActiveDrag();
       const slotIndex = Number(slotButton.dataset.slotIndex);
       const label = choiceButton.dataset.label;
@@ -1275,10 +1336,10 @@
       slotButton.classList.add("filled");
       choiceButton.classList.add("is-gone");
       choiceButton.disabled = true;
-      window.setTimeout(() => {
-        choiceButton.remove();
-      }, 120);
-      maybeFinishProblem();
+      setResolvingState(true);
+      await playCorrectSound();
+      setResolvingState(false);
+      await maybeFinishProblem();
     }
 
     async function handlePointerUp(event) {
@@ -1297,7 +1358,7 @@
       const sourceButton = activeDrag.sourceButton;
 
       if (expectedLabel === label) {
-        placeChoiceInSlot(sourceButton, slot);
+        await placeChoiceInSlot(sourceButton, slot);
         return;
       }
 
@@ -1323,6 +1384,7 @@
       }
 
       event.preventDefault();
+  void unlockAudioPlayers();
       clearActiveDrag();
 
       const ghost = button.cloneNode(true);
@@ -1383,14 +1445,19 @@
       });
 
       applyInteractionLock();
-      void playWordSound(currentProblem.audio);
+      if (hasUnlockedAudio) {
+        void playWordSound(currentProblem.audio);
+      }
     }
 
     emojiButton.addEventListener("click", () => {
       if (isPartyLockActive || isResolving || !currentProblem) {
         return;
       }
-      void playWordSound(currentProblem.audio);
+      void (async () => {
+        await unlockAudioPlayers();
+        await playWordSound(currentProblem.audio);
+      })();
     });
 
     setMeterProgress(0);

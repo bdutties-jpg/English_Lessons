@@ -2,7 +2,7 @@ SPELLING_CONFIG = {
     # Progressive Difficulty
 
     # Star Mechanics
-    "correct_answer_per_star": 2,
+    "correct_answer_per_star": 1,
     "star_max_boost": 1,
     "star_min_boost": 0,
 

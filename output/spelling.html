@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="English Playtime" />
   <meta name="application-name" content="English Playtime" />
   <meta name="theme-color" content="#fdba74" />
-  <meta name="app-version" content="20260719005751" />
+  <meta name="app-version" content="20260719012654" />
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="../assets/icons/icon-512.png" />
@@ -251,6 +251,7 @@
       transform: scale(0.8);
       pointer-events: none;
       animation: none;
+      cursor: default;
     }
 
     .drag-ghost {
@@ -571,7 +572,7 @@
   </main>
 
   <script>
-    const appVersion = "20260719005751";
+    const appVersion = "20260719012654";
     const versionInfoPath = "../app_version.json";
     const pageConfig = {
   "title": "Spelling",
@@ -579,7 +580,7 @@
   "description": "Drag the missing letters into the word.",
   "backAudio": "../assets/audio/Menu/Back%20to%20home.m4a?v=20260628-1",
   "spellingConfig": {
-    "correct_answer_per_star": 2,
+    "correct_answer_per_star": 1,
     "star_max_boost": 1,
     "star_min_boost": 0,
     "correct_answer": "../assets/audio/UI_Sounds/ding%20sparkle.m4a?v=20260628-1",
@@ -813,6 +814,8 @@
     let isPartyLockActive = false;
     let roundFirstTry = true;
     let activeDrag = null;
+    let hasUnlockedAudio = false;
+    let audioUnlockPromise = null;
     let flyingPartyStars = [];
     let partyAnimationFrame = null;
 
@@ -870,9 +873,63 @@
 
     void ensureLatestVersion();
 
+    async function primeAudioPlayer(player, audioPath) {
+      if (!audioPath) {
+        return;
+      }
+
+      const previousSrc = player.src;
+      const previousMuted = player.muted;
+      const previousCurrentTime = player.currentTime;
+
+      try {
+        player.pause();
+        player.currentTime = 0;
+        player.src = audioPath;
+        player.muted = true;
+        await player.play();
+        player.pause();
+        player.currentTime = 0;
+      } catch (error) {
+        void error;
+      } finally {
+        player.muted = previousMuted;
+        player.src = previousSrc;
+        try {
+          player.currentTime = previousCurrentTime;
+        } catch (error) {
+          void error;
+        }
+      }
+    }
+
+    async function unlockAudioPlayers() {
+      if (hasUnlockedAudio) {
+        return;
+      }
+
+      if (!audioUnlockPromise) {
+        audioUnlockPromise = (async () => {
+          const currentWordAudio = currentProblem?.audio || vocabulary[0]?.audio || "";
+          await Promise.all([
+            primeAudioPlayer(uiPlayer, spellingConfig.correct_answer || spellingConfig.wrong_answer || currentWordAudio),
+            primeAudioPlayer(wordPlayer, currentWordAudio),
+            primeAudioPlayer(magicPlayer, spellingConfig.star_celebration || currentWordAudio),
+            primeAudioPlayer(partyPlayer, spellingConfig.star_party || currentWordAudio),
+          ]);
+          hasUnlockedAudio = true;
+        })();
+      }
+
+      await audioUnlockPromise;
+    }
+
     backLink.addEventListener("click", (event) => {
       event.preventDefault();
-      playThenNavigate(pageConfig.backAudio, backLink.getAttribute("href"));
+      void (async () => {
+        await unlockAudioPlayers();
+        await playThenNavigate(pageConfig.backAudio, backLink.getAttribute("href"));
+      })();
     });
 
     function randomInt(min, max) {
@@ -1408,6 +1465,10 @@
       slot?.classList.add("drop-target");
     }
 
+    function isChoiceStillNeededElsewhere(label) {
+      return currentProblem.slots.some((slot) => slot.missing && !slot.filled && slot.label === label);
+    }
+
     async function handleWrongPlacement(choiceButton) {
       clearActiveDrag();
       const resolutionId = ++activeResolutionId;
@@ -1415,11 +1476,12 @@
       roundFirstTry = false;
       streakCount = 0;
       setMeterProgress(0);
-      choiceButton.classList.add("is-gone");
-      choiceButton.disabled = true;
+      if (!isChoiceStillNeededElsewhere(choiceButton.dataset.label)) {
+        choiceButton.classList.add("is-gone");
+        choiceButton.disabled = true;
+      }
       setStatus("Try again!", "bad");
       await playWrongSound();
-      choiceButton.remove();
       if (resolutionId === activeResolutionId) {
         setResolvingState(false);
       }
@@ -1439,7 +1501,6 @@
 
       setStatus(roundFirstTry ? "Great job!" : "You fixed the word!", roundFirstTry ? "good" : "");
 
-      await playCorrectSound();
       await playWordSound(currentProblem.audio);
 
       if (roundFirstTry && streakCount === correctAnswersPerStar) {
@@ -1466,17 +1527,17 @@
       }
     }
 
-    function maybeFinishProblem() {
+    async function maybeFinishProblem() {
       const allFilled = currentProblem.slots.every((slot) => slot.filled);
       if (!allFilled) {
         setStatus("Nice!", "good");
         return;
       }
 
-      void finishSolvedProblem();
+      await finishSolvedProblem();
     }
 
-    function placeChoiceInSlot(choiceButton, slotButton) {
+    async function placeChoiceInSlot(choiceButton, slotButton) {
       clearActiveDrag();
       const slotIndex = Number(slotButton.dataset.slotIndex);
       const label = choiceButton.dataset.label;
@@ -1486,10 +1547,10 @@
       slotButton.classList.add("filled");
       choiceButton.classList.add("is-gone");
       choiceButton.disabled = true;
-      window.setTimeout(() => {
-        choiceButton.remove();
-      }, 120);
-      maybeFinishProblem();
+      setResolvingState(true);
+      await playCorrectSound();
+      setResolvingState(false);
+      await maybeFinishProblem();
     }
 
     async function handlePointerUp(event) {
@@ -1508,7 +1569,7 @@
       const sourceButton = activeDrag.sourceButton;
 
       if (expectedLabel === label) {
-        placeChoiceInSlot(sourceButton, slot);
+        await placeChoiceInSlot(sourceButton, slot);
         return;
       }
 
@@ -1534,6 +1595,7 @@
       }
 
       event.preventDefault();
+  void unlockAudioPlayers();
       clearActiveDrag();
 
       const ghost = button.cloneNode(true);
@@ -1594,14 +1656,19 @@
       });
 
       applyInteractionLock();
-      void playWordSound(currentProblem.audio);
+      if (hasUnlockedAudio) {
+        void playWordSound(currentProblem.audio);
+      }
     }
 
     emojiButton.addEventListener("click", () => {
       if (isPartyLockActive || isResolving || !currentProblem) {
         return;
       }
-      void playWordSound(currentProblem.audio);
+      void (async () => {
+        await unlockAudioPlayers();
+        await playWordSound(currentProblem.audio);
+      })();
     });
 
     setMeterProgress(0);
