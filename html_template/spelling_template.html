@@ -7,13 +7,13 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="English Playtime" />
   <meta name="application-name" content="English Playtime" />
-  <meta name="theme-color" content="#a5f3fc" />
-  <meta name="app-version" content="20260719005751" />
+  <meta name="theme-color" content="#fdba74" />
+  <meta name="app-version" content="__APP_VERSION__" />
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="../assets/icons/icon-512.png" />
   <link rel="manifest" href="../site.webmanifest" />
-  <title>Math</title>
+  <title>Spelling</title>
   <style>
     :root {
       --ink: #1f2937;
@@ -34,12 +34,12 @@
       color: var(--ink);
       background:
         radial-gradient(circle at top left, rgba(255, 255, 255, 0.85), transparent 25%),
-        radial-gradient(circle at top right, rgba(255, 255, 255, 0.7), transparent 20%),
-        linear-gradient(180deg, #a5f3fc 0%, #bfdbfe 40%, #fde68a 100%);
+        radial-gradient(circle at top right, rgba(255, 255, 255, 0.72), transparent 22%),
+        linear-gradient(180deg, #fdba74 0%, #f9a8d4 42%, #bfdbfe 100%);
     }
 
     .page {
-      width: min(100%, 960px);
+      width: min(100%, 980px);
       margin: 0 auto;
       padding: 24px 16px 40px;
     }
@@ -84,31 +84,185 @@
       text-shadow: 0 3px 0 rgba(255, 255, 255, 0.65);
     }
 
-    .subtitle {
-      margin: 12px auto 0;
-      font-size: clamp(1.1rem, 4vw, 1.35rem);
-      font-weight: 800;
-    }
-
     .card {
-      margin: 28px auto 0;
-      max-width: 42rem;
+      margin: 22px auto 0;
+      max-width: 52rem;
       padding: 22px 16px 20px;
       border-radius: 32px;
-      background: rgba(255, 255, 255, 0.72);
+      background: rgba(255, 255, 255, 0.74);
       box-shadow: 0 16px 32px var(--shadow);
       backdrop-filter: blur(6px);
     }
 
     .problem-shell {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(90px, 112px) 74px;
-      gap: 14px;
-      align-items: center;
-      justify-content: center;
-      width: fit-content;
+      grid-template-columns: minmax(0, 1fr) 74px;
+      gap: 16px;
+      align-items: start;
       max-width: 100%;
       margin: 0 auto;
+    }
+
+    .play-area {
+      min-width: 0;
+      display: grid;
+      gap: 16px;
+    }
+
+    .prompt-card {
+      padding: 16px 16px 14px;
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.72));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 10px 24px rgba(31, 41, 55, 0.12);
+    }
+
+    .emoji-button {
+      display: grid;
+      place-items: center;
+      width: clamp(6.5rem, 22vw, 8.75rem);
+      aspect-ratio: 1 / 1;
+      margin: 0 auto;
+      border: none;
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.18)), #fde68a;
+      box-shadow: 0 10px 0 rgba(255, 255, 255, 0.72), 0 14px 26px rgba(31, 41, 55, 0.16);
+      font-size: clamp(3rem, 10vw, 4.4rem);
+      cursor: pointer;
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    }
+
+    .emoji-button:active {
+      transform: translateY(5px) scale(0.98);
+      box-shadow: 0 4px 0 rgba(255, 255, 255, 0.74), 0 8px 14px rgba(31, 41, 55, 0.16);
+    }
+
+    .emoji-button:focus-visible,
+    .choice-button:focus-visible,
+    .slot-button:focus-visible {
+      outline: 4px solid rgba(255, 255, 255, 0.92);
+      outline-offset: 3px;
+    }
+
+    .word-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .slot-button {
+      width: clamp(2.9rem, 9vw, 3.7rem);
+      height: clamp(3.3rem, 10vw, 4rem);
+      border: 3px dashed rgba(148, 163, 184, 0.72);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: inset 0 -4px 0 rgba(255, 255, 255, 0.7);
+      color: #0f172a;
+      font-size: clamp(1.55rem, 4.8vw, 2.05rem);
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    }
+
+    .slot-button.filled,
+    .slot-button.static-letter {
+      border-style: solid;
+      border-color: rgba(251, 191, 36, 0.78);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(254, 240, 138, 0.72));
+    }
+
+    .slot-button.missing::before {
+      content: "?";
+      color: rgba(148, 163, 184, 0.95);
+      font-size: clamp(1.4rem, 4vw, 1.8rem);
+    }
+
+    .slot-button.filled::before,
+    .slot-button.static-letter::before,
+    .slot-button.drop-target::before {
+      content: none;
+    }
+
+    .slot-button.drop-target {
+      transform: translateY(-4px) scale(1.04);
+      border-color: #34d399;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(187, 247, 208, 0.82));
+    }
+
+    .tray-section {
+      padding: 14px 16px 12px;
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(254, 249, 195, 0.74));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 10px 24px rgba(31, 41, 55, 0.12);
+      border: 2px solid rgba(251, 191, 36, 0.28);
+    }
+
+    .tray-label {
+      margin: 0 0 12px;
+      text-align: center;
+      font-size: clamp(0.95rem, 3.4vw, 1.1rem);
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #7c2d12;
+    }
+
+    .choices-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(3.5rem, 4.25rem));
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .choice-button {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border: none;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.18)), var(--button-color, #93c5fd);
+      box-shadow: 0 8px 0 rgba(255, 255, 255, 0.72), 0 12px 22px rgba(31, 41, 55, 0.16);
+      color: #0f172a;
+      cursor: grab;
+      font-family: inherit;
+      font-size: clamp(1.55rem, 4.8vw, 2.05rem);
+      font-weight: 900;
+      transition: transform 120ms ease, box-shadow 120ms ease, opacity 160ms ease;
+      touch-action: none;
+      user-select: none;
+      animation: choice-rock 1800ms ease-in-out infinite;
+      animation-delay: var(--rock-delay, 0ms);
+    }
+
+    .choice-button:active {
+      cursor: grabbing;
+    }
+
+    .choice-button.dragging-source {
+      opacity: 0.3;
+      animation-play-state: paused;
+    }
+
+    .choice-button.is-gone {
+      opacity: 0;
+      transform: scale(0.8);
+      pointer-events: none;
+      animation: none;
+    }
+
+    .drag-ghost {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 60;
+      margin: 0;
+      pointer-events: none;
+      transform: translate(-50%, -50%) rotate(-4deg) scale(1.04);
+      box-shadow: 0 16px 28px rgba(31, 41, 55, 0.28);
+      animation: none;
     }
 
     .game-rail {
@@ -216,6 +370,22 @@
       transition: opacity 220ms ease;
     }
 
+    .status {
+      min-height: 1.6em;
+      margin: 16px 0 0;
+      text-align: center;
+      font-size: clamp(1rem, 3.8vw, 1.15rem);
+      font-weight: 800;
+    }
+
+    .status.good {
+      color: var(--good);
+    }
+
+    .status.bad {
+      color: var(--bad);
+    }
+
     .star-bank-section {
       margin-top: 18px;
       padding: 14px 10px 4px;
@@ -277,8 +447,7 @@
     .party-mode .hero,
     .party-mode .card,
     .party-mode .topbar,
-    .party-mode .problem-text,
-    .party-mode .answers,
+    .party-mode .play-area,
     .party-mode .game-rail,
     .party-mode .star-bank-section {
       animation: party-sway 860ms ease-in-out infinite alternate;
@@ -313,143 +482,10 @@
       animation: none;
     }
 
-    .problem-text {
-      min-width: 0;
-      font-size: clamp(2rem, 9vw, 4rem);
-      line-height: 1;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-align: right;
-      white-space: nowrap;
-      padding-right: 6px;
-    }
-
-    .answers {
-      display: grid;
-      gap: 10px;
-      width: min(112px, 24vw);
-      min-width: 90px;
-    }
-
-    .answer-button {
-      position: relative;
-      aspect-ratio: 1 / 1;
-      width: 100%;
-      border: none;
-      border-radius: 22px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.15)),
-        var(--button-color, #fca5a5);
-      box-shadow: 0 8px 0 rgba(255, 255, 255, 0.7), 0 12px 22px rgba(31, 41, 55, 0.16);
-      color: #0f172a;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: clamp(1.8rem, 8vw, 2.6rem);
-      font-weight: 900;
-      transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease, background 120ms ease;
-      overflow: visible;
-    }
-
-    .answer-button:active {
-      transform: translateY(5px) scale(0.98);
-      box-shadow: 0 3px 0 rgba(255, 255, 255, 0.75), 0 8px 14px rgba(31, 41, 55, 0.18);
-    }
-
-    .answer-button:focus-visible {
-      outline: 4px solid rgba(255, 255, 255, 0.92);
-      outline-offset: 3px;
-    }
-
-    .answer-button.correct {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.18)), #86efac;
-      color: #14532d;
-    }
-
-    .answer-button.wrong {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.18)), #fca5a5;
-      color: #7f1d1d;
-      animation: wrong-shake 360ms ease;
-    }
-
-    .answer-button.correct {
-      animation: correct-dance 700ms ease;
-      transform-origin: center;
-      z-index: 2;
-    }
-
-    .answer-button.sparkle-burst .sparkle {
-      animation: sparkle-burst 620ms ease-out forwards;
-    }
-
-    .sparkle {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 14px;
-      height: 14px;
-      margin-left: -7px;
-      margin-top: -7px;
-      border-radius: 999px;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, currentColor 45%, rgba(255, 255, 255, 0) 70%);
-      opacity: 0;
-      pointer-events: none;
-      transform: rotate(var(--angle)) translateY(0) scale(0.2);
-      color: var(--sparkle-color, #facc15);
-    }
-
-    .status {
-      min-height: 1.6em;
-      margin: 16px 0 0;
-      text-align: center;
-      font-size: clamp(1rem, 3.8vw, 1.15rem);
-      font-weight: 800;
-    }
-
-    .status.good {
-      color: var(--good);
-    }
-
-    .status.bad {
-      color: var(--bad);
-    }
-
-    .hint {
-      margin: 8px 0 0;
-      text-align: center;
-      font-size: clamp(0.95rem, 3.4vw, 1.05rem);
-      line-height: 1.35;
-      font-weight: 700;
-    }
-
-    @keyframes wrong-shake {
-      0% { transform: translateX(0); }
-      20% { transform: translateX(-10px) rotate(-3deg); }
-      40% { transform: translateX(10px) rotate(3deg); }
-      60% { transform: translateX(-8px) rotate(-2deg); }
-      80% { transform: translateX(8px) rotate(2deg); }
-      100% { transform: translateX(0); }
-    }
-
-    @keyframes correct-dance {
-      0% { transform: scale(1); }
-      18% { transform: scale(1.18) rotate(-7deg); }
-      36% { transform: scale(1.26) rotate(7deg); }
-      54% { transform: scale(1.2) rotate(-5deg); }
-      72% { transform: scale(1.1) rotate(4deg); }
-      100% { transform: scale(1.12) rotate(0deg); }
-    }
-
-    @keyframes sparkle-burst {
-      0% {
-        opacity: 0.2;
-        transform: rotate(var(--angle)) translateY(0) scale(0.2);
-      }
-      25% {
-        opacity: 1;
-      }
-      100% {
-        opacity: 0;
-        transform: rotate(var(--angle)) translateY(-64px) scale(1.1);
-      }
+    @keyframes choice-rock {
+      0% { transform: rotate(-3deg) translateY(0); }
+      50% { transform: rotate(3deg) translateY(-2px); }
+      100% { transform: rotate(-3deg) translateY(0); }
     }
 
     @keyframes bank-star-dance {
@@ -479,33 +515,16 @@
       100% { transform: translate(-50%, -50%) scale(1.08) rotate(8deg); opacity: 1; }
     }
 
-    @media (max-width: 420px) {
+    @media (max-width: 640px) {
       .problem-shell {
-        gap: 10px;
-        grid-template-columns: minmax(0, 1fr) minmax(82px, 96px) 62px;
+        grid-template-columns: 1fr;
       }
 
-      .problem-text {
-        font-size: clamp(1.8rem, 8.5vw, 2.6rem);
-      }
-
-      .answers {
-        width: min(96px, 27vw);
-        min-width: 84px;
-      }
-
-       .game-rail {
-        width: 62px;
-      }
-
-      .thermo {
-        width: 32px;
-        height: 164px;
-      }
-
-      .thermo-bulb {
-        width: 46px;
-        height: 46px;
+      .game-rail {
+        width: 100%;
+        flex-direction: row;
+        justify-content: center;
+        padding-top: 8px;
       }
     }
   </style>
@@ -516,13 +535,20 @@
       <a class="back-link" href="../index.html" aria-label="Back to home page">⬅️🏡</a>
     </div>
     <header class="hero">
-      <h1 class="title">Math</h1>
-      <p class="subtitle">toán học</p>
+      <h1 class="title" id="page-title">Spelling</h1>
     </header>
     <section class="card">
       <div class="problem-shell">
-        <div class="problem-text" id="problem-text">7 - 4 =</div>
-        <div class="answers" id="answers"></div>
+        <div class="play-area">
+          <section class="prompt-card" aria-label="Spelling prompt">
+            <button type="button" class="emoji-button" id="emoji-button" aria-label="Play word audio"></button>
+            <div class="word-row" id="word-row"></div>
+          </section>
+          <section class="tray-section" aria-label="Letter choices">
+            <p class="tray-label">Drag A Letter To The Empty Spot</p>
+            <div class="choices-grid" id="choices-grid"></div>
+          </section>
+        </div>
         <div class="game-rail" aria-label="Streak progress">
           <div class="goal-star-shell" id="goal-star-shell" aria-hidden="true">
             <span class="goal-star goal-star-off">★</span>
@@ -545,45 +571,39 @@
   </main>
 
   <script>
-    const appVersion = "20260719005751";
+    const appVersion = "__APP_VERSION__";
     const versionInfoPath = "../app_version.json";
-    const mathConfig = {
-  "base_max_number": 10,
-  "base_min_number": 0,
-  "correct_answer_per_star": 3,
-  "star_max_boost": 1,
-  "star_min_boost": 0,
-  "correct_answer": "../assets/audio/UI_Sounds/ding%20sparkle.m4a?v=20260628-1",
-  "wrong_answer": "../assets/audio/UI_Sounds/Uuugh.m4a?v=20260628-1",
-  "star_celebration": "../assets/audio/UI_Sounds/Magic%20ga.m4a?v=20260628-1",
-  "star_party": "../assets/audio/UI_Sounds/rocket-road.m4a?v=20260628-1"
-};
-    const answersElement = document.getElementById("answers");
-    const problemTextElement = document.getElementById("problem-text");
+    const pageConfig = __PAGE_CONFIG_JSON__;
+    const spellingConfig = pageConfig.spellingConfig || {};
+    const vocabulary = pageConfig.vocabulary || [];
+    const alphabet = pageConfig.alphabet || [];
+    const correctAnswersPerStar = Math.max(1, Number(spellingConfig.correct_answer_per_star) || 1);
+    const advanceDelayMs = Math.max(0, Number(spellingConfig.iteration_delay_ms) || 0);
+    const pageTitle = document.getElementById("page-title");
+    const emojiButton = document.getElementById("emoji-button");
+    const wordRow = document.getElementById("word-row");
+    const choicesGrid = document.getElementById("choices-grid");
     const statusElement = document.getElementById("status");
     const backLink = document.querySelector(".back-link");
     const thermoFill = document.getElementById("thermo-fill");
     const goalStarShell = document.getElementById("goal-star-shell");
     const starsBank = document.getElementById("stars-bank");
-    const palette = ["#fcd34d", "#93c5fd", "#f9a8d4"];
-    const sparklePalette = ["#facc15", "#fb7185", "#60a5fa", "#34d399", "#c084fc"];
-    const navigationPlayer = new Audio("../assets/audio/Menu/Back%20to%20home.m4a");
+    const choicePalette = ["#fde68a", "#93c5fd", "#f9a8d4", "#86efac", "#fdba74", "#c4b5fd"];
+    const navigationPlayer = new Audio();
     const uiPlayer = new Audio();
+    const wordPlayer = new Audio();
     const magicPlayer = new Audio();
     const partyPlayer = new Audio();
-    const correctAudio = mathConfig.correct_answer;
-    const wrongAudio = mathConfig.wrong_answer;
-    const magicAudio = mathConfig.star_celebration;
-    const partyAudio = mathConfig.star_party;
-    const correctAnswersPerStar = Math.max(1, Number(mathConfig.correct_answer_per_star) || 1);
     let currentProblem = null;
+    const recentWords = [];
     let streakCount = 0;
     let isResolving = false;
     let activeResolutionId = 0;
     let isPartyLockActive = false;
     let roundFirstTry = true;
-    let partyAnimationFrame = null;
+    let activeDrag = null;
     let flyingPartyStars = [];
+    let partyAnimationFrame = null;
 
     function withVersion(href, version = appVersion) {
       const url = new URL(href, window.location.href);
@@ -609,6 +629,8 @@
       }
     }
 
+    pageTitle.textContent = pageConfig.title;
+
     async function playThenNavigate(audioPath, href) {
       if (isPartyLockActive) {
         return;
@@ -626,13 +648,9 @@
 
       try {
         await navigationPlayer.play();
-        navigationPlayer.addEventListener(
-          "ended",
-          () => {
-            window.location.href = destination;
-          },
-          { once: true }
-        );
+        navigationPlayer.addEventListener("ended", () => {
+          window.location.href = destination;
+        }, { once: true });
       } catch (error) {
         console.error("Unable to play back audio", error);
         window.location.href = destination;
@@ -641,7 +659,54 @@
 
     void ensureLatestVersion();
 
-    async function playSound(audioPath, waitForEnd = false) {
+    backLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      playThenNavigate(pageConfig.backAudio, backLink.getAttribute("href"));
+    });
+
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function shuffle(items) {
+      const copy = [...items];
+      for (let index = copy.length - 1; index > 0; index -= 1) {
+        const swapIndex = randomInt(0, index);
+        [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+      }
+      return copy;
+    }
+
+    function wait(ms) {
+      return new Promise((resolve) => {
+        window.setTimeout(resolve, ms);
+      });
+    }
+
+    function setStatus(message, tone) {
+      statusElement.textContent = message;
+      statusElement.className = tone ? `status ${tone}` : "status";
+    }
+
+    function setResolvingState(resolving) {
+      isResolving = resolving;
+      applyInteractionLock();
+    }
+
+    function applyInteractionLock() {
+      emojiButton.disabled = isPartyLockActive || isResolving;
+      choicesGrid.querySelectorAll(".choice-button").forEach((button) => {
+        button.disabled = isPartyLockActive || isResolving || button.classList.contains("is-gone");
+      });
+      backLink.setAttribute("aria-disabled", String(isPartyLockActive));
+    }
+
+    function setPartyInteractionLock(locked) {
+      isPartyLockActive = locked;
+      applyInteractionLock();
+    }
+
+    async function playUiSound(audioPath) {
       if (!audioPath) {
         return;
       }
@@ -652,24 +717,67 @@
 
       try {
         await uiPlayer.play();
-        if (waitForEnd) {
-          await new Promise((resolve) => {
-            uiPlayer.addEventListener("ended", resolve, { once: true });
-          });
-        }
+        await new Promise((resolve) => {
+          const finish = () => {
+            uiPlayer.removeEventListener("ended", finish);
+            uiPlayer.removeEventListener("error", finish);
+            resolve();
+          };
+
+          uiPlayer.addEventListener("ended", finish, { once: true });
+          uiPlayer.addEventListener("error", finish, { once: true });
+        });
       } catch (error) {
         console.error("Unable to play UI audio", error);
       }
     }
 
+    function playCorrectSound() {
+      return playUiSound(spellingConfig.correct_answer);
+    }
+
+    function playWrongSound() {
+      return playUiSound(spellingConfig.wrong_answer);
+    }
+
+    async function playWordSound(audioPath) {
+      if (!audioPath) {
+        return;
+      }
+
+      wordPlayer.pause();
+      wordPlayer.currentTime = 0;
+      wordPlayer.src = audioPath;
+
+      try {
+        await wordPlayer.play();
+        await new Promise((resolve) => {
+          const finish = () => {
+            wordPlayer.removeEventListener("ended", finish);
+            wordPlayer.removeEventListener("error", finish);
+            wordPlayer.removeEventListener("pause", finish);
+            wordPlayer.removeEventListener("emptied", finish);
+            resolve();
+          };
+
+          wordPlayer.addEventListener("ended", finish, { once: true });
+          wordPlayer.addEventListener("error", finish, { once: true });
+          wordPlayer.addEventListener("pause", finish, { once: true });
+          wordPlayer.addEventListener("emptied", finish, { once: true });
+        });
+      } catch (error) {
+        console.error("Unable to play word audio", error);
+      }
+    }
+
     async function playMagicSound() {
-      if (!magicAudio) {
+      if (!spellingConfig.star_celebration) {
         return;
       }
 
       magicPlayer.pause();
       magicPlayer.currentTime = 0;
-      magicPlayer.src = magicAudio;
+      magicPlayer.src = spellingConfig.star_celebration;
 
       try {
         await magicPlayer.play();
@@ -705,25 +813,21 @@
           return;
         }
 
-        probe.addEventListener(
-          "loadedmetadata",
-          () => {
-            finish(Number.isFinite(probe.duration) ? probe.duration : 0);
-          },
-          { once: true }
-        );
+        probe.addEventListener("loadedmetadata", () => {
+          finish(Number.isFinite(probe.duration) ? probe.duration : 0);
+        }, { once: true });
         probe.addEventListener("error", () => finish(0), { once: true });
       });
     }
 
     async function playPartySound() {
-      if (!partyAudio) {
+      if (!spellingConfig.star_party) {
         return;
       }
 
       partyPlayer.pause();
       partyPlayer.currentTime = 0;
-      partyPlayer.src = partyAudio;
+      partyPlayer.src = spellingConfig.star_party;
 
       try {
         await partyPlayer.play();
@@ -741,12 +845,6 @@
       thermoFill.style.height = `${ratio * 100}%`;
       goalStarShell.classList.toggle("lit", ratio >= 1);
       document.documentElement.style.setProperty("--bulb-glow", String(0.22 + ratio * 0.58));
-    }
-
-    function wait(ms) {
-      return new Promise((resolve) => {
-        window.setTimeout(resolve, ms);
-      });
     }
 
     function addBankPlaceholder() {
@@ -914,14 +1012,18 @@
       });
     }
 
+    function getStarCount() {
+      return starsBank.querySelectorAll(".star-token:not(.placeholder)").length;
+    }
+
     async function runStarParty() {
       const starCount = getStarCount();
-      if (!partyAudio || starCount === 0) {
+      if (!spellingConfig.star_party || starCount === 0) {
         return;
       }
 
       document.body.classList.add("party-mode");
-      const totalDurationMs = Math.max(await getAudioDuration(partyAudio) * 1000, 1000);
+      const totalDurationMs = Math.max(await getAudioDuration(spellingConfig.star_party) * 1000, 1000);
       const intervalMs = starCount > 1 ? totalDurationMs / (starCount + 2) : totalDurationMs;
       const compactionDuration = Math.max(90, Math.min(540, intervalMs * 0.78));
       const playback = playPartySound();
@@ -985,8 +1087,8 @@
       });
 
       const magicPlayback = playMagicSound();
-  streakCount = 0;
-  setMeterProgress(0);
+      streakCount = 0;
+      setMeterProgress(0);
       await animationPromise;
       floatingStar.remove();
       finalizeBankStar(placeholder);
@@ -996,242 +1098,300 @@
       return totalStars;
     }
 
-    function playWrongSound() {
-      return playSound(wrongAudio, true);
+    function getMissingLetterCount() {
+      return 1 + Math.floor(getStarCount() / 7);
     }
 
-    function playCorrectSound() {
-      return playSound(correctAudio, true);
-    }
-
-    backLink.addEventListener("click", (event) => {
-      event.preventDefault();
-      playThenNavigate("../assets/audio/Menu/Back%20to%20home.m4a", backLink.getAttribute("href"));
-    });
-
-    function randomInt(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    function shuffle(items) {
-      const copy = [...items];
-      for (let index = copy.length - 1; index > 0; index -= 1) {
-        const swapIndex = randomInt(0, index);
-        [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
-      }
-      return copy;
-    }
-
-    function getStarCount() {
-      return starsBank.querySelectorAll(".star-token:not(.placeholder)").length;
-    }
-
-    function getDifficultyBounds() {
-      const starCount = getStarCount();
-      const minNumber = mathConfig.base_min_number + starCount * mathConfig.star_min_boost;
-      const maxNumber = mathConfig.base_max_number + starCount * mathConfig.star_max_boost;
-      return {
-        minNumber,
-        maxNumber: Math.max(minNumber + 1, maxNumber),
-      };
+    function chooseMissingIndexes(length) {
+      const maxMissing = Math.min(6, Math.max(1, length), getMissingLetterCount());
+      return shuffle([...Array(length).keys()]).slice(0, maxMissing).sort((left, right) => left - right);
     }
 
     function buildProblem() {
-      const { minNumber, maxNumber } = getDifficultyBounds();
-      const problemBuilders = [];
+      const eligibleWords = vocabulary.filter((item) => !recentWords.includes(item.word));
+      const pool = eligibleWords.length > 0 ? eligibleWords : vocabulary;
+      const item = pool[randomInt(0, pool.length - 1)];
+      recentWords.push(item.word);
+      if (recentWords.length > 3) {
+        recentWords.shift();
+      }
 
-      if (minNumber <= maxNumber - minNumber) {
-        problemBuilders.push(() => {
-          const left = randomInt(minNumber, maxNumber - minNumber);
-          const right = randomInt(minNumber, maxNumber - left);
-          return {
-            text: `${left} + ${right} =`,
-            correctAnswer: left + right,
-          };
+      const letters = item.letters.map((letter) => ({ label: letter.label }));
+      const missingIndexes = chooseMissingIndexes(letters.length);
+      const missingLabels = missingIndexes.map((index) => letters[index].label);
+      const slots = letters.map((letter, index) => ({
+        label: letter.label,
+        missing: missingIndexes.includes(index),
+        filled: !missingIndexes.includes(index),
+      }));
+
+      const distractorPool = shuffle(alphabet.filter((label) => !missingLabels.includes(label)));
+      const choices = missingLabels.map((label, index) => ({ id: `correct-${index}-${label}`, label, correct: true }));
+      let fillerIndex = 0;
+      while (choices.length < 6 && fillerIndex < distractorPool.length) {
+        choices.push({
+          id: `extra-${choices.length}-${distractorPool[fillerIndex]}`,
+          label: distractorPool[fillerIndex],
+          correct: false,
         });
-
-        problemBuilders.push(() => {
-          const correctAnswer = randomInt(minNumber, maxNumber - minNumber);
-          const right = randomInt(minNumber, maxNumber - correctAnswer);
-          return {
-            text: `${correctAnswer + right} - ${right} =`,
-            correctAnswer,
-          };
-        });
+        fillerIndex += 1;
       }
-
-      if (problemBuilders.length === 0) {
-        throw new Error(`No valid math problems for bounds ${minNumber}-${maxNumber}`);
+      while (choices.length < 6) {
+        const fallbackLetter = alphabet[randomInt(0, Math.max(0, alphabet.length - 1))] || "A";
+        choices.push({ id: `fallback-${choices.length}-${fallbackLetter}`, label: fallbackLetter, correct: false });
       }
-
-      const { text, correctAnswer } = problemBuilders[randomInt(0, problemBuilders.length - 1)]();
-      const choices = new Set([correctAnswer]);
-
-      for (const offset of shuffle([-3, -2, -1, 1, 2, 3])) {
-        const wrongAnswer = correctAnswer + offset;
-        if (wrongAnswer < minNumber || wrongAnswer > maxNumber) {
-          continue;
-        }
-        choices.add(wrongAnswer);
-        if (choices.size === 3) {
-          break;
-        }
-      }
-
-      if (choices.size < 3) {
-        for (const value of shuffle([...Array(maxNumber - minNumber + 1).keys()].map((offset) => minNumber + offset))) {
-          if (value !== correctAnswer) {
-            choices.add(value);
-          }
-          if (choices.size === 3) {
-            break;
-          }
-        }
-      }
-
-      const answers = shuffle([...choices]);
 
       return {
-        text,
-        correctAnswer,
-        answers,
+        emoji: item.emoji,
+        audio: item.audio,
+        word: item.word,
+        slots,
+        choices: shuffle(choices),
+        missingCount: missingIndexes.length,
       };
     }
 
-    function setStatus(message, tone) {
-      statusElement.textContent = message;
-      statusElement.className = tone ? `status ${tone}` : "status";
-    }
-
-    function applyInteractionLock() {
-      answersElement.querySelectorAll(".answer-button").forEach((button) => {
-        button.disabled = isPartyLockActive;
+    function clearDropTargets() {
+      wordRow.querySelectorAll(".slot-button.drop-target").forEach((slot) => {
+        slot.classList.remove("drop-target");
       });
-      backLink.setAttribute("aria-disabled", String(isPartyLockActive));
     }
 
-    function setPartyInteractionLock(locked) {
-      isPartyLockActive = locked;
-      applyInteractionLock();
-    }
-
-    function renderProblem() {
-      currentProblem = buildProblem();
-      roundFirstTry = true;
-      problemTextElement.textContent = currentProblem.text;
-      answersElement.innerHTML = "";
-      setStatus("", "");
-
-      currentProblem.answers.forEach((answer, index) => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "answer-button";
-        button.textContent = answer;
-        button.style.setProperty("--button-color", palette[index % palette.length]);
-        button.setAttribute("aria-label", `Answer ${answer}`);
-        button.addEventListener("click", () => handleAnswer(button, answer));
-        answersElement.appendChild(button);
-      });
-
-      applyInteractionLock();
-    }
-
-    function burstSparkles(button) {
-      button.classList.remove("sparkle-burst");
-      button.querySelectorAll(".sparkle").forEach((sparkle) => sparkle.remove());
-
-      for (let index = 0; index < 8; index += 1) {
-        const sparkle = document.createElement("span");
-        sparkle.className = "sparkle";
-        sparkle.style.setProperty("--angle", `${index * 45}deg`);
-        sparkle.style.setProperty(
-          "--sparkle-color",
-          sparklePalette[index % sparklePalette.length]
-        );
-        button.appendChild(sparkle);
-      }
-
-      button.classList.add("sparkle-burst");
-      window.setTimeout(() => {
-        button.classList.remove("sparkle-burst");
-        button.querySelectorAll(".sparkle").forEach((sparkle) => sparkle.remove());
-      }, 650);
-    }
-
-    async function handleAnswer(button, answer) {
-      if (isResolving || isPartyLockActive || button.disabled) {
+    function clearActiveDrag() {
+      if (!activeDrag) {
         return;
       }
 
-      stopMagicSound();
+      const { sourceButton, ghost, pointerId } = activeDrag;
+      sourceButton.classList.remove("dragging-source");
+      ghost.remove();
+      clearDropTargets();
+      document.removeEventListener("pointermove", handlePointerMove);
+      document.removeEventListener("pointerup", handlePointerUp);
+      document.removeEventListener("pointercancel", handlePointerCancel);
+      if (pointerId !== null) {
+        try {
+          sourceButton.releasePointerCapture(pointerId);
+        } catch (error) {
+          void error;
+        }
+      }
+      activeDrag = null;
+    }
+
+    function findSlotAtPoint(clientX, clientY) {
+      const target = document.elementFromPoint(clientX, clientY);
+      const slot = target?.closest(".slot-button.missing:not(.filled)");
+      return slot && wordRow.contains(slot) ? slot : null;
+    }
+
+    function handlePointerMove(event) {
+      if (!activeDrag || event.pointerId !== activeDrag.pointerId) {
+        return;
+      }
+
+      activeDrag.ghost.style.left = `${event.clientX}px`;
+      activeDrag.ghost.style.top = `${event.clientY}px`;
+      clearDropTargets();
+      const slot = findSlotAtPoint(event.clientX, event.clientY);
+      slot?.classList.add("drop-target");
+    }
+
+    async function handleWrongPlacement(choiceButton) {
+      clearActiveDrag();
       const resolutionId = ++activeResolutionId;
-      const buttons = [...answersElement.querySelectorAll(".answer-button")];
-      if (answer === currentProblem.correctAnswer) {
-        isResolving = true;
-        if (roundFirstTry) {
-          streakCount = Math.min(streakCount + 1, correctAnswersPerStar);
-          setMeterProgress(streakCount);
-        } else {
-          streakCount = 0;
-          setMeterProgress(0);
-        }
-        button.classList.add("correct");
-        burstSparkles(button);
-        setStatus("Great job!", "good");
-        buttons.forEach((item) => {
-          item.disabled = true;
-        });
-        await playCorrectSound();
-        if (streakCount === correctAnswersPerStar) {
-          setStatus("Star earned!", "good");
-          const willTriggerParty = (getStarCount() + 1) % 7 === 0;
-          const milestonePromise = celebrateMilestone();
-          renderProblem();
-          if (willTriggerParty) {
-            setPartyInteractionLock(true);
-          } else {
-            isResolving = false;
-          }
-          const totalStars = await milestonePromise;
-          if (resolutionId !== activeResolutionId) {
-            return;
-          }
-          if (willTriggerParty && totalStars > 0 && totalStars % 7 === 0) {
-            setStatus("Star party!", "good");
-            await runStarParty();
-          }
-          if (willTriggerParty) {
-            setPartyInteractionLock(false);
-            isResolving = false;
-          }
-          return;
-        }
-        if (resolutionId === activeResolutionId) {
-          isResolving = false;
-        }
-        renderProblem();
-        return;
-      }
-
-      isResolving = true;
+      setResolvingState(true);
       roundFirstTry = false;
       streakCount = 0;
       setMeterProgress(0);
-      button.classList.remove("wrong");
-      void button.offsetWidth;
-      button.classList.add("wrong");
-      buttons.forEach((item) => {
-        item.disabled = true;
-      });
+      choiceButton.classList.add("is-gone");
+      choiceButton.disabled = true;
       setStatus("Try again!", "bad");
       await playWrongSound();
-      buttons.forEach((item) => {
-        item.disabled = item === button;
-      });
+      choiceButton.remove();
       if (resolutionId === activeResolutionId) {
-        isResolving = false;
+        setResolvingState(false);
       }
     }
+
+    async function finishSolvedProblem() {
+      const resolutionId = ++activeResolutionId;
+      setResolvingState(true);
+
+      if (roundFirstTry) {
+        streakCount = Math.min(streakCount + 1, correctAnswersPerStar);
+        setMeterProgress(streakCount);
+      } else {
+        streakCount = 0;
+        setMeterProgress(0);
+      }
+
+      setStatus(roundFirstTry ? "Great job!" : "You fixed the word!", roundFirstTry ? "good" : "");
+
+      await playCorrectSound();
+      await playWordSound(currentProblem.audio);
+
+      if (roundFirstTry && streakCount === correctAnswersPerStar) {
+        setStatus("Star earned!", "good");
+        const totalStars = await celebrateMilestone();
+        if (resolutionId !== activeResolutionId) {
+          return;
+        }
+        if (totalStars > 0 && totalStars % 7 === 0) {
+          setPartyInteractionLock(true);
+          setStatus("Star party!", "good");
+          await runStarParty();
+          setPartyInteractionLock(false);
+        }
+      }
+
+      if (advanceDelayMs > 0) {
+        await wait(advanceDelayMs);
+      }
+
+      if (resolutionId === activeResolutionId) {
+        setResolvingState(false);
+        renderProblem();
+      }
+    }
+
+    function maybeFinishProblem() {
+      const allFilled = currentProblem.slots.every((slot) => slot.filled);
+      if (!allFilled) {
+        setStatus("Nice!", "good");
+        return;
+      }
+
+      void finishSolvedProblem();
+    }
+
+    function placeChoiceInSlot(choiceButton, slotButton) {
+      clearActiveDrag();
+      const slotIndex = Number(slotButton.dataset.slotIndex);
+      const label = choiceButton.dataset.label;
+      currentProblem.slots[slotIndex].filled = true;
+      slotButton.textContent = label;
+      slotButton.classList.remove("missing", "drop-target");
+      slotButton.classList.add("filled");
+      choiceButton.classList.add("is-gone");
+      choiceButton.disabled = true;
+      window.setTimeout(() => {
+        choiceButton.remove();
+      }, 120);
+      maybeFinishProblem();
+    }
+
+    async function handlePointerUp(event) {
+      if (!activeDrag || event.pointerId !== activeDrag.pointerId) {
+        return;
+      }
+
+      const slot = findSlotAtPoint(event.clientX, event.clientY);
+      if (!slot) {
+        clearActiveDrag();
+        return;
+      }
+
+      const expectedLabel = slot.dataset.label;
+      const label = activeDrag.sourceButton.dataset.label;
+      const sourceButton = activeDrag.sourceButton;
+
+      if (expectedLabel === label) {
+        placeChoiceInSlot(sourceButton, slot);
+        return;
+      }
+
+      await handleWrongPlacement(sourceButton);
+    }
+
+    function handlePointerCancel(event) {
+      if (!activeDrag || event.pointerId !== activeDrag.pointerId) {
+        return;
+      }
+
+      clearActiveDrag();
+    }
+
+    function startDrag(event) {
+      if (isResolving || isPartyLockActive) {
+        return;
+      }
+
+      const button = event.currentTarget;
+      if (button.disabled) {
+        return;
+      }
+
+      event.preventDefault();
+      clearActiveDrag();
+
+      const ghost = button.cloneNode(true);
+      ghost.classList.add("drag-ghost");
+      ghost.style.width = `${button.offsetWidth}px`;
+      ghost.style.height = `${button.offsetHeight}px`;
+      document.body.appendChild(ghost);
+      button.classList.add("dragging-source");
+
+      activeDrag = {
+        pointerId: event.pointerId,
+        sourceButton: button,
+        ghost,
+      };
+
+      button.setPointerCapture(event.pointerId);
+      handlePointerMove(event);
+      document.addEventListener("pointermove", handlePointerMove);
+      document.addEventListener("pointerup", handlePointerUp);
+      document.addEventListener("pointercancel", handlePointerCancel);
+    }
+
+    function renderProblem() {
+      clearActiveDrag();
+      currentProblem = buildProblem();
+      roundFirstTry = true;
+      emojiButton.textContent = currentProblem.emoji;
+      emojiButton.setAttribute("aria-label", `Play the word for ${currentProblem.word}`);
+      wordRow.innerHTML = "";
+      choicesGrid.innerHTML = "";
+      setStatus("", "");
+
+      currentProblem.slots.forEach((slot, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = slot.missing ? "slot-button missing" : "slot-button static-letter";
+        button.dataset.slotIndex = String(index);
+        button.dataset.label = slot.label;
+        button.disabled = true;
+        if (!slot.missing) {
+          button.textContent = slot.label;
+        }
+        wordRow.appendChild(button);
+      });
+
+      currentProblem.choices.forEach((choice, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "choice-button";
+        button.textContent = choice.label;
+        button.dataset.choiceId = choice.id;
+        button.dataset.label = choice.label;
+        button.style.setProperty("--button-color", choicePalette[index % choicePalette.length]);
+        button.style.setProperty("--rock-delay", `${index * 110}ms`);
+        button.setAttribute("aria-label", `Letter choice ${choice.label}`);
+        button.addEventListener("pointerdown", startDrag);
+        choicesGrid.appendChild(button);
+      });
+
+      applyInteractionLock();
+      void playWordSound(currentProblem.audio);
+    }
+
+    emojiButton.addEventListener("click", () => {
+      if (isPartyLockActive || isResolving || !currentProblem) {
+        return;
+      }
+      void playWordSound(currentProblem.audio);
+    });
 
     setMeterProgress(0);
     renderProblem();

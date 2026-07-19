@@ -13,7 +13,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from config import MATH_CONFIG, READING_CONFIG
+from config import MATH_CONFIG, READING_CONFIG, SPELLING_CONFIG
 
 SHORT_SENTENCES_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Short sentences"
 LETTER_SOUNDS_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Letters" / "Learning"
@@ -24,9 +24,11 @@ TEMPLATE_PATH = ROOT_DIR / "html_template" / "lesson_template.html"
 HOME_TEMPLATE_PATH = ROOT_DIR / "html_template" / "home_template.html"
 MATH_TEMPLATE_PATH = ROOT_DIR / "html_template" / "math_template.html"
 READING_TEMPLATE_PATH = ROOT_DIR / "html_template" / "reading_template.html"
+SPELLING_TEMPLATE_PATH = ROOT_DIR / "html_template" / "spelling_template.html"
 OUTPUT_PATH = ROOT_DIR / "output" / "short_sentences.html"
 MATH_OUTPUT_PATH = ROOT_DIR / "output" / "math.html"
 READING_OUTPUT_PATH = ROOT_DIR / "output" / "reading.html"
+SPELLING_OUTPUT_PATH = ROOT_DIR / "output" / "spelling.html"
 LETTER_SOUNDS_OUTPUT_PATH = ROOT_DIR / "output" / "letter_sounds.html"
 INDEX_PATH = ROOT_DIR / "index.html"
 APP_VERSION_PATH = ROOT_DIR / "app_version.json"
@@ -281,6 +283,13 @@ def render_home_html() -> str:
             "href": "output/reading.html",
             "audio": menu_audio.get("reading", ""),
         },
+        {
+            "emoji": "✏️",
+            "title": "Spelling",
+            "subtitle": "đánh vần",
+            "href": "output/spelling.html",
+            "audio": menu_audio.get("spelling", ""),
+        },
     ]
     menu_json = json.dumps(menu_items, ensure_ascii=False, indent=2)
     if MENU_PLACEHOLDER not in template:
@@ -333,6 +342,34 @@ def render_reading_html() -> str:
     return template.replace(PAGE_CONFIG_PLACEHOLDER, json.dumps(page_config, ensure_ascii=False, indent=2))
 
 
+def render_spelling_html() -> str:
+    template = apply_app_version(SPELLING_TEMPLATE_PATH.read_text(encoding="utf-8"))
+    vocabulary = build_vocabulary()
+    spelling_config = dict(SPELLING_CONFIG)
+    alphabet = sorted({letter.upper() for letter in build_letter_audio_map().keys() if len(letter) == 1})
+
+    for key in ("correct_answer", "wrong_answer", "star_celebration", "star_party"):
+        audio_path = spelling_config.get(key)
+        if audio_path:
+            spelling_config[key] = encode_audio_path(ROOT_DIR / audio_path)
+
+    for item in vocabulary:
+        item["letters"] = [{"label": letter.upper()} for letter in item["word"]]
+
+    page_config = {
+        "title": "Spelling",
+        "subtitle": "đánh vần",
+        "description": "Drag the missing letters into the word.",
+        "backAudio": encode_audio_path(MENU_AUDIO_DIR / "Back to home.m4a"),
+        "spellingConfig": spelling_config,
+        "vocabulary": vocabulary,
+        "alphabet": alphabet,
+    }
+    if PAGE_CONFIG_PLACEHOLDER not in template:
+        raise ValueError(f"Template is missing placeholder {PAGE_CONFIG_PLACEHOLDER}")
+    return template.replace(PAGE_CONFIG_PLACEHOLDER, json.dumps(page_config, ensure_ascii=False, indent=2))
+
+
 def main() -> None:
     lessons = build_lessons()
     letter_sounds = build_letter_sounds()
@@ -356,10 +393,12 @@ def main() -> None:
     home_html = render_home_html()
     math_html = render_math_html()
     reading_html = render_reading_html()
+    spelling_html = render_spelling_html()
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_PATH.write_text(lesson_html, encoding="utf-8")
     MATH_OUTPUT_PATH.write_text(math_html, encoding="utf-8")
     READING_OUTPUT_PATH.write_text(reading_html, encoding="utf-8")
+    SPELLING_OUTPUT_PATH.write_text(spelling_html, encoding="utf-8")
     LETTER_SOUNDS_OUTPUT_PATH.write_text(letter_sounds_html, encoding="utf-8")
     INDEX_PATH.write_text(home_html, encoding="utf-8")
     APP_VERSION_PATH.write_text(
@@ -369,6 +408,7 @@ def main() -> None:
     print(f"Wrote {len(lessons)} buttons to {OUTPUT_PATH}")
     print(f"Wrote math page to {MATH_OUTPUT_PATH}")
     print(f"Wrote reading page to {READING_OUTPUT_PATH}")
+    print(f"Wrote spelling page to {SPELLING_OUTPUT_PATH}")
     print(f"Wrote {len(letter_sounds)} buttons to {LETTER_SOUNDS_OUTPUT_PATH}")
     print(f"Wrote home page to {INDEX_PATH}")
     print(f"Wrote app version to {APP_VERSION_PATH}")
