@@ -118,7 +118,7 @@
     }
 
     .go-prompt {
-      margin: 4px 0 12px;
+      margin: 12px 0 0;
       text-align: center;
       color: #7a6757;
       font-size: 1rem;
@@ -225,6 +225,12 @@
       font-weight: 800;
     }
 
+    .next-button {
+      background: linear-gradient(180deg, #9ec1b3, #84ac9b);
+      color: #fffdf8;
+      box-shadow: 0 12px 24px rgba(117, 146, 132, 0.24);
+    }
+
     .action-button:disabled {
       opacity: 0.45;
       box-shadow: none;
@@ -246,6 +252,38 @@
 
     .answer-body p {
       margin: 0;
+      white-space: pre-wrap;
+    }
+
+    .answer-reveal-stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .answer-reveal-button {
+      width: 100%;
+      min-height: 54px;
+      padding: 14px 16px;
+      border: 1px solid rgba(167, 145, 124, 0.24);
+      border-radius: 16px;
+      background: linear-gradient(180deg, #f6ecde, #eddcc8);
+      color: #715e4e;
+      box-shadow: 0 8px 18px rgba(140, 115, 90, 0.12);
+      font: inherit;
+      font-size: 0.98rem;
+      font-weight: 700;
+      line-height: 1.35;
+      text-align: left;
+    }
+
+    .answer-reveal-button:focus-visible {
+      outline: 3px solid rgba(143, 184, 168, 0.95);
+      outline-offset: 2px;
+    }
+
+    .answer-reveal-item {
+      margin: 0;
+      padding-left: 1.2rem;
       white-space: pre-wrap;
     }
 
@@ -301,8 +339,8 @@
     <div class="controls-shell">
       <section class="controls" id="controls"></section>
       <div class="go-wrap" id="go-wrap">
-        <p class="go-prompt" id="go-prompt">What questions would you like to practice?</p>
         <button class="go-button" id="go-button" type="button" disabled>Go!</button>
+        <p class="go-prompt" id="go-prompt">What questions would you like to practice?</p>
       </div>
     </div>
 
@@ -326,7 +364,7 @@
         </div>
 
         <div class="next-row is-hidden" id="next-row">
-          <button class="action-button" id="next-button" type="button">Next question</button>
+          <button class="action-button next-button" id="next-button" type="button">Next question</button>
         </div>
       </article>
     </section>
@@ -350,6 +388,7 @@
     const nextButton = document.getElementById("next-button");
 
     const sectionSelections = new Map(pageConfig.sections.map((section) => [section.title, false]));
+    const recentQuestionIds = [];
     let currentCard = null;
     let hasStarted = false;
 
@@ -383,7 +422,8 @@
 
     function getQuestionPool() {
       return getSelectedSections().flatMap((section) =>
-        section.questions.map((question) => ({
+        section.questions.map((question, index) => ({
+          id: `${section.title}::${index}`,
           sectionTitle: section.title,
           question: question.question,
           answers: question.answers,
@@ -395,7 +435,7 @@
       const hasSelection = getSelectedSections().length > 0;
       goButton.disabled = hasStarted || !hasSelection;
       nextButton.disabled = !hasSelection;
-      goPrompt.classList.toggle("is-hidden", hasSelection || hasStarted);
+      goPrompt.classList.toggle("is-hidden", hasStarted);
     }
 
     function renderAnswer(answers) {
@@ -407,13 +447,27 @@
         return;
       }
 
-      const list = document.createElement("ul");
-      answers.forEach((answer) => {
-        const item = document.createElement("li");
-        item.textContent = answer;
-        list.appendChild(item);
+      const stack = document.createElement("div");
+      stack.className = "answer-reveal-stack";
+      answers.forEach((answer, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "answer-reveal-button";
+        button.textContent = `Reveal point ${index + 1}`;
+        button.setAttribute("aria-label", `Reveal answer point ${index + 1}`);
+        button.addEventListener("click", () => {
+          const item = document.createElement("p");
+          item.className = "answer-reveal-item";
+          item.textContent = `• ${answer}`;
+          button.replaceWith(item);
+        });
+        stack.appendChild(button);
       });
-      answerBody.appendChild(list);
+      answerBody.appendChild(stack);
+    }
+
+    function countAllQuestions() {
+      return pageConfig.sections.reduce((total, section) => total + section.questions.length, 0);
     }
 
     function pickRandomQuestion() {
@@ -426,22 +480,21 @@
         return pool[0];
       }
 
-      let nextCard = pool[Math.floor(Math.random() * pool.length)];
-      let attempts = 0;
-      while (
-        currentCard &&
-        nextCard.sectionTitle === currentCard.sectionTitle &&
-        nextCard.question === currentCard.question &&
-        attempts < 8
-      ) {
-        nextCard = pool[Math.floor(Math.random() * pool.length)];
-        attempts += 1;
-      }
-      return nextCard;
+      const availableIds = new Set(pool.map((card) => card.id));
+      const relevantRecentIds = recentQuestionIds.filter((id) => availableIds.has(id));
+      const cooldownSize = Math.min(6, Math.max(pool.length - 1, 0));
+      const blockedIds = new Set(relevantRecentIds.slice(-cooldownSize));
+      const eligiblePool = pool.filter((card) => !blockedIds.has(card.id));
+      const sourcePool = eligiblePool.length ? eligiblePool : pool;
+      return sourcePool[Math.floor(Math.random() * sourcePool.length)];
     }
 
     function showQuestion(card) {
       currentCard = card;
+      recentQuestionIds.push(card.id);
+      if (recentQuestionIds.length > countAllQuestions()) {
+        recentQuestionIds.shift();
+      }
       sectionName.textContent = card.sectionTitle;
       questionText.textContent = card.question;
       renderAnswer(card.answers);
