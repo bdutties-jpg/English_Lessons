@@ -1,5 +1,5 @@
-**Interview Questions**  
-**Personal Information**
+
+**About You**
 
 * What’s your nationality?  
   * I’m Vietnamese  
@@ -16,7 +16,7 @@
 * Have you been to the United States before?  
   * No, we tried to plan a trip for me to visit over Christmas and New Years in 2024, but by the time we started to apply for the tourist visa we couldn’t get an interview in time.  He came to visit me that January instead.
 
-**Questions About Your Fiancé**
+**About Your Fiancé**
 
 * How old is he?  
   * 40  
@@ -45,14 +45,15 @@
   * We like to visit new and different coffee shops  
   * We like to explore new restaurants  
   * We like to talk and be with each other.  We video call every day for hours.  If we are both awake and not busy, we like to be on the phone.  We’ve been doing this for over two years now.  
-* Do you know your fiancé(e)’s parents?  
-  * I text with his mom sometimes, and have spoken briefly with his mom, dad, step mom and step dad on different video calls where my fiancé was with them  
-* Have you ever been to the U.S. to visit your fiancé(e)?  
+* Do you know your fiancé’s parents?  
+  * Yes.  I text with his mom sometimes, and have spoken briefly with his mom, dad, step mom and step dad on different video calls where my fiancé was with them  
+* Have you ever been to the U.S. to visit your fiancé?  
   * No, we tried to plan a trip for me to visit over Christmas and New Years in 2024, but by the time we started to apply for the tourist visa we couldn’t get an interview in time.  He came to visit me that January instead.  
 * What was the proposal like?  
   * When he visited me the second time in Japan, he suggested I recommend a spot where there was a good view of the sunset.  He said he wanted to film a TikTok trend video with me.  He set up his camera and when we were about to start the video, he got down on one knee and proposed to me.  I brought pictures that he took from the video.  
 * Have you planned the wedding? If so, do you have any proof?  
-  * He has been handling planning the wedding.  He wants to have a smaller wedding because with the 90 days time frame we won’t have a lot of time to prepare, and also his mom’s side of the family is very large, and it will be less stressful for him if it is smaller and more intimate.  
+  * We are hoping to be able to have the wedding on October 24th, on his mom’s birthday, as long as everything comes through with the visa in time.  
+  * My fiancé has been handling planning the wedding.  He wants to have a smaller wedding because with the 90 days time frame we won’t have a lot of time to prepare, and also his mom’s side of the family is very large, and it will be less stressful for him if it is smaller and more intimate.  
   * Proof:  I don’t have any proof with me, but I know that he has been talking with his parents about it, and he has spoken with his best friend (Tom) and he has agreed to officiate the wedding.  His friend received a license to perform weddings many years ago so he could do another friend’s wedding.  
 * Who will be at the wedding?  
   * My fiancé’s mom and stepdad,   
@@ -62,4 +63,3 @@
   * His Aunt Patti and a few other aunts and uncles that he is closest with on his mom’s side  
   * His 3 aunts and uncle’s and their spouses on his dad’s side  
   * He was hoping his grandma would be able to come, but she is in a nursing home, and his dad said she needs too much care to be able to leave the facility for more than a 10-15 minute walk.
-
