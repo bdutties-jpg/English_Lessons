@@ -20,16 +20,19 @@ LETTER_SOUNDS_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Letters" / "Learning"
 MENU_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Menu"
 UI_SOUNDS_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "UI_Sounds"
 VOCABULARY_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Vocabulary"
+QUESTION_FLASHCARDS_MD_PATH = ROOT_DIR / "assets" / "md" / "Question_Flashcards.md"
 TEMPLATE_PATH = ROOT_DIR / "html_template" / "lesson_template.html"
 HOME_TEMPLATE_PATH = ROOT_DIR / "html_template" / "home_template.html"
 MATH_TEMPLATE_PATH = ROOT_DIR / "html_template" / "math_template.html"
 READING_TEMPLATE_PATH = ROOT_DIR / "html_template" / "reading_template.html"
 SPELLING_TEMPLATE_PATH = ROOT_DIR / "html_template" / "spelling_template.html"
+QUESTION_FLASHCARDS_TEMPLATE_PATH = ROOT_DIR / "html_template" / "question_flashcards_template.html"
 OUTPUT_PATH = ROOT_DIR / "output" / "short_sentences.html"
 MATH_OUTPUT_PATH = ROOT_DIR / "output" / "math.html"
 READING_OUTPUT_PATH = ROOT_DIR / "output" / "reading.html"
 SPELLING_OUTPUT_PATH = ROOT_DIR / "output" / "spelling.html"
 LETTER_SOUNDS_OUTPUT_PATH = ROOT_DIR / "output" / "letter_sounds.html"
+QUESTION_FLASHCARDS_OUTPUT_PATH = ROOT_DIR / "output" / "question_flashcards.html"
 INDEX_PATH = ROOT_DIR / "index.html"
 APP_VERSION_PATH = ROOT_DIR / "app_version.json"
 PLACEHOLDER = "__LESSONS_JSON__"
@@ -63,6 +66,64 @@ class VocabularyItem:
     word: str
     emoji: str
     audio: str
+
+
+def parse_question_flashcards_markdown() -> list[dict[str, object]]:
+    if not QUESTION_FLASHCARDS_MD_PATH.exists():
+        raise FileNotFoundError(f"Question flashcards file not found at {QUESTION_FLASHCARDS_MD_PATH}")
+
+    lines = QUESTION_FLASHCARDS_MD_PATH.read_text(encoding="utf-8").splitlines()
+    sections: list[dict[str, object]] = []
+    current_section: dict[str, object] | None = None
+    current_question: dict[str, object] | None = None
+
+    for raw_line in lines:
+        line = raw_line.rstrip()
+        stripped = line.strip()
+
+        if not stripped:
+            continue
+
+        section_match = re.match(r"^\*\*(?P<title>.+?)\*\*$", stripped)
+        if section_match:
+            current_section = {
+                "title": section_match.group("title").strip(),
+                "questions": [],
+            }
+            sections.append(current_section)
+            current_question = None
+            continue
+
+        bullet_match = re.match(r"^(?P<indent>\s*)\*\s+(?P<content>.+)$", line)
+        if not bullet_match:
+            if current_question and current_question["answers"]:
+                current_question["answers"][-1] = f"{current_question['answers'][-1]} {stripped}".strip()
+            elif current_question:
+                current_question["question"] = f"{current_question['question']} {stripped}".strip()
+            continue
+
+        if current_section is None:
+            raise ValueError("Encountered a question before any flashcard section heading.")
+
+        content = bullet_match.group("content").strip()
+        indent = bullet_match.group("indent")
+        if indent:
+            if current_question is None:
+                raise ValueError(f"Encountered an answer before a question in section '{current_section['title']}'.")
+            current_question["answers"].append(content)
+            continue
+
+        current_question = {
+            "question": content,
+            "answers": [],
+        }
+        current_section["questions"].append(current_question)
+
+    sections = [section for section in sections if section["questions"]]
+    if not sections:
+        raise ValueError(f"No flashcard sections with questions found in {QUESTION_FLASHCARDS_MD_PATH}")
+
+    return sections
 
 
 def encode_relative_path(path: Path, *, from_output_dir: bool = True) -> str:
@@ -370,6 +431,17 @@ def render_spelling_html() -> str:
     return template.replace(PAGE_CONFIG_PLACEHOLDER, json.dumps(page_config, ensure_ascii=False, indent=2))
 
 
+def render_question_flashcards_html() -> str:
+    template = apply_app_version(QUESTION_FLASHCARDS_TEMPLATE_PATH.read_text(encoding="utf-8"))
+    sections = parse_question_flashcards_markdown()
+    page_config = {
+        "sections": sections,
+    }
+    if PAGE_CONFIG_PLACEHOLDER not in template:
+        raise ValueError(f"Template is missing placeholder {PAGE_CONFIG_PLACEHOLDER}")
+    return template.replace(PAGE_CONFIG_PLACEHOLDER, json.dumps(page_config, ensure_ascii=False, indent=2))
+
+
 def main() -> None:
     lessons = build_lessons()
     letter_sounds = build_letter_sounds()
@@ -394,12 +466,14 @@ def main() -> None:
     math_html = render_math_html()
     reading_html = render_reading_html()
     spelling_html = render_spelling_html()
+    question_flashcards_html = render_question_flashcards_html()
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_PATH.write_text(lesson_html, encoding="utf-8")
     MATH_OUTPUT_PATH.write_text(math_html, encoding="utf-8")
     READING_OUTPUT_PATH.write_text(reading_html, encoding="utf-8")
     SPELLING_OUTPUT_PATH.write_text(spelling_html, encoding="utf-8")
     LETTER_SOUNDS_OUTPUT_PATH.write_text(letter_sounds_html, encoding="utf-8")
+    QUESTION_FLASHCARDS_OUTPUT_PATH.write_text(question_flashcards_html, encoding="utf-8")
     INDEX_PATH.write_text(home_html, encoding="utf-8")
     APP_VERSION_PATH.write_text(
         json.dumps({"version": APP_VERSION, "audio_version": AUDIO_ASSET_VERSION}, indent=2),
@@ -410,6 +484,7 @@ def main() -> None:
     print(f"Wrote reading page to {READING_OUTPUT_PATH}")
     print(f"Wrote spelling page to {SPELLING_OUTPUT_PATH}")
     print(f"Wrote {len(letter_sounds)} buttons to {LETTER_SOUNDS_OUTPUT_PATH}")
+    print(f"Wrote question flashcards page to {QUESTION_FLASHCARDS_OUTPUT_PATH}")
     print(f"Wrote home page to {INDEX_PATH}")
     print(f"Wrote app version to {APP_VERSION_PATH}")
 

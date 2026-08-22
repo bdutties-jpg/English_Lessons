@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Interview Practice" />
+  <meta name="application-name" content="Interview Practice" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="app-version" content="__APP_VERSION__" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="../assets/icons/icon-512.png" />
+  <link rel="manifest" href="../site.webmanifest" />
+  <title>Interview Practice</title>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --panel: rgba(15, 23, 42, 0.82);
+      --panel-strong: rgba(15, 23, 42, 0.94);
+      --card: rgba(248, 250, 252, 0.96);
+      --ink: #0f172a;
+      --muted: #475569;
+      --line: rgba(148, 163, 184, 0.26);
+      --accent: #22c55e;
+      --accent-2: #f59e0b;
+      --accent-3: #38bdf8;
+      --disabled: #334155;
+      --shadow: rgba(2, 6, 23, 0.34);
+      --sticky-top: max(12px, env(safe-area-inset-top));
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: #e2e8f0;
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 28%),
+        radial-gradient(circle at 85% 15%, rgba(245, 158, 11, 0.16), transparent 20%),
+        linear-gradient(180deg, #020617 0%, #0f172a 55%, #111827 100%);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .page {
+      width: min(100%, 860px);
+      margin: 0 auto;
+      padding: 0 14px calc(36px + env(safe-area-inset-bottom));
+    }
+
+    .controls-shell {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding-top: var(--sticky-top);
+      background: linear-gradient(180deg, rgba(2, 6, 23, 0.96), rgba(2, 6, 23, 0.78) 72%, rgba(2, 6, 23, 0));
+      backdrop-filter: blur(14px);
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      padding: 12px 0 10px;
+    }
+
+    .toggle-button,
+    .go-button,
+    .action-button {
+      border: none;
+      border-radius: 18px;
+      transition: transform 140ms ease, box-shadow 140ms ease, background-color 140ms ease, opacity 140ms ease;
+    }
+
+    .toggle-button {
+      min-height: 58px;
+      padding: 12px 10px;
+      background: rgba(30, 41, 59, 0.92);
+      color: #cbd5e1;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      box-shadow: 0 10px 24px rgba(2, 6, 23, 0.22);
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: 0.01em;
+    }
+
+    .toggle-button.is-selected {
+      color: white;
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.95), rgba(14, 116, 144, 0.95));
+      box-shadow: 0 14px 28px rgba(8, 47, 73, 0.44);
+      transform: translateY(-1px);
+    }
+
+    .toggle-button:active,
+    .go-button:active,
+    .action-button:active {
+      transform: translateY(2px) scale(0.985);
+    }
+
+    .toggle-button:focus-visible,
+    .go-button:focus-visible,
+    .action-button:focus-visible {
+      outline: 3px solid rgba(125, 211, 252, 0.9);
+      outline-offset: 2px;
+    }
+
+    .go-wrap {
+      padding-bottom: 14px;
+    }
+
+    .go-button {
+      width: 100%;
+      min-height: 56px;
+      padding: 14px 18px;
+      background: linear-gradient(180deg, rgba(245, 158, 11, 0.92), rgba(217, 119, 6, 0.96));
+      color: white;
+      box-shadow: 0 16px 28px rgba(120, 53, 15, 0.38);
+      font-size: 1.08rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .go-button:disabled {
+      background: linear-gradient(180deg, rgba(51, 65, 85, 0.94), rgba(30, 41, 59, 0.98));
+      color: rgba(226, 232, 240, 0.66);
+      box-shadow: none;
+      transform: none;
+    }
+
+    .go-button.is-popping {
+      animation: balloon-pop 900ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      pointer-events: none;
+    }
+
+    .go-wrap.is-hidden {
+      display: none;
+    }
+
+    .content {
+      padding-top: 18px;
+    }
+
+    .content.is-hidden {
+      display: none;
+    }
+
+    .card {
+      background: var(--card);
+      color: var(--ink);
+      border-radius: 28px;
+      padding: 22px 18px 24px;
+      box-shadow: 0 18px 36px var(--shadow);
+    }
+
+    .meta-label {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .section-name {
+      margin: 0 0 18px;
+      font-size: clamp(1.1rem, 4.8vw, 1.45rem);
+      line-height: 1.25;
+      font-weight: 800;
+    }
+
+    .question-block,
+    .answer-block {
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
+      margin-top: 18px;
+    }
+
+    .question-text {
+      margin: 0;
+      font-size: clamp(1.35rem, 6vw, 2rem);
+      line-height: 1.3;
+      font-weight: 750;
+      text-wrap: pretty;
+    }
+
+    .action-row {
+      margin-top: 20px;
+    }
+
+    .action-button {
+      width: 100%;
+      min-height: 58px;
+      padding: 16px 18px;
+      background: linear-gradient(180deg, #0f172a, #1e293b);
+      color: white;
+      box-shadow: 0 14px 28px rgba(15, 23, 42, 0.22);
+      font-size: 1.02rem;
+      font-weight: 800;
+    }
+
+    .action-button:disabled {
+      opacity: 0.45;
+      box-shadow: none;
+    }
+
+    .answer-block {
+      display: none;
+    }
+
+    .answer-block.is-visible {
+      display: block;
+    }
+
+    .answer-body {
+      color: #1e293b;
+      font-size: clamp(1.02rem, 4.2vw, 1.18rem);
+      line-height: 1.6;
+    }
+
+    .answer-body p {
+      margin: 0;
+      white-space: pre-wrap;
+    }
+
+    .answer-body ul {
+      margin: 0;
+      padding-left: 1.2rem;
+    }
+
+    .answer-body li + li {
+      margin-top: 0.72rem;
+    }
+
+    .next-row {
+      margin-top: 24px;
+    }
+
+    @keyframes balloon-pop {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      35% {
+        transform: scale(1.09);
+      }
+      72% {
+        transform: scale(0.92);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1.36);
+        opacity: 0;
+      }
+    }
+
+    @media (min-width: 700px) {
+      .page {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .card {
+        padding: 28px 26px 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="controls-shell">
+      <section class="controls" id="controls"></section>
+      <div class="go-wrap" id="go-wrap">
+        <button class="go-button" id="go-button" type="button" disabled>Go!</button>
+      </div>
+    </div>
+
+    <section class="content is-hidden" id="content">
+      <article class="card">
+        <p class="meta-label">Section</p>
+        <h1 class="section-name" id="section-name"></h1>
+
+        <div class="question-block">
+          <p class="meta-label">Question</p>
+          <p class="question-text" id="question-text"></p>
+        </div>
+
+        <div class="action-row">
+          <button class="action-button" id="answer-button" type="button">See the answer</button>
+        </div>
+
+        <div class="answer-block" id="answer-block">
+          <p class="meta-label">Answer</p>
+          <div class="answer-body" id="answer-body"></div>
+        </div>
+
+        <div class="next-row">
+          <button class="action-button" id="next-button" type="button">Next question</button>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const appVersion = "__APP_VERSION__";
+    const versionInfoPath = "../app_version.json";
+    const pageConfig = __PAGE_CONFIG_JSON__;
+    const controls = document.getElementById("controls");
+    const goWrap = document.getElementById("go-wrap");
+    const goButton = document.getElementById("go-button");
+    const content = document.getElementById("content");
+    const sectionName = document.getElementById("section-name");
+    const questionText = document.getElementById("question-text");
+    const answerButton = document.getElementById("answer-button");
+    const answerBlock = document.getElementById("answer-block");
+    const answerBody = document.getElementById("answer-body");
+    const nextButton = document.getElementById("next-button");
+
+    const sectionSelections = new Map(pageConfig.sections.map((section) => [section.title, false]));
+    let currentCard = null;
+    let hasStarted = false;
+
+    function withVersion(href, version = appVersion) {
+      const url = new URL(href, window.location.href);
+      url.searchParams.set("v", version);
+      return url.toString();
+    }
+
+    async function ensureLatestVersion() {
+      try {
+        const response = await fetch(`${versionInfoPath}?t=${Date.now()}`, { cache: "no-store" });
+        if (!response.ok) {
+          return;
+        }
+
+        const latest = await response.json();
+        if (!latest.version || latest.version === appVersion) {
+          return;
+        }
+
+        window.location.replace(withVersion(window.location.pathname + window.location.search + window.location.hash, latest.version));
+      } catch (error) {
+        console.error("Unable to check app version", error);
+      }
+    }
+
+    function getSelectedSections() {
+      return pageConfig.sections.filter((section) => sectionSelections.get(section.title));
+    }
+
+    function getQuestionPool() {
+      return getSelectedSections().flatMap((section) =>
+        section.questions.map((question) => ({
+          sectionTitle: section.title,
+          question: question.question,
+          answers: question.answers,
+        }))
+      );
+    }
+
+    function updateActionState() {
+      const hasSelection = getSelectedSections().length > 0;
+      goButton.disabled = hasStarted || !hasSelection;
+      nextButton.disabled = !hasSelection;
+    }
+
+    function renderAnswer(answers) {
+      answerBody.replaceChildren();
+      if (answers.length <= 1) {
+        const paragraph = document.createElement("p");
+        paragraph.textContent = answers[0] || "";
+        answerBody.appendChild(paragraph);
+        return;
+      }
+
+      const list = document.createElement("ul");
+      answers.forEach((answer) => {
+        const item = document.createElement("li");
+        item.textContent = answer;
+        list.appendChild(item);
+      });
+      answerBody.appendChild(list);
+    }
+
+    function pickRandomQuestion() {
+      const pool = getQuestionPool();
+      if (!pool.length) {
+        return null;
+      }
+
+      if (pool.length === 1) {
+        return pool[0];
+      }
+
+      let nextCard = pool[Math.floor(Math.random() * pool.length)];
+      let attempts = 0;
+      while (
+        currentCard &&
+        nextCard.sectionTitle === currentCard.sectionTitle &&
+        nextCard.question === currentCard.question &&
+        attempts < 8
+      ) {
+        nextCard = pool[Math.floor(Math.random() * pool.length)];
+        attempts += 1;
+      }
+      return nextCard;
+    }
+
+    function showQuestion(card) {
+      currentCard = card;
+      sectionName.textContent = card.sectionTitle;
+      questionText.textContent = card.question;
+      renderAnswer(card.answers);
+      answerBlock.classList.remove("is-visible");
+      answerButton.hidden = false;
+      answerButton.disabled = false;
+      content.classList.remove("is-hidden");
+      updateActionState();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function advanceQuestion() {
+      const nextCard = pickRandomQuestion();
+      if (!nextCard) {
+        return;
+      }
+      showQuestion(nextCard);
+    }
+
+    function buildToggleButtons() {
+      pageConfig.sections.forEach((section) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "toggle-button";
+        button.textContent = section.title;
+        button.setAttribute("aria-pressed", "false");
+        button.addEventListener("click", () => {
+          const isSelected = !sectionSelections.get(section.title);
+          sectionSelections.set(section.title, isSelected);
+          button.classList.toggle("is-selected", isSelected);
+          button.setAttribute("aria-pressed", String(isSelected));
+          updateActionState();
+        });
+        controls.appendChild(button);
+      });
+    }
+
+    goButton.addEventListener("click", () => {
+      if (goButton.disabled) {
+        return;
+      }
+
+      hasStarted = true;
+      updateActionState();
+      goButton.textContent = "I love you, sweetie!";
+      goButton.classList.add("is-popping");
+
+      window.setTimeout(() => {
+        goWrap.classList.add("is-hidden");
+        advanceQuestion();
+      }, 900);
+    });
+
+    answerButton.addEventListener("click", () => {
+      answerBlock.classList.add("is-visible");
+      answerButton.hidden = true;
+    });
+
+    nextButton.addEventListener("click", () => {
+      if (nextButton.disabled) {
+        return;
+      }
+      advanceQuestion();
+    });
+
+    void ensureLatestVersion();
+    buildToggleButtons();
+    updateActionState();
+  </script>
+</body>
+</html>
