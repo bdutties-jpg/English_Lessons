@@ -444,11 +444,12 @@
         const paragraph = document.createElement("p");
         paragraph.textContent = answers[0] || "";
         answerBody.appendChild(paragraph);
-        return;
+        return { multiReveal: false };
       }
 
       const stack = document.createElement("div");
       stack.className = "answer-reveal-stack";
+      let remainingAnswers = answers.length;
       answers.forEach((answer, index) => {
         const button = document.createElement("button");
         button.type = "button";
@@ -460,10 +461,15 @@
           item.className = "answer-reveal-item";
           item.textContent = `• ${answer}`;
           button.replaceWith(item);
+          remainingAnswers -= 1;
+          if (remainingAnswers === 0) {
+            nextRow.classList.remove("is-hidden");
+          }
         });
         stack.appendChild(button);
       });
       answerBody.appendChild(stack);
+      return { multiReveal: true };
     }
 
     function countAllQuestions() {
@@ -497,10 +503,10 @@
       }
       sectionName.textContent = card.sectionTitle;
       questionText.textContent = card.question;
-      renderAnswer(card.answers);
-      answerBlock.classList.remove("is-visible");
-      answerButton.hidden = false;
-      answerButton.disabled = false;
+      const answerMode = renderAnswer(card.answers);
+      answerBlock.classList.toggle("is-visible", answerMode.multiReveal);
+      answerButton.hidden = answerMode.multiReveal;
+      answerButton.disabled = answerMode.multiReveal;
       nextRow.classList.add("is-hidden");
       content.classList.remove("is-hidden");
       updateActionState();

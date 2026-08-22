@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="Interview Practice" />
   <meta name="application-name" content="Interview Practice" />
   <meta name="theme-color" content="#efe6d6" />
-  <meta name="app-version" content="20260822013327" />
+  <meta name="app-version" content="20260822013818" />
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="../assets/icons/icon-512.png" />
@@ -371,7 +371,7 @@
   </main>
 
   <script>
-    const appVersion = "20260822013327";
+    const appVersion = "20260822013818";
     const versionInfoPath = "../app_version.json";
     const pageConfig = {
   "sections": [
@@ -601,11 +601,12 @@
         const paragraph = document.createElement("p");
         paragraph.textContent = answers[0] || "";
         answerBody.appendChild(paragraph);
-        return;
+        return { multiReveal: false };
       }
 
       const stack = document.createElement("div");
       stack.className = "answer-reveal-stack";
+      let remainingAnswers = answers.length;
       answers.forEach((answer, index) => {
         const button = document.createElement("button");
         button.type = "button";
@@ -617,10 +618,15 @@
           item.className = "answer-reveal-item";
           item.textContent = `• ${answer}`;
           button.replaceWith(item);
+          remainingAnswers -= 1;
+          if (remainingAnswers === 0) {
+            nextRow.classList.remove("is-hidden");
+          }
         });
         stack.appendChild(button);
       });
       answerBody.appendChild(stack);
+      return { multiReveal: true };
     }
 
     function countAllQuestions() {
@@ -654,10 +660,10 @@
       }
       sectionName.textContent = card.sectionTitle;
       questionText.textContent = card.question;
-      renderAnswer(card.answers);
-      answerBlock.classList.remove("is-visible");
-      answerButton.hidden = false;
-      answerButton.disabled = false;
+      const answerMode = renderAnswer(card.answers);
+      answerBlock.classList.toggle("is-visible", answerMode.multiReveal);
+      answerButton.hidden = answerMode.multiReveal;
+      answerButton.disabled = answerMode.multiReveal;
       nextRow.classList.add("is-hidden");
       content.classList.remove("is-hidden");
       updateActionState();
