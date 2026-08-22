@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Interview Practice" />
   <meta name="application-name" content="Interview Practice" />
-  <meta name="theme-color" content="#0f172a" />
+  <meta name="theme-color" content="#efe6d6" />
   <meta name="app-version" content="__APP_VERSION__" />
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
@@ -16,18 +16,18 @@
   <title>Interview Practice</title>
   <style>
     :root {
-      --bg: #0b1120;
-      --panel: rgba(15, 23, 42, 0.82);
-      --panel-strong: rgba(15, 23, 42, 0.94);
-      --card: rgba(248, 250, 252, 0.96);
-      --ink: #0f172a;
-      --muted: #475569;
-      --line: rgba(148, 163, 184, 0.26);
-      --accent: #22c55e;
-      --accent-2: #f59e0b;
-      --accent-3: #38bdf8;
-      --disabled: #334155;
-      --shadow: rgba(2, 6, 23, 0.34);
+      --bg: #efe6d6;
+      --panel: rgba(244, 236, 223, 0.92);
+      --panel-strong: rgba(239, 230, 214, 0.97);
+      --card: rgba(255, 251, 244, 0.96);
+      --ink: #4e4135;
+      --muted: #8a7665;
+      --line: rgba(167, 145, 124, 0.24);
+      --accent: #8fb8a8;
+      --accent-2: #d6ab7d;
+      --accent-3: #b7c7de;
+      --disabled: #c7baa8;
+      --shadow: rgba(109, 88, 69, 0.16);
       --sticky-top: max(12px, env(safe-area-inset-top));
     }
 
@@ -42,12 +42,12 @@
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: "Avenir Next", "Segoe UI", sans-serif;
-      color: #e2e8f0;
+      font-family: "Comic Sans MS", "Chalkboard SE", "Trebuchet MS", sans-serif;
+      color: var(--ink);
       background:
-        radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 28%),
-        radial-gradient(circle at 85% 15%, rgba(245, 158, 11, 0.16), transparent 20%),
-        linear-gradient(180deg, #020617 0%, #0f172a 55%, #111827 100%);
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.52), transparent 28%),
+        radial-gradient(circle at 85% 15%, rgba(215, 190, 160, 0.22), transparent 20%),
+        linear-gradient(180deg, #f5ecdf 0%, #efe6d6 55%, #e7dccb 100%);
     }
 
     button {
@@ -65,7 +65,7 @@
       top: 0;
       z-index: 20;
       padding-top: var(--sticky-top);
-      background: linear-gradient(180deg, rgba(2, 6, 23, 0.96), rgba(2, 6, 23, 0.78) 72%, rgba(2, 6, 23, 0));
+      background: linear-gradient(180deg, rgba(245, 236, 223, 0.97), rgba(245, 236, 223, 0.88) 72%, rgba(245, 236, 223, 0));
       backdrop-filter: blur(14px);
     }
 
@@ -87,10 +87,10 @@
     .toggle-button {
       min-height: 58px;
       padding: 12px 10px;
-      background: rgba(30, 41, 59, 0.92);
-      color: #cbd5e1;
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      box-shadow: 0 10px 24px rgba(2, 6, 23, 0.22);
+      background: rgba(255, 248, 238, 0.96);
+      color: #7a6757;
+      border: 1px solid rgba(167, 145, 124, 0.22);
+      box-shadow: 0 8px 20px rgba(109, 88, 69, 0.12);
       font-size: 0.95rem;
       font-weight: 700;
       line-height: 1.15;
@@ -98,9 +98,9 @@
     }
 
     .toggle-button.is-selected {
-      color: white;
-      background: linear-gradient(180deg, rgba(56, 189, 248, 0.95), rgba(14, 116, 144, 0.95));
-      box-shadow: 0 14px 28px rgba(8, 47, 73, 0.44);
+      color: #fffdf8;
+      background: linear-gradient(180deg, #9ec1b3, #84ac9b);
+      box-shadow: 0 12px 24px rgba(117, 146, 132, 0.24);
       transform: translateY(-1px);
     }
 
@@ -113,8 +113,21 @@
     .toggle-button:focus-visible,
     .go-button:focus-visible,
     .action-button:focus-visible {
-      outline: 3px solid rgba(125, 211, 252, 0.9);
+      outline: 3px solid rgba(143, 184, 168, 0.95);
       outline-offset: 2px;
+    }
+
+    .go-prompt {
+      margin: 4px 0 12px;
+      text-align: center;
+      color: #7a6757;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .go-prompt.is-hidden {
+      display: none;
     }
 
     .go-wrap {
@@ -125,17 +138,17 @@
       width: 100%;
       min-height: 56px;
       padding: 14px 18px;
-      background: linear-gradient(180deg, rgba(245, 158, 11, 0.92), rgba(217, 119, 6, 0.96));
-      color: white;
-      box-shadow: 0 16px 28px rgba(120, 53, 15, 0.38);
+      background: linear-gradient(180deg, #d8b18a, #c8976c);
+      color: #fffdf9;
+      box-shadow: 0 12px 24px rgba(160, 118, 80, 0.24);
       font-size: 1.08rem;
       font-weight: 800;
       letter-spacing: 0.02em;
     }
 
     .go-button:disabled {
-      background: linear-gradient(180deg, rgba(51, 65, 85, 0.94), rgba(30, 41, 59, 0.98));
-      color: rgba(226, 232, 240, 0.66);
+      background: linear-gradient(180deg, #d8cfbf, #cabdaa);
+      color: rgba(94, 78, 62, 0.7);
       box-shadow: none;
       transform: none;
     }
@@ -162,6 +175,7 @@
       color: var(--ink);
       border-radius: 28px;
       padding: 22px 18px 24px;
+      border: 1px solid rgba(167, 145, 124, 0.14);
       box-shadow: 0 18px 36px var(--shadow);
     }
 
@@ -204,9 +218,9 @@
       width: 100%;
       min-height: 58px;
       padding: 16px 18px;
-      background: linear-gradient(180deg, #0f172a, #1e293b);
-      color: white;
-      box-shadow: 0 14px 28px rgba(15, 23, 42, 0.22);
+      background: linear-gradient(180deg, #edd8be, #e0c4a5);
+      color: #5f4b3c;
+      box-shadow: 0 12px 24px rgba(140, 115, 90, 0.16);
       font-size: 1.02rem;
       font-weight: 800;
     }
@@ -248,6 +262,10 @@
       margin-top: 24px;
     }
 
+    .next-row.is-hidden {
+      display: none;
+    }
+
     @keyframes balloon-pop {
       0% {
         transform: scale(1);
@@ -283,6 +301,7 @@
     <div class="controls-shell">
       <section class="controls" id="controls"></section>
       <div class="go-wrap" id="go-wrap">
+        <p class="go-prompt" id="go-prompt">What questions would you like to practice?</p>
         <button class="go-button" id="go-button" type="button" disabled>Go!</button>
       </div>
     </div>
@@ -306,7 +325,7 @@
           <div class="answer-body" id="answer-body"></div>
         </div>
 
-        <div class="next-row">
+        <div class="next-row is-hidden" id="next-row">
           <button class="action-button" id="next-button" type="button">Next question</button>
         </div>
       </article>
@@ -319,6 +338,7 @@
     const pageConfig = __PAGE_CONFIG_JSON__;
     const controls = document.getElementById("controls");
     const goWrap = document.getElementById("go-wrap");
+    const goPrompt = document.getElementById("go-prompt");
     const goButton = document.getElementById("go-button");
     const content = document.getElementById("content");
     const sectionName = document.getElementById("section-name");
@@ -326,6 +346,7 @@
     const answerButton = document.getElementById("answer-button");
     const answerBlock = document.getElementById("answer-block");
     const answerBody = document.getElementById("answer-body");
+    const nextRow = document.getElementById("next-row");
     const nextButton = document.getElementById("next-button");
 
     const sectionSelections = new Map(pageConfig.sections.map((section) => [section.title, false]));
@@ -374,6 +395,7 @@
       const hasSelection = getSelectedSections().length > 0;
       goButton.disabled = hasStarted || !hasSelection;
       nextButton.disabled = !hasSelection;
+      goPrompt.classList.toggle("is-hidden", hasSelection || hasStarted);
     }
 
     function renderAnswer(answers) {
@@ -426,6 +448,7 @@
       answerBlock.classList.remove("is-visible");
       answerButton.hidden = false;
       answerButton.disabled = false;
+      nextRow.classList.add("is-hidden");
       content.classList.remove("is-hidden");
       updateActionState();
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -434,6 +457,14 @@
     function advanceQuestion() {
       const nextCard = pickRandomQuestion();
       if (!nextCard) {
+        hasStarted = false;
+        currentCard = null;
+        content.classList.add("is-hidden");
+        goWrap.classList.remove("is-hidden");
+        goButton.classList.remove("is-popping");
+        goButton.textContent = "Go!";
+        updateActionState();
+        window.scrollTo({ top: 0, behavior: "smooth" });
         return;
       }
       showQuestion(nextCard);
@@ -476,6 +507,7 @@
     answerButton.addEventListener("click", () => {
       answerBlock.classList.add("is-visible");
       answerButton.hidden = true;
+      nextRow.classList.remove("is-hidden");
     });
 
     nextButton.addEventListener("click", () => {
