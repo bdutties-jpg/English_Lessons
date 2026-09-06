@@ -307,7 +307,7 @@ def build_person_has_people() -> list[dict[str, str]]:
 
     for image_path in person_images:
         name = image_path.stem
-        if normalized_key(name) == normalized_key("Bơ"):
+        if normalized_key(name) in {normalized_key("Bơ"), "bo"}:
             question_text = "What do you have?"
             reply_text = "I have a"
         else:
