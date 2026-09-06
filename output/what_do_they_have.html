@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="English Playtime" />
+  <meta name="application-name" content="English Playtime" />
+  <meta name="theme-color" content="#7dd3fc" />
+  <meta name="app-version" content="20260906014605" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="../assets/icons/icon-512.png" />
+  <link rel="manifest" href="../site.webmanifest" />
+  <title>What Do They Have?</title>
+  <style>
+    :root {
+      --ink: #1f2937;
+      --paper: #fffef5;
+      --shadow: rgba(31, 41, 55, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Trebuchet MS", "Comic Sans MS", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.8), transparent 28%),
+        radial-gradient(circle at top right, rgba(255, 255, 255, 0.65), transparent 22%),
+        linear-gradient(180deg, #8be9ff 0%, #7dd3fc 40%, #fef3c7 100%);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .page {
+      width: min(100%, 960px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    .topbar {
+      margin-bottom: 12px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 6px 18px rgba(31, 41, 55, 0.12);
+      color: #0f172a;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .back-link:focus-visible,
+    .person-button:focus-visible,
+    .reply-button:focus-visible {
+      outline: 4px solid rgba(255, 255, 255, 0.9);
+      outline-offset: 3px;
+    }
+
+    .hero {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      line-height: 1;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #0f172a;
+      text-shadow: 0 3px 0 rgba(255, 255, 255, 0.65);
+    }
+
+    .subtitle {
+      margin: 12px auto 0;
+      max-width: 34rem;
+      font-size: clamp(1rem, 3vw, 1.2rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .subtitle strong {
+      display: block;
+      font-size: clamp(1.05rem, 3.2vw, 1.3rem);
+    }
+
+    .people-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+    }
+
+    .person-button {
+      aspect-ratio: 1;
+      overflow: hidden;
+      padding: 0;
+      border: 5px solid rgba(255, 255, 255, 0.78);
+      border-radius: 28px;
+      background: var(--paper);
+      box-shadow: 0 10px 0 rgba(255, 255, 255, 0.6), 0 16px 32px var(--shadow);
+      cursor: pointer;
+      transition: transform 140ms ease, box-shadow 140ms ease;
+    }
+
+    .person-button:hover {
+      transform: translateY(-3px) scale(1.02);
+    }
+
+    .person-button:active {
+      transform: translateY(5px) scale(0.98);
+      box-shadow: 0 4px 0 rgba(255, 255, 255, 0.65), 0 8px 18px var(--shadow);
+    }
+
+    .person-button img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .stage {
+      display: grid;
+      justify-items: center;
+      gap: 16px;
+    }
+
+    .stage[hidden],
+    .people-grid[hidden],
+    .hero[hidden] {
+      display: none;
+    }
+
+    .person-picture {
+      position: relative;
+      width: min(100%, 72dvh, 720px);
+      aspect-ratio: 1;
+      overflow: hidden;
+      border: 6px solid rgba(255, 255, 255, 0.82);
+      border-radius: clamp(24px, 5vw, 40px);
+      background: var(--paper);
+      box-shadow: 0 14px 34px var(--shadow);
+    }
+
+    .person-picture img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .held-emoji {
+      position: absolute;
+      top: 86%;
+      left: 50%;
+      z-index: 1;
+      font-size: clamp(7rem, 26vmin, 14rem);
+      line-height: 1;
+      transform: translate(-50%, -75%);
+      filter: drop-shadow(0 3px 2px rgba(15, 23, 42, 0.25));
+      animation: appear 180ms ease-out both;
+      pointer-events: none;
+    }
+
+    .reply-button {
+      width: min(100%, 720px);
+      min-height: 74px;
+      padding: 14px 20px;
+      border: 4px solid rgba(255, 255, 255, 0.82);
+      border-radius: 24px;
+      background: #fde68a;
+      box-shadow: 0 8px 0 rgba(255, 255, 255, 0.62), 0 14px 26px var(--shadow);
+      color: #0f172a;
+      cursor: pointer;
+      font-size: clamp(1.3rem, 5vw, 2rem);
+      font-weight: 800;
+      transition: transform 120ms ease, filter 120ms ease;
+    }
+
+    .reply-button:active:not(:disabled) {
+      transform: translateY(5px) scale(0.99);
+    }
+
+    .reply-button:disabled {
+      cursor: wait;
+      filter: grayscale(0.35) brightness(0.94);
+    }
+
+    @keyframes appear {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -75%) scale(0.5);
+      }
+
+      to {
+        opacity: 1;
+        transform: translate(-50%, -75%) scale(1);
+      }
+    }
+
+    @media (min-width: 700px) {
+      .page {
+        padding-top: 36px;
+      }
+
+      .people-grid {
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="topbar">
+      <a class="back-link" href="../index.html" aria-label="Back to home page">⬅️🏡</a>
+    </div>
+    <header class="hero" id="hero">
+      <h1 class="title" id="page-title"></h1>
+      <p class="subtitle"><strong id="page-subtitle"></strong><span id="page-description"></span></p>
+    </header>
+    <section class="people-grid" id="people-grid" aria-label="Choose a person"></section>
+    <section class="stage" id="stage" hidden aria-live="polite">
+      <div class="person-picture">
+        <img id="selected-person-image" alt="" />
+        <span class="held-emoji" id="held-emoji" aria-hidden="true"></span>
+      </div>
+      <button class="reply-button" id="reply-button" type="button" disabled></button>
+    </section>
+  </main>
+
+  <script>
+    const appVersion = "20260906014605";
+    const versionInfoPath = "../app_version.json";
+    const pageConfig = {
+  "title": "What Do They Have?",
+  "subtitle": "Họ có gì?",
+  "description": "Choose a person, then listen and answer.",
+  "backAudio": "../assets/audio/Menu/Back%20to%20home.m4a?v=20260628-1",
+  "people": [
+    {
+      "name": "Bơ",
+      "image": "../assets/people/Bo%CC%9B.jpeg",
+      "questionAudio": "../assets/audio/Vocabulary/person%20has/Question/What%20do%20you%20have%3F.m4a?v=20260628-1",
+      "replyText": "I have a",
+      "replyAudio": "../assets/audio/Vocabulary/person%20has/Reply/I%20have%20a.m4a?v=20260628-1"
+    },
+    {
+      "name": "Strawberry",
+      "image": "../assets/people/Strawberry.jpeg",
+      "questionAudio": "../assets/audio/Vocabulary/person%20has/Question/What%20does%20strawberry%20have%3F.m4a?v=20260628-1",
+      "replyText": "Strawberry has a",
+      "replyAudio": "../assets/audio/Vocabulary/person%20has/Reply/Strawberry%20has%20a.m4a?v=20260628-1"
+    },
+    {
+      "name": "Teacher",
+      "image": "../assets/people/Teacher.jpeg",
+      "questionAudio": "../assets/audio/Vocabulary/person%20has/Question/What%20does%20Teacher%20have%3F.m4a?v=20260628-1",
+      "replyText": "Teacher has a",
+      "replyAudio": "../assets/audio/Vocabulary/person%20has/Reply/Teacher%20has%20a.m4a?v=20260628-1"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "Car",
+      "emoji": "🚗",
+      "audio": "../assets/audio/Vocabulary/Car%20%F0%9F%9A%97.m4a?v=20260628-1"
+    },
+    {
+      "word": "Cat",
+      "emoji": "🐱",
+      "audio": "../assets/audio/Vocabulary/Cat%20%F0%9F%90%B1.m4a?v=20260628-1"
+    },
+    {
+      "word": "Cow",
+      "emoji": "🐮",
+      "audio": "../assets/audio/Vocabulary/Cow%20%F0%9F%90%AE.m4a?v=20260628-1"
+    },
+    {
+      "word": "Dog",
+      "emoji": "🐶",
+      "audio": "../assets/audio/Vocabulary/Dog%20%F0%9F%90%B6.m4a?v=20260628-1"
+    },
+    {
+      "word": "Fox",
+      "emoji": "🦊",
+      "audio": "../assets/audio/Vocabulary/Fox%20%F0%9F%A6%8A.m4a?v=20260628-1"
+    },
+    {
+      "word": "Frog",
+      "emoji": "🐸",
+      "audio": "../assets/audio/Vocabulary/Frog%20%F0%9F%90%B8.m4a?v=20260628-1"
+    },
+    {
+      "word": "Hand",
+      "emoji": "🤚🏼",
+      "audio": "../assets/audio/Vocabulary/Hand%20%F0%9F%A4%9A%F0%9F%8F%BC.m4a?v=20260628-1"
+    },
+    {
+      "word": "Hat",
+      "emoji": "👒",
+      "audio": "../assets/audio/Vocabulary/Hat%20%F0%9F%91%92.m4a?v=20260628-1"
+    },
+    {
+      "word": "Jar",
+      "emoji": "🫙",
+      "audio": "../assets/audio/Vocabulary/Jar%20%F0%9F%AB%99.m4a?v=20260628-1"
+    },
+    {
+      "word": "Pig",
+      "emoji": "🐷",
+      "audio": "../assets/audio/Vocabulary/Pig%20%F0%9F%90%B7.m4a?v=20260628-1"
+    },
+    {
+      "word": "Sun",
+      "emoji": "☀️",
+      "audio": "../assets/audio/Vocabulary/Sun%20%E2%98%80%EF%B8%8F.m4a?v=20260628-1"
+    }
+  ]
+};
+    const peopleGrid = document.getElementById("people-grid");
+    const hero = document.getElementById("hero");
+    const stage = document.getElementById("stage");
+    const selectedPersonImage = document.getElementById("selected-person-image");
+    const heldEmoji = document.getElementById("held-emoji");
+    const replyButton = document.getElementById("reply-button");
+    const backLink = document.querySelector(".back-link");
+    const questionPlayer = new Audio();
+    const replyPlayer = new Audio();
+    const vocabularyPlayer = new Audio();
+    let activePerson = null;
+    let activeVocabulary = null;
+
+    function withVersion(href, version = appVersion) {
+      const url = new URL(href, window.location.href);
+      url.searchParams.set("v", version);
+      return url.toString();
+    }
+
+    async function ensureLatestVersion() {
+      try {
+        const response = await fetch(`${versionInfoPath}?t=${Date.now()}`, { cache: "no-store" });
+        if (!response.ok) {
+          return;
+        }
+
+        const latest = await response.json();
+        if (!latest.version || latest.version === appVersion) {
+          return;
+        }
+
+        window.location.replace(withVersion(window.location.pathname + window.location.search + window.location.hash, latest.version));
+      } catch (error) {
+        console.error("Unable to check app version", error);
+      }
+    }
+
+    function stopAudio() {
+      [questionPlayer, replyPlayer, vocabularyPlayer].forEach((player) => {
+        player.pause();
+        player.currentTime = 0;
+        player.removeAttribute("src");
+      });
+    }
+
+    function resetSelection() {
+      stopAudio();
+      activePerson = null;
+      activeVocabulary = null;
+      replyButton.disabled = true;
+      heldEmoji.textContent = "";
+      selectedPersonImage.removeAttribute("src");
+      selectedPersonImage.alt = "";
+      stage.hidden = true;
+      peopleGrid.hidden = false;
+      hero.hidden = false;
+    }
+
+    async function playQuestion() {
+      questionPlayer.src = activePerson.questionAudio;
+      questionPlayer.onended = () => {
+        replyButton.disabled = false;
+      };
+
+      try {
+        await questionPlayer.play();
+      } catch (error) {
+        console.error("Unable to play question audio", error);
+        replyButton.disabled = false;
+      }
+    }
+
+    function selectPerson(person) {
+      stopAudio();
+      activePerson = person;
+      activeVocabulary = pageConfig.vocabulary[Math.floor(Math.random() * pageConfig.vocabulary.length)];
+      selectedPersonImage.src = person.image;
+      selectedPersonImage.alt = person.name;
+      heldEmoji.textContent = activeVocabulary.emoji;
+      replyButton.textContent = `${person.replyText} ${activeVocabulary.word}`;
+      replyButton.disabled = true;
+      peopleGrid.hidden = true;
+      hero.hidden = true;
+      stage.hidden = false;
+      void playQuestion();
+    }
+
+    async function playReply() {
+      if (!activePerson || !activeVocabulary || replyButton.disabled) {
+        return;
+      }
+
+      replyButton.disabled = true;
+      questionPlayer.pause();
+      questionPlayer.currentTime = 0;
+      replyPlayer.src = activePerson.replyAudio;
+      replyPlayer.onended = async () => {
+        vocabularyPlayer.src = activeVocabulary.audio;
+        vocabularyPlayer.onended = resetSelection;
+        try {
+          await vocabularyPlayer.play();
+        } catch (error) {
+          console.error("Unable to play vocabulary audio", error);
+          resetSelection();
+        }
+      };
+
+      try {
+        await replyPlayer.play();
+      } catch (error) {
+        console.error("Unable to play reply audio", error);
+        resetSelection();
+      }
+    }
+
+    async function playThenNavigate(audioPath, href) {
+      const destination = withVersion(href);
+      stopAudio();
+      if (!audioPath) {
+        window.location.href = destination;
+        return;
+      }
+
+      questionPlayer.src = audioPath;
+      questionPlayer.onended = () => {
+        window.location.href = destination;
+      };
+
+      try {
+        await questionPlayer.play();
+      } catch (error) {
+        console.error("Unable to play back audio", error);
+        window.location.href = destination;
+      }
+    }
+
+    document.getElementById("page-title").textContent = pageConfig.title;
+    document.getElementById("page-subtitle").textContent = pageConfig.subtitle;
+    document.getElementById("page-description").textContent = pageConfig.description;
+    void ensureLatestVersion();
+
+    backLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      playThenNavigate(pageConfig.backAudio, backLink.getAttribute("href"));
+    });
+
+    replyButton.addEventListener("click", () => {
+      void playReply();
+    });
+
+    pageConfig.people.forEach((person) => {
+      const button = document.createElement("button");
+      const image = document.createElement("img");
+      button.type = "button";
+      button.className = "person-button";
+      button.setAttribute("aria-label", person.name);
+      image.src = person.image;
+      image.alt = person.name;
+      button.appendChild(image);
+      button.addEventListener("click", () => selectPerson(person));
+      peopleGrid.appendChild(button);
+    });
+  </script>
+</body>
+</html>
