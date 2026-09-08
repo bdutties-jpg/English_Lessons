@@ -295,6 +295,25 @@ def build_person_has_people() -> list[dict[str, str]]:
     if not person_images:
         raise FileNotFoundError(f"No people images found in {PEOPLE_DIR}")
 
+    person_order = [normalized_key(name) for name in WHAT_DO_THEY_HAVE_CONFIG.get("person_order", [])]
+    if len(person_order) != len(set(person_order)):
+        raise ValueError("What Do They Have? person_order contains duplicate names.")
+
+    image_names = {normalized_key(path.stem) for path in person_images}
+    configured_names = set(person_order)
+    unknown_names = configured_names - image_names
+    missing_names = image_names - configured_names
+    if unknown_names or missing_names:
+        details = []
+        if unknown_names:
+            details.append(f"no matching image for: {', '.join(sorted(unknown_names))}")
+        if missing_names:
+            details.append(f"not included in person_order: {', '.join(sorted(missing_names))}")
+        raise ValueError(f"What Do They Have? person_order is incomplete: {'; '.join(details)}.")
+
+    order_index = {name: index for index, name in enumerate(person_order)}
+    person_images.sort(key=lambda path: order_index[normalized_key(path.stem)])
+
     question_audio = {
         normalized_key(path.stem): path
         for path in PERSON_HAS_QUESTION_AUDIO_DIR.glob("*.m4a")
