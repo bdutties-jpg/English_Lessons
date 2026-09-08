@@ -311,8 +311,10 @@ def build_person_has_people() -> list[dict[str, str]]:
             question_text = "What do you have?"
             reply_text = "I have a"
         else:
-            question_text = f"What does {name} have?"
-            reply_text = f"{name} has a"
+            question_name = f"your {name[3:]}" if normalized_key(name).startswith("my ") else name
+            question_text = f"What does {question_name} have?"
+            reply_name = f"{name[:1].upper()}{name[1:]}"
+            reply_text = f"{reply_name} has a"
 
         question_path = question_audio.get(normalized_key(question_text))
         reply_path = reply_audio.get(normalized_key(reply_text))
