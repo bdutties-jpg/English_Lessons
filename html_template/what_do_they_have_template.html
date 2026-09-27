@@ -107,6 +107,8 @@
     }
 
     .person-button {
+      position: relative;
+      container-type: inline-size;
       aspect-ratio: 1;
       overflow: hidden;
       padding: 0;
@@ -132,6 +134,18 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+    }
+
+    .tile-held-emoji {
+      position: absolute;
+      top: 86%;
+      left: 50%;
+      z-index: 1;
+      font-size: 30cqi;
+      line-height: 1;
+      transform: translate(-50%, -75%);
+      filter: drop-shadow(0 1px 1px rgba(15, 23, 42, 0.25));
+      pointer-events: none;
     }
 
     .stage {
@@ -257,8 +271,8 @@
     const questionPlayer = new Audio();
     const replyPlayer = new Audio();
     const vocabularyPlayer = new Audio();
-    let activePerson = null;
-    let activeVocabulary = null;
+    let activeTile = null;
+    let remainingPeople = [];
 
     function withVersion(href, version = appVersion) {
       const url = new URL(href, window.location.href);
@@ -294,8 +308,8 @@
 
     function resetSelection() {
       stopAudio();
-      activePerson = null;
-      activeVocabulary = null;
+      const completedTile = activeTile;
+      activeTile = null;
       replyButton.disabled = true;
       heldEmoji.textContent = "";
       selectedPersonImage.removeAttribute("src");
@@ -303,10 +317,17 @@
       stage.hidden = true;
       peopleGrid.hidden = false;
       hero.hidden = false;
+      if (completedTile) {
+        remainingPeople = remainingPeople.filter((tile) => tile.id !== completedTile.id);
+      }
+      renderPeople();
+      if (remainingPeople.length === 0 && completedTile) {
+        startNextRound();
+      }
     }
 
     async function playQuestion() {
-      questionPlayer.src = activePerson.questionAudio;
+      questionPlayer.src = activeTile.person.questionAudio;
       questionPlayer.onended = () => {
         replyButton.disabled = false;
       };
@@ -319,14 +340,13 @@
       }
     }
 
-    function selectPerson(person) {
+    function selectPerson(tile) {
       stopAudio();
-      activePerson = person;
-      activeVocabulary = pageConfig.vocabulary[Math.floor(Math.random() * pageConfig.vocabulary.length)];
-      selectedPersonImage.src = person.image;
-      selectedPersonImage.alt = person.name;
-      heldEmoji.textContent = activeVocabulary.emoji;
-      replyButton.textContent = `${person.replyText} ${activeVocabulary.word}`;
+      activeTile = tile;
+      selectedPersonImage.src = tile.person.image;
+      selectedPersonImage.alt = tile.person.name;
+      heldEmoji.textContent = tile.vocabulary.emoji;
+      replyButton.textContent = `${tile.person.replyText} ${tile.vocabulary.word}`;
       replyButton.disabled = true;
       peopleGrid.hidden = true;
       hero.hidden = true;
@@ -335,16 +355,16 @@
     }
 
     async function playReply() {
-      if (!activePerson || !activeVocabulary || replyButton.disabled) {
+      if (!activeTile || replyButton.disabled) {
         return;
       }
 
       replyButton.disabled = true;
       questionPlayer.pause();
       questionPlayer.currentTime = 0;
-      replyPlayer.src = activePerson.replyAudio;
+      replyPlayer.src = activeTile.person.replyAudio;
       replyPlayer.onended = async () => {
-        vocabularyPlayer.src = activeVocabulary.audio;
+        vocabularyPlayer.src = activeTile.vocabulary.audio;
         vocabularyPlayer.onended = resetSelection;
         try {
           await vocabularyPlayer.play();
@@ -397,18 +417,41 @@
       void playReply();
     });
 
-    pageConfig.people.forEach((person) => {
-      const button = document.createElement("button");
-      const image = document.createElement("img");
-      button.type = "button";
-      button.className = "person-button";
-      button.setAttribute("aria-label", person.name);
-      image.src = person.image;
-      image.alt = person.name;
-      button.appendChild(image);
-      button.addEventListener("click", () => selectPerson(person));
-      peopleGrid.appendChild(button);
-    });
+    function createRoundPeople() {
+      return pageConfig.people.map((person) => ({
+        id: person.name,
+        person,
+        vocabulary: pageConfig.vocabulary[Math.floor(Math.random() * pageConfig.vocabulary.length)],
+      }));
+    }
+
+    function renderPeople() {
+      peopleGrid.replaceChildren();
+      remainingPeople.forEach((tile) => {
+        const button = document.createElement("button");
+        const image = document.createElement("img");
+        const emoji = document.createElement("span");
+        button.type = "button";
+        button.className = "person-button";
+        button.setAttribute("aria-label", `${tile.person.name} has ${tile.vocabulary.word}`);
+        image.src = tile.person.image;
+        image.alt = tile.person.name;
+        emoji.className = "tile-held-emoji";
+        emoji.textContent = tile.vocabulary.emoji;
+        emoji.setAttribute("aria-hidden", "true");
+        button.append(image, emoji);
+        button.addEventListener("click", () => selectPerson(tile));
+        peopleGrid.appendChild(button);
+      });
+    }
+
+    function startNextRound() {
+      remainingPeople = createRoundPeople();
+      renderPeople();
+    }
+
+    remainingPeople = createRoundPeople();
+    renderPeople();
   </script>
 </body>
 </html>
