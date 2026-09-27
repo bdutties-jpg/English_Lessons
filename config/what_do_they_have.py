@@ -6,7 +6,9 @@ WHAT_DO_THEY_HAVE_CONFIG = {
         'my grandma', 'my grandpa', 
         'my mom', 'my dad',
         'Bo', 'Strawberry',
+        'my brother', 'uncle Ha',
         'aunt Chin', 'Teacher',
-        'Bong', 'uncle Ha'
+        'Bong', 'the cat'
+
     ]
 }
