@@ -151,6 +151,11 @@
       margin-top: 14px;
     }
 
+    .word-space {
+      display: block;
+      flex: 0 0 clamp(0.7rem, 2.5vw, 1.35rem);
+    }
+
     .slot-button {
       width: clamp(2.9rem, 9vw, 3.7rem);
       height: clamp(3.3rem, 10vw, 4rem);
@@ -1159,9 +1164,9 @@
       return 1 + Math.floor(getStarCount() / 7);
     }
 
-    function chooseMissingIndexes(length) {
-      const maxMissing = Math.min(6, Math.max(1, length), getMissingLetterCount());
-      return shuffle([...Array(length).keys()]).slice(0, maxMissing).sort((left, right) => left - right);
+    function chooseMissingIndexes(letterIndexes) {
+      const maxMissing = Math.min(6, Math.max(1, letterIndexes.length), getMissingLetterCount());
+      return shuffle(letterIndexes).slice(0, maxMissing).sort((left, right) => left - right);
     }
 
     function buildProblem() {
@@ -1173,13 +1178,20 @@
         recentWords.shift();
       }
 
-      const letters = item.letters.map((letter) => ({ label: letter.label }));
-      const missingIndexes = chooseMissingIndexes(letters.length);
+      const letters = item.letters.map((letter) => ({
+        label: letter.label,
+        isSpace: Boolean(letter.isSpace),
+      }));
+      const letterIndexes = letters
+        .map((letter, index) => (letter.isSpace ? null : index))
+        .filter((index) => index !== null);
+      const missingIndexes = chooseMissingIndexes(letterIndexes);
       const missingLabels = missingIndexes.map((index) => letters[index].label);
       const slots = letters.map((letter, index) => ({
         label: letter.label,
-        missing: missingIndexes.includes(index),
-        filled: !missingIndexes.includes(index),
+        isSpace: letter.isSpace,
+        missing: !letter.isSpace && missingIndexes.includes(index),
+        filled: letter.isSpace || !missingIndexes.includes(index),
       }));
 
       const distractorPool = shuffle(alphabet.filter((label) => !missingLabels.includes(label)));
@@ -1418,6 +1430,14 @@
       setStatus("", "");
 
       currentProblem.slots.forEach((slot, index) => {
+        if (slot.isSpace) {
+          const spacer = document.createElement("span");
+          spacer.className = "word-space";
+          spacer.setAttribute("aria-hidden", "true");
+          wordRow.appendChild(spacer);
+          return;
+        }
+
         const button = document.createElement("button");
         button.type = "button";
         button.className = slot.missing ? "slot-button missing" : "slot-button static-letter";

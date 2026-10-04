@@ -14,7 +14,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from config import MATH_CONFIG, READING_CONFIG, SPELLING_CONFIG, WHAT_DO_THEY_HAVE_CONFIG
+from config import MATH_CONFIG, READING_CONFIG, SPELLING_CONFIG, VOCABULARY_CONFIG, WHAT_DO_THEY_HAVE_CONFIG
 
 SHORT_SENTENCES_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Short sentences"
 LETTER_SOUNDS_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Letters" / "Learning"
@@ -30,12 +30,14 @@ HOME_TEMPLATE_PATH = ROOT_DIR / "html_template" / "home_template.html"
 MATH_TEMPLATE_PATH = ROOT_DIR / "html_template" / "math_template.html"
 READING_TEMPLATE_PATH = ROOT_DIR / "html_template" / "reading_template.html"
 SPELLING_TEMPLATE_PATH = ROOT_DIR / "html_template" / "spelling_template.html"
+VOCABULARY_TEMPLATE_PATH = ROOT_DIR / "html_template" / "vocabulary_template.html"
 WHAT_DO_THEY_HAVE_TEMPLATE_PATH = ROOT_DIR / "html_template" / "what_do_they_have_template.html"
 QUESTION_FLASHCARDS_TEMPLATE_PATH = ROOT_DIR / "html_template" / "question_flashcards_template.html"
 OUTPUT_PATH = ROOT_DIR / "output" / "short_sentences.html"
 MATH_OUTPUT_PATH = ROOT_DIR / "output" / "math.html"
 READING_OUTPUT_PATH = ROOT_DIR / "output" / "reading.html"
 SPELLING_OUTPUT_PATH = ROOT_DIR / "output" / "spelling.html"
+VOCABULARY_OUTPUT_PATH = ROOT_DIR / "output" / "vocabulary.html"
 WHAT_DO_THEY_HAVE_OUTPUT_PATH = ROOT_DIR / "output" / "what_do_they_have.html"
 LETTER_SOUNDS_OUTPUT_PATH = ROOT_DIR / "output" / "letter_sounds.html"
 QUESTION_FLASHCARDS_OUTPUT_PATH = ROOT_DIR / "output" / "question_flashcards.html"
@@ -429,6 +431,13 @@ def render_home_html() -> str:
             "audio": menu_audio.get("spelling", ""),
         },
         {
+            "emoji": "🧩",
+            "title": "Vocabulary",
+            "subtitle": "từ vựng",
+            "href": "output/vocabulary.html",
+            "audio": menu_audio.get("vocabulary", ""),
+        },
+        {
             "emoji": "👐🏼",
             "title": "What Do They Have?",
             "subtitle": "Họ có gì?",
@@ -467,12 +476,19 @@ def render_reading_html() -> str:
 
     for item in vocabulary:
         letter_buttons: list[dict[str, str]] = []
+        word_parts: list[dict[str, object]] = []
         for letter in item["word"]:
+            if letter.isspace():
+                word_parts.append({"isSpace": True})
+                continue
             audio = letter_audio_map.get(letter.casefold())
             if not audio:
                 raise ValueError(f"No letter sound audio found for '{letter}' in word '{item['word']}'.")
-            letter_buttons.append({"label": letter.upper(), "audio": audio})
+            letter_button = {"label": letter.upper(), "audio": audio}
+            letter_buttons.append(letter_button)
+            word_parts.append(letter_button)
         item["letters"] = letter_buttons
+        item["wordParts"] = word_parts
 
     page_config = {
         "title": "Reading",
@@ -499,7 +515,13 @@ def render_spelling_html() -> str:
             spelling_config[key] = encode_audio_path(ROOT_DIR / audio_path)
 
     for item in vocabulary:
-        item["letters"] = [{"label": letter.upper()} for letter in item["word"]]
+        word_parts: list[dict[str, object]] = []
+        for letter in item["word"]:
+            if letter.isspace():
+                word_parts.append({"isSpace": True})
+            else:
+                word_parts.append({"label": letter.upper()})
+        item["letters"] = word_parts
 
     page_config = {
         "title": "Spelling",
@@ -509,6 +531,27 @@ def render_spelling_html() -> str:
         "spellingConfig": spelling_config,
         "vocabulary": vocabulary,
         "alphabet": alphabet,
+    }
+    if PAGE_CONFIG_PLACEHOLDER not in template:
+        raise ValueError(f"Template is missing placeholder {PAGE_CONFIG_PLACEHOLDER}")
+    return template.replace(PAGE_CONFIG_PLACEHOLDER, json.dumps(page_config, ensure_ascii=False, indent=2))
+
+
+def render_vocabulary_html() -> str:
+    template = apply_app_version(VOCABULARY_TEMPLATE_PATH.read_text(encoding="utf-8"))
+    vocabulary_config = dict(VOCABULARY_CONFIG)
+    for key in ("charge_sound", "star_celebration", "star_party"):
+        audio_path = vocabulary_config.get(key)
+        if audio_path:
+            vocabulary_config[key] = encode_audio_path(ROOT_DIR / audio_path)
+
+    page_config = {
+        "title": "Vocabulary",
+        "subtitle": "từ vựng",
+        "description": "Tap each picture three times to power it up!",
+        "backAudio": encode_audio_path(MENU_AUDIO_DIR / "Back to home.m4a"),
+        "vocabularyConfig": vocabulary_config,
+        "vocabulary": build_vocabulary(),
     }
     if PAGE_CONFIG_PLACEHOLDER not in template:
         raise ValueError(f"Template is missing placeholder {PAGE_CONFIG_PLACEHOLDER}")
@@ -573,6 +616,7 @@ def main() -> None:
     math_html = render_math_html()
     reading_html = render_reading_html()
     spelling_html = render_spelling_html()
+    vocabulary_html = render_vocabulary_html()
     what_do_they_have_html = render_what_do_they_have_html()
     question_flashcards_html = render_question_flashcards_html()
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -580,6 +624,7 @@ def main() -> None:
     MATH_OUTPUT_PATH.write_text(math_html, encoding="utf-8")
     READING_OUTPUT_PATH.write_text(reading_html, encoding="utf-8")
     SPELLING_OUTPUT_PATH.write_text(spelling_html, encoding="utf-8")
+    VOCABULARY_OUTPUT_PATH.write_text(vocabulary_html, encoding="utf-8")
     WHAT_DO_THEY_HAVE_OUTPUT_PATH.write_text(what_do_they_have_html, encoding="utf-8")
     LETTER_SOUNDS_OUTPUT_PATH.write_text(letter_sounds_html, encoding="utf-8")
     QUESTION_FLASHCARDS_OUTPUT_PATH.write_text(question_flashcards_html, encoding="utf-8")
@@ -592,6 +637,7 @@ def main() -> None:
     print(f"Wrote math page to {MATH_OUTPUT_PATH}")
     print(f"Wrote reading page to {READING_OUTPUT_PATH}")
     print(f"Wrote spelling page to {SPELLING_OUTPUT_PATH}")
+    print(f"Wrote vocabulary page to {VOCABULARY_OUTPUT_PATH}")
     print(f"Wrote what-do-they-have page to {WHAT_DO_THEY_HAVE_OUTPUT_PATH}")
     print(f"Wrote {len(letter_sounds)} buttons to {LETTER_SOUNDS_OUTPUT_PATH}")
     print(f"Wrote question flashcards page to {QUESTION_FLASHCARDS_OUTPUT_PATH}")

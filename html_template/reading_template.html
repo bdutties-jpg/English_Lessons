@@ -317,9 +317,14 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
       min-width: 0;
       padding-right: 6px;
+    }
+
+    .word-space {
+      display: block;
+      flex: 0 0 clamp(0.7rem, 2.5vw, 1.35rem);
     }
 
     .letter-button {
@@ -1411,6 +1416,7 @@
 
       return {
         letters: correctItem.letters,
+        wordParts: correctItem.wordParts,
         audio: correctItem.audio,
         answers,
       };
@@ -1446,7 +1452,15 @@
       answersElement.innerHTML = "";
       setStatus("", "");
 
-      currentProblem.letters.forEach((letter) => {
+      currentProblem.wordParts.forEach((letter) => {
+        if (letter.isSpace) {
+          const spacer = document.createElement("span");
+          spacer.className = "word-space";
+          spacer.setAttribute("aria-hidden", "true");
+          lettersRow.appendChild(spacer);
+          return;
+        }
+
         const button = document.createElement("button");
         button.type = "button";
         button.className = "letter-button";

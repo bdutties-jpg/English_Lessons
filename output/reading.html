@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="English Playtime" />
   <meta name="application-name" content="English Playtime" />
   <meta name="theme-color" content="#f9a8d4" />
-  <meta name="app-version" content="20260927020552" />
+  <meta name="app-version" content="20261004020127" />
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="../assets/icons/icon-512.png" />
@@ -317,9 +317,14 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
       min-width: 0;
       padding-right: 6px;
+    }
+
+    .word-space {
+      display: block;
+      flex: 0 0 clamp(0.7rem, 2.5vw, 1.35rem);
     }
 
     .letter-button {
@@ -588,7 +593,7 @@
   </main>
 
   <script>
-    const appVersion = "20260927020552";
+    const appVersion = "20261004020127";
     const versionInfoPath = "../app_version.json";
     const pageConfig = {
   "title": "Reading",
@@ -611,6 +616,36 @@
       "emoji": "🥑",
       "audio": "../assets/audio/Vocabulary/Avocado%20%F0%9F%A5%91.m4a?v=20260628-1",
       "letters": [
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "V",
+          "audio": "../assets/audio/Letters/Learning/V.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "D",
+          "audio": "../assets/audio/Letters/Learning/D.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
         {
           "label": "A",
           "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
@@ -662,6 +697,24 @@
           "label": "L",
           "audio": "../assets/audio/Letters/Learning/L.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "B",
+          "audio": "../assets/audio/Letters/Learning/B.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "L",
+          "audio": "../assets/audio/Letters/Learning/L.m4a?v=20260628-1"
+        },
+        {
+          "label": "L",
+          "audio": "../assets/audio/Letters/Learning/L.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -669,6 +722,32 @@
       "emoji": "🍌",
       "audio": "../assets/audio/Vocabulary/Banana%20%F0%9F%8D%8C.m4a?v=20260628-1",
       "letters": [
+        {
+          "label": "B",
+          "audio": "../assets/audio/Letters/Learning/B.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "N",
+          "audio": "../assets/audio/Letters/Learning/N.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "N",
+          "audio": "../assets/audio/Letters/Learning/N.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
         {
           "label": "B",
           "audio": "../assets/audio/Letters/Learning/B.m4a?v=20260628-1"
@@ -724,6 +803,32 @@
           "label": "R",
           "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "B",
+          "audio": "../assets/audio/Letters/Learning/B.m4a?v=20260628-1"
+        },
+        {
+          "label": "U",
+          "audio": "../assets/audio/Letters/Learning/U%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "G",
+          "audio": "../assets/audio/Letters/Learning/G%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -731,6 +836,20 @@
       "emoji": "🚗",
       "audio": "../assets/audio/Vocabulary/Car%20%F0%9F%9A%97.m4a?v=20260628-1",
       "letters": [
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
         {
           "label": "C",
           "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
@@ -774,6 +893,32 @@
           "label": "T",
           "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -793,6 +938,20 @@
           "label": "T",
           "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -800,6 +959,36 @@
       "emoji": "🐓",
       "audio": "../assets/audio/Vocabulary/Chicken%20%F0%9F%90%93.m4a?v=20260628-1",
       "letters": [
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "H",
+          "audio": "../assets/audio/Letters/Learning/H.m4a?v=20260628-1"
+        },
+        {
+          "label": "I",
+          "audio": "../assets/audio/Letters/Learning/I%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "K",
+          "audio": "../assets/audio/Letters/Learning/K.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        },
+        {
+          "label": "N",
+          "audio": "../assets/audio/Letters/Learning/N.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
         {
           "label": "C",
           "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
@@ -863,6 +1052,93 @@
           "label": "T",
           "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "N",
+          "audio": "../assets/audio/Letters/Learning/N.m4a?v=20260628-1"
+        },
+        {
+          "label": "U",
+          "audio": "../assets/audio/Letters/Learning/U%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
+        }
+      ]
+    },
+    {
+      "word": "Cookie",
+      "emoji": "🍪",
+      "audio": "../assets/audio/Vocabulary/Cookie%20%F0%9F%8D%AA.m4a?v=20260628-1",
+      "letters": [
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "K",
+          "audio": "../assets/audio/Letters/Learning/K.m4a?v=20260628-1"
+        },
+        {
+          "label": "I",
+          "audio": "../assets/audio/Letters/Learning/I%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "K",
+          "audio": "../assets/audio/Letters/Learning/K.m4a?v=20260628-1"
+        },
+        {
+          "label": "I",
+          "audio": "../assets/audio/Letters/Learning/I%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -886,6 +1162,24 @@
           "label": "N",
           "audio": "../assets/audio/Letters/Learning/N.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "N",
+          "audio": "../assets/audio/Letters/Learning/N.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -893,6 +1187,20 @@
       "emoji": "🐮",
       "audio": "../assets/audio/Vocabulary/Cow%20%F0%9F%90%AE.m4a?v=20260628-1",
       "letters": [
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "W",
+          "audio": "../assets/audio/Letters/Learning/W.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
         {
           "label": "C",
           "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
@@ -944,6 +1252,40 @@
           "label": "R",
           "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "D",
+          "audio": "../assets/audio/Letters/Learning/D.m4a?v=20260628-1"
+        },
+        {
+          "label": "I",
+          "audio": "../assets/audio/Letters/Learning/I%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "N",
+          "audio": "../assets/audio/Letters/Learning/N.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "S",
+          "audio": "../assets/audio/Letters/Learning/S.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "U",
+          "audio": "../assets/audio/Letters/Learning/U%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -963,6 +1305,20 @@
           "label": "G",
           "audio": "../assets/audio/Letters/Learning/G%20%28hard%29.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "D",
+          "audio": "../assets/audio/Letters/Learning/D.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "G",
+          "audio": "../assets/audio/Letters/Learning/G%20%28hard%29.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -970,6 +1326,24 @@
       "emoji": "🔥",
       "audio": "../assets/audio/Vocabulary/Fire%20%F0%9F%94%A5.m4a?v=20260628-1",
       "letters": [
+        {
+          "label": "F",
+          "audio": "../assets/audio/Letters/Learning/F.m4a?v=20260628-1"
+        },
+        {
+          "label": "I",
+          "audio": "../assets/audio/Letters/Learning/I%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
         {
           "label": "F",
           "audio": "../assets/audio/Letters/Learning/F.m4a?v=20260628-1"
@@ -1021,6 +1395,36 @@
           "label": "S",
           "audio": "../assets/audio/Letters/Learning/S.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "F",
+          "audio": "../assets/audio/Letters/Learning/F.m4a?v=20260628-1"
+        },
+        {
+          "label": "L",
+          "audio": "../assets/audio/Letters/Learning/L.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "W",
+          "audio": "../assets/audio/Letters/Learning/W.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "S",
+          "audio": "../assets/audio/Letters/Learning/S.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -1040,6 +1444,20 @@
           "label": "X",
           "audio": "../assets/audio/Letters/Learning/X.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "F",
+          "audio": "../assets/audio/Letters/Learning/F.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "X",
+          "audio": "../assets/audio/Letters/Learning/X.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -1047,6 +1465,24 @@
       "emoji": "🐸",
       "audio": "../assets/audio/Vocabulary/Frog%20%F0%9F%90%B8.m4a?v=20260628-1",
       "letters": [
+        {
+          "label": "F",
+          "audio": "../assets/audio/Letters/Learning/F.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "G",
+          "audio": "../assets/audio/Letters/Learning/G%20%28hard%29.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
         {
           "label": "F",
           "audio": "../assets/audio/Letters/Learning/F.m4a?v=20260628-1"
@@ -1086,6 +1522,24 @@
           "label": "D",
           "audio": "../assets/audio/Letters/Learning/D.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "H",
+          "audio": "../assets/audio/Letters/Learning/H.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "N",
+          "audio": "../assets/audio/Letters/Learning/N.m4a?v=20260628-1"
+        },
+        {
+          "label": "D",
+          "audio": "../assets/audio/Letters/Learning/D.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -1105,6 +1559,20 @@
           "label": "T",
           "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "H",
+          "audio": "../assets/audio/Letters/Learning/H.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -1112,6 +1580,20 @@
       "emoji": "🫙",
       "audio": "../assets/audio/Vocabulary/Jar%20%F0%9F%AB%99.m4a?v=20260628-1",
       "letters": [
+        {
+          "label": "J",
+          "audio": "../assets/audio/Letters/Learning/J.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
         {
           "label": "J",
           "audio": "../assets/audio/Letters/Learning/J.m4a?v=20260628-1"
@@ -1147,6 +1629,73 @@
           "label": "E",
           "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "K",
+          "audio": "../assets/audio/Letters/Learning/K.m4a?v=20260628-1"
+        },
+        {
+          "label": "I",
+          "audio": "../assets/audio/Letters/Learning/I%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        }
+      ]
+    },
+    {
+      "word": "Lemon",
+      "emoji": "🍋",
+      "audio": "../assets/audio/Vocabulary/Lemon%20%F0%9F%8D%8B.m4a?v=20260628-1",
+      "letters": [
+        {
+          "label": "L",
+          "audio": "../assets/audio/Letters/Learning/L.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        },
+        {
+          "label": "M",
+          "audio": "../assets/audio/Letters/Learning/M.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "N",
+          "audio": "../assets/audio/Letters/Learning/N.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
+        {
+          "label": "L",
+          "audio": "../assets/audio/Letters/Learning/L.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        },
+        {
+          "label": "M",
+          "audio": "../assets/audio/Letters/Learning/M.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "N",
+          "audio": "../assets/audio/Letters/Learning/N.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -1170,6 +1719,24 @@
           "label": "K",
           "audio": "../assets/audio/Letters/Learning/K.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "M",
+          "audio": "../assets/audio/Letters/Learning/M.m4a?v=20260628-1"
+        },
+        {
+          "label": "I",
+          "audio": "../assets/audio/Letters/Learning/I%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "L",
+          "audio": "../assets/audio/Letters/Learning/L.m4a?v=20260628-1"
+        },
+        {
+          "label": "K",
+          "audio": "../assets/audio/Letters/Learning/K.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -1177,6 +1744,32 @@
       "emoji": "🐒",
       "audio": "../assets/audio/Vocabulary/Monkey%20%F0%9F%90%92.m4a?v=20260628-1",
       "letters": [
+        {
+          "label": "M",
+          "audio": "../assets/audio/Letters/Learning/M.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "N",
+          "audio": "../assets/audio/Letters/Learning/N.m4a?v=20260628-1"
+        },
+        {
+          "label": "K",
+          "audio": "../assets/audio/Letters/Learning/K.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        },
+        {
+          "label": "Y",
+          "audio": "../assets/audio/Letters/Learning/Y.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
         {
           "label": "M",
           "audio": "../assets/audio/Letters/Learning/M.m4a?v=20260628-1"
@@ -1228,6 +1821,28 @@
           "label": "E",
           "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "M",
+          "audio": "../assets/audio/Letters/Learning/M.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "U",
+          "audio": "../assets/audio/Letters/Learning/U%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "S",
+          "audio": "../assets/audio/Letters/Learning/S.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -1235,6 +1850,20 @@
       "emoji": "🦉",
       "audio": "../assets/audio/Vocabulary/Owl%20%F0%9F%A6%89.m4a?v=20260628-1",
       "letters": [
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "W",
+          "audio": "../assets/audio/Letters/Learning/W.m4a?v=20260628-1"
+        },
+        {
+          "label": "L",
+          "audio": "../assets/audio/Letters/Learning/L.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
         {
           "label": "O",
           "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
@@ -1274,6 +1903,110 @@
           "label": "A",
           "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "P",
+          "audio": "../assets/audio/Letters/Learning/P.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "N",
+          "audio": "../assets/audio/Letters/Learning/N.m4a?v=20260628-1"
+        },
+        {
+          "label": "D",
+          "audio": "../assets/audio/Letters/Learning/D.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        }
+      ]
+    },
+    {
+      "word": "Peach",
+      "emoji": "🍑",
+      "audio": "../assets/audio/Vocabulary/Peach%20%F0%9F%8D%91.m4a?v=20260628-1",
+      "letters": [
+        {
+          "label": "P",
+          "audio": "../assets/audio/Letters/Learning/P.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "H",
+          "audio": "../assets/audio/Letters/Learning/H.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
+        {
+          "label": "P",
+          "audio": "../assets/audio/Letters/Learning/P.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "H",
+          "audio": "../assets/audio/Letters/Learning/H.m4a?v=20260628-1"
+        }
+      ]
+    },
+    {
+      "word": "Pie",
+      "emoji": "🥧",
+      "audio": "../assets/audio/Vocabulary/Pie%20%F0%9F%A5%A7.m4a?v=20260628-1",
+      "letters": [
+        {
+          "label": "P",
+          "audio": "../assets/audio/Letters/Learning/P.m4a?v=20260628-1"
+        },
+        {
+          "label": "I",
+          "audio": "../assets/audio/Letters/Learning/I%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
+        {
+          "label": "P",
+          "audio": "../assets/audio/Letters/Learning/P.m4a?v=20260628-1"
+        },
+        {
+          "label": "I",
+          "audio": "../assets/audio/Letters/Learning/I%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -1292,6 +2025,126 @@
         {
           "label": "G",
           "audio": "../assets/audio/Letters/Learning/G%20%28hard%29.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
+        {
+          "label": "P",
+          "audio": "../assets/audio/Letters/Learning/P.m4a?v=20260628-1"
+        },
+        {
+          "label": "I",
+          "audio": "../assets/audio/Letters/Learning/I%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "G",
+          "audio": "../assets/audio/Letters/Learning/G%20%28hard%29.m4a?v=20260628-1"
+        }
+      ]
+    },
+    {
+      "word": "Pizza",
+      "emoji": "🍕",
+      "audio": "../assets/audio/Vocabulary/Pizza%20%F0%9F%8D%95.m4a?v=20260628-1",
+      "letters": [
+        {
+          "label": "P",
+          "audio": "../assets/audio/Letters/Learning/P.m4a?v=20260628-1"
+        },
+        {
+          "label": "I",
+          "audio": "../assets/audio/Letters/Learning/I%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "Z",
+          "audio": "../assets/audio/Letters/Learning/Z.m4a?v=20260628-1"
+        },
+        {
+          "label": "Z",
+          "audio": "../assets/audio/Letters/Learning/Z.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
+        {
+          "label": "P",
+          "audio": "../assets/audio/Letters/Learning/P.m4a?v=20260628-1"
+        },
+        {
+          "label": "I",
+          "audio": "../assets/audio/Letters/Learning/I%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "Z",
+          "audio": "../assets/audio/Letters/Learning/Z.m4a?v=20260628-1"
+        },
+        {
+          "label": "Z",
+          "audio": "../assets/audio/Letters/Learning/Z.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        }
+      ]
+    },
+    {
+      "word": "Potato",
+      "emoji": "🥔",
+      "audio": "../assets/audio/Vocabulary/Potato%20%F0%9F%A5%94.m4a?v=20260628-1",
+      "letters": [
+        {
+          "label": "P",
+          "audio": "../assets/audio/Letters/Learning/P.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
+        {
+          "label": "P",
+          "audio": "../assets/audio/Letters/Learning/P.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
         }
       ]
     },
@@ -1324,6 +2177,32 @@
           "label": "T",
           "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "B",
+          "audio": "../assets/audio/Letters/Learning/B.m4a?v=20260628-1"
+        },
+        {
+          "label": "B",
+          "audio": "../assets/audio/Letters/Learning/B.m4a?v=20260628-1"
+        },
+        {
+          "label": "I",
+          "audio": "../assets/audio/Letters/Learning/I%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -1331,6 +2210,28 @@
       "emoji": "🤖",
       "audio": "../assets/audio/Vocabulary/Robot%20%F0%9F%A4%96.m4a?v=20260628-1",
       "letters": [
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "B",
+          "audio": "../assets/audio/Letters/Learning/B.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
         {
           "label": "R",
           "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
@@ -1390,6 +2291,40 @@
           "label": "H",
           "audio": "../assets/audio/Letters/Learning/H.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "S",
+          "audio": "../assets/audio/Letters/Learning/S.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "N",
+          "audio": "../assets/audio/Letters/Learning/N.m4a?v=20260628-1"
+        },
+        {
+          "label": "D",
+          "audio": "../assets/audio/Letters/Learning/D.m4a?v=20260628-1"
+        },
+        {
+          "label": "W",
+          "audio": "../assets/audio/Letters/Learning/W.m4a?v=20260628-1"
+        },
+        {
+          "label": "I",
+          "audio": "../assets/audio/Letters/Learning/I%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "H",
+          "audio": "../assets/audio/Letters/Learning/H.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -1417,6 +2352,152 @@
           "label": "T",
           "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "S",
+          "audio": "../assets/audio/Letters/Learning/S.m4a?v=20260628-1"
+        },
+        {
+          "label": "H",
+          "audio": "../assets/audio/Letters/Learning/H.m4a?v=20260628-1"
+        },
+        {
+          "label": "I",
+          "audio": "../assets/audio/Letters/Learning/I%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
+        }
+      ]
+    },
+    {
+      "word": "Strawberry cake",
+      "emoji": "🍰",
+      "audio": "../assets/audio/Vocabulary/Strawberry%20cake%20%F0%9F%8D%B0.m4a?v=20260628-1",
+      "letters": [
+        {
+          "label": "S",
+          "audio": "../assets/audio/Letters/Learning/S.m4a?v=20260628-1"
+        },
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "W",
+          "audio": "../assets/audio/Letters/Learning/W.m4a?v=20260628-1"
+        },
+        {
+          "label": "B",
+          "audio": "../assets/audio/Letters/Learning/B.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "Y",
+          "audio": "../assets/audio/Letters/Learning/Y.m4a?v=20260628-1"
+        },
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "K",
+          "audio": "../assets/audio/Letters/Learning/K.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
+        {
+          "label": "S",
+          "audio": "../assets/audio/Letters/Learning/S.m4a?v=20260628-1"
+        },
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "W",
+          "audio": "../assets/audio/Letters/Learning/W.m4a?v=20260628-1"
+        },
+        {
+          "label": "B",
+          "audio": "../assets/audio/Letters/Learning/B.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "Y",
+          "audio": "../assets/audio/Letters/Learning/Y.m4a?v=20260628-1"
+        },
+        {
+          "isSpace": true
+        },
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "K",
+          "audio": "../assets/audio/Letters/Learning/K.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -1424,6 +2505,48 @@
       "emoji": "🍓",
       "audio": "../assets/audio/Vocabulary/Strawberry%20%F0%9F%8D%93.m4a?v=20260628-1",
       "letters": [
+        {
+          "label": "S",
+          "audio": "../assets/audio/Letters/Learning/S.m4a?v=20260628-1"
+        },
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "W",
+          "audio": "../assets/audio/Letters/Learning/W.m4a?v=20260628-1"
+        },
+        {
+          "label": "B",
+          "audio": "../assets/audio/Letters/Learning/B.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "Y",
+          "audio": "../assets/audio/Letters/Learning/Y.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
         {
           "label": "S",
           "audio": "../assets/audio/Letters/Learning/S.m4a?v=20260628-1"
@@ -1483,6 +2606,20 @@
           "label": "N",
           "audio": "../assets/audio/Letters/Learning/N.m4a?v=20260628-1"
         }
+      ],
+      "wordParts": [
+        {
+          "label": "S",
+          "audio": "../assets/audio/Letters/Learning/S.m4a?v=20260628-1"
+        },
+        {
+          "label": "U",
+          "audio": "../assets/audio/Letters/Learning/U%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "N",
+          "audio": "../assets/audio/Letters/Learning/N.m4a?v=20260628-1"
+        }
       ]
     },
     {
@@ -1490,6 +2627,24 @@
       "emoji": "🌮",
       "audio": "../assets/audio/Vocabulary/Taco%20%F0%9F%8C%AE.m4a?v=20260628-1",
       "letters": [
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
         {
           "label": "T",
           "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
@@ -1532,6 +2687,174 @@
         {
           "label": "K",
           "audio": "../assets/audio/Letters/Learning/K.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "U",
+          "audio": "../assets/audio/Letters/Learning/U%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "C",
+          "audio": "../assets/audio/Letters/Learning/C%20%28hard%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "K",
+          "audio": "../assets/audio/Letters/Learning/K.m4a?v=20260628-1"
+        }
+      ]
+    },
+    {
+      "word": "Waffle",
+      "emoji": "🧇",
+      "audio": "../assets/audio/Vocabulary/Waffle%20%F0%9F%A7%87.m4a?v=20260628-1",
+      "letters": [
+        {
+          "label": "W",
+          "audio": "../assets/audio/Letters/Learning/W.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "F",
+          "audio": "../assets/audio/Letters/Learning/F.m4a?v=20260628-1"
+        },
+        {
+          "label": "F",
+          "audio": "../assets/audio/Letters/Learning/F.m4a?v=20260628-1"
+        },
+        {
+          "label": "L",
+          "audio": "../assets/audio/Letters/Learning/L.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
+        {
+          "label": "W",
+          "audio": "../assets/audio/Letters/Learning/W.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "F",
+          "audio": "../assets/audio/Letters/Learning/F.m4a?v=20260628-1"
+        },
+        {
+          "label": "F",
+          "audio": "../assets/audio/Letters/Learning/F.m4a?v=20260628-1"
+        },
+        {
+          "label": "L",
+          "audio": "../assets/audio/Letters/Learning/L.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        }
+      ]
+    },
+    {
+      "word": "Watermelon",
+      "emoji": "🍉",
+      "audio": "../assets/audio/Vocabulary/Watermelon%20%F0%9F%8D%89.m4a?v=20260628-1",
+      "letters": [
+        {
+          "label": "W",
+          "audio": "../assets/audio/Letters/Learning/W.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "M",
+          "audio": "../assets/audio/Letters/Learning/M.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        },
+        {
+          "label": "L",
+          "audio": "../assets/audio/Letters/Learning/L.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "N",
+          "audio": "../assets/audio/Letters/Learning/N.m4a?v=20260628-1"
+        }
+      ],
+      "wordParts": [
+        {
+          "label": "W",
+          "audio": "../assets/audio/Letters/Learning/W.m4a?v=20260628-1"
+        },
+        {
+          "label": "A",
+          "audio": "../assets/audio/Letters/Learning/A%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "T",
+          "audio": "../assets/audio/Letters/Learning/T.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        },
+        {
+          "label": "R",
+          "audio": "../assets/audio/Letters/Learning/R.m4a?v=20260628-1"
+        },
+        {
+          "label": "M",
+          "audio": "../assets/audio/Letters/Learning/M.m4a?v=20260628-1"
+        },
+        {
+          "label": "E",
+          "audio": "../assets/audio/Letters/Learning/E.m4a?v=20260628-1"
+        },
+        {
+          "label": "L",
+          "audio": "../assets/audio/Letters/Learning/L.m4a?v=20260628-1"
+        },
+        {
+          "label": "O",
+          "audio": "../assets/audio/Letters/Learning/O%20%28soft%29.m4a?v=20260628-1"
+        },
+        {
+          "label": "N",
+          "audio": "../assets/audio/Letters/Learning/N.m4a?v=20260628-1"
         }
       ]
     }
@@ -2357,6 +3680,7 @@
 
       return {
         letters: correctItem.letters,
+        wordParts: correctItem.wordParts,
         audio: correctItem.audio,
         answers,
       };
@@ -2392,7 +3716,15 @@
       answersElement.innerHTML = "";
       setStatus("", "");
 
-      currentProblem.letters.forEach((letter) => {
+      currentProblem.wordParts.forEach((letter) => {
+        if (letter.isSpace) {
+          const spacer = document.createElement("span");
+          spacer.className = "word-space";
+          spacer.setAttribute("aria-hidden", "true");
+          lettersRow.appendChild(spacer);
+          return;
+        }
+
         const button = document.createElement("button");
         button.type = "button";
         button.className = "letter-button";
