@@ -306,10 +306,8 @@
     </div>
     <header class="hero">
       <h1 class="title" id="page-title"></h1>
-      <p class="subtitle" id="page-description"></p>
     </header>
     <section class="music-card" aria-label="Interactive musical staff">
-      <p class="music-tip">Tap more than one note to make your own chord!</p>
       <div class="staff" id="staff" role="group" aria-label="Musical notes from low do to high do">
         <div class="staff-lines" aria-hidden="true">
           <span class="staff-line"></span>
@@ -331,7 +329,6 @@
     const musicNotes = __MUSIC_NOTES_JSON__;
     const noteColors = ["#f97316", "#ef4444", "#ec4899", "#a855f7", "#6366f1", "#0ea5e9", "#14b8a6", "#22c55e"];
     const pageTitle = document.getElementById("page-title");
-    const pageDescription = document.getElementById("page-description");
     const notesLayer = document.getElementById("notes-layer");
     const backLink = document.querySelector(".back-link");
     const navigationPlayer = new Audio();
@@ -418,7 +415,6 @@
     }
 
     pageTitle.textContent = pageConfig.title;
-    pageDescription.textContent = pageConfig.description;
     void ensureLatestVersion();
 
     backLink.addEventListener("click", (event) => {

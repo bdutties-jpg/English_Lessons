@@ -605,7 +605,6 @@ def render_music_html() -> str:
     template = apply_app_version(MUSIC_TEMPLATE_PATH.read_text(encoding="utf-8"))
     page_config = {
         "title": "Music",
-        "description": "Tap the notes to hear do, re, mi. Play several notes together like a piano!",
         "backAudio": encode_audio_path(MENU_AUDIO_DIR / "Back to home.m4a"),
     }
     if PAGE_CONFIG_PLACEHOLDER not in template:
