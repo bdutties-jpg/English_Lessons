@@ -19,6 +19,7 @@ from config import MATH_CONFIG, READING_CONFIG, SPELLING_CONFIG, VOCABULARY_CONF
 SHORT_SENTENCES_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Short sentences"
 LETTER_SOUNDS_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Letters" / "Learning"
 MENU_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Menu"
+MUSIC_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Music"
 UI_SOUNDS_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "UI_Sounds"
 VOCABULARY_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Vocabulary"
 PERSON_HAS_QUESTION_AUDIO_DIR = VOCABULARY_AUDIO_DIR / "person has" / "Question"
@@ -31,6 +32,7 @@ MATH_TEMPLATE_PATH = ROOT_DIR / "html_template" / "math_template.html"
 READING_TEMPLATE_PATH = ROOT_DIR / "html_template" / "reading_template.html"
 SPELLING_TEMPLATE_PATH = ROOT_DIR / "html_template" / "spelling_template.html"
 VOCABULARY_TEMPLATE_PATH = ROOT_DIR / "html_template" / "vocabulary_template.html"
+MUSIC_TEMPLATE_PATH = ROOT_DIR / "html_template" / "music_template.html"
 WHAT_DO_THEY_HAVE_TEMPLATE_PATH = ROOT_DIR / "html_template" / "what_do_they_have_template.html"
 QUESTION_FLASHCARDS_TEMPLATE_PATH = ROOT_DIR / "html_template" / "question_flashcards_template.html"
 OUTPUT_PATH = ROOT_DIR / "output" / "short_sentences.html"
@@ -38,6 +40,7 @@ MATH_OUTPUT_PATH = ROOT_DIR / "output" / "math.html"
 READING_OUTPUT_PATH = ROOT_DIR / "output" / "reading.html"
 SPELLING_OUTPUT_PATH = ROOT_DIR / "output" / "spelling.html"
 VOCABULARY_OUTPUT_PATH = ROOT_DIR / "output" / "vocabulary.html"
+MUSIC_OUTPUT_PATH = ROOT_DIR / "output" / "music.html"
 WHAT_DO_THEY_HAVE_OUTPUT_PATH = ROOT_DIR / "output" / "what_do_they_have.html"
 LETTER_SOUNDS_OUTPUT_PATH = ROOT_DIR / "output" / "letter_sounds.html"
 QUESTION_FLASHCARDS_OUTPUT_PATH = ROOT_DIR / "output" / "question_flashcards.html"
@@ -52,7 +55,7 @@ FILENAME_PATTERN = re.compile(r"^(?P<emoji>.+?)\s*-\s*(?P<text>.+)$")
 VOCABULARY_PATTERN = re.compile(r"^(?P<word>.+?)\s+(?P<emoji>\S+)$")
 APP_VERSION = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
 # Bump this only when audio files change and you need clients to fetch them again.
-AUDIO_ASSET_VERSION = "20260628-1"
+AUDIO_ASSET_VERSION = "20261010-1"
 
 
 @dataclass(frozen=True)
@@ -262,6 +265,39 @@ def build_letter_sounds() -> list[dict[str, str]]:
     return buttons
 
 
+def build_music_notes() -> list[dict[str, object]]:
+    note_definitions = [
+        ("do 1", "do", "Play low do", 0, True),
+        ("re", "re", "Play re", 1, False),
+        ("mi", "mi", "Play mi", 2, False),
+        ("fa", "fa", "Play fa", 3, False),
+        ("so", "so", "Play so", 4, False),
+        ("la", "la", "Play la", 5, False),
+        ("ti", "ti", "Play ti", 6, False),
+        ("do 2", "do", "Play high do", 7, False),
+    ]
+    audio_by_name = {
+        audio_path.stem.casefold(): audio_path
+        for audio_path in MUSIC_AUDIO_DIR.glob("*.m4a")
+    }
+    missing_notes = [file_name for file_name, *_ in note_definitions if file_name not in audio_by_name]
+    if missing_notes:
+        raise FileNotFoundError(
+            f"Missing Music audio for: {', '.join(missing_notes)}. Expected files in {MUSIC_AUDIO_DIR}."
+        )
+
+    return [
+        {
+            "label": label,
+            "ariaLabel": aria_label,
+            "position": position,
+            "hasLedger": has_ledger,
+            "audio": encode_audio_path(audio_by_name[file_name]),
+        }
+        for file_name, label, aria_label, position, has_ledger in note_definitions
+    ]
+
+
 def build_vocabulary() -> list[dict[str, str]]:
     audio_files = sorted(VOCABULARY_AUDIO_DIR.glob("*.m4a"), key=lambda path: path.stem.casefold())
     if not audio_files:
@@ -438,6 +474,13 @@ def render_home_html() -> str:
             "audio": menu_audio.get("vocabulary", ""),
         },
         {
+            "emoji": "🎵",
+            "title": "Music",
+            "subtitle": "âm nhạc",
+            "href": "output/music.html",
+            "audio": menu_audio.get("music", ""),
+        },
+        {
             "emoji": "👐🏼",
             "title": "What Do They Have?",
             "subtitle": "Họ có gì?",
@@ -558,6 +601,23 @@ def render_vocabulary_html() -> str:
     return template.replace(PAGE_CONFIG_PLACEHOLDER, json.dumps(page_config, ensure_ascii=False, indent=2))
 
 
+def render_music_html() -> str:
+    template = apply_app_version(MUSIC_TEMPLATE_PATH.read_text(encoding="utf-8"))
+    page_config = {
+        "title": "Music",
+        "description": "Tap the notes to hear do, re, mi. Play several notes together like a piano!",
+        "backAudio": encode_audio_path(MENU_AUDIO_DIR / "Back to home.m4a"),
+    }
+    if PAGE_CONFIG_PLACEHOLDER not in template:
+        raise ValueError(f"Template is missing placeholder {PAGE_CONFIG_PLACEHOLDER}")
+    if "__MUSIC_NOTES_JSON__" not in template:
+        raise ValueError("Music template is missing placeholder __MUSIC_NOTES_JSON__")
+    return (
+        template.replace(PAGE_CONFIG_PLACEHOLDER, json.dumps(page_config, ensure_ascii=False, indent=2))
+        .replace("__MUSIC_NOTES_JSON__", json.dumps(build_music_notes(), ensure_ascii=False, indent=2))
+    )
+
+
 def render_what_do_they_have_html() -> str:
     template = apply_app_version(WHAT_DO_THEY_HAVE_TEMPLATE_PATH.read_text(encoding="utf-8"))
     excluded_vocabulary = {
@@ -617,6 +677,7 @@ def main() -> None:
     reading_html = render_reading_html()
     spelling_html = render_spelling_html()
     vocabulary_html = render_vocabulary_html()
+    music_html = render_music_html()
     what_do_they_have_html = render_what_do_they_have_html()
     question_flashcards_html = render_question_flashcards_html()
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -625,6 +686,7 @@ def main() -> None:
     READING_OUTPUT_PATH.write_text(reading_html, encoding="utf-8")
     SPELLING_OUTPUT_PATH.write_text(spelling_html, encoding="utf-8")
     VOCABULARY_OUTPUT_PATH.write_text(vocabulary_html, encoding="utf-8")
+    MUSIC_OUTPUT_PATH.write_text(music_html, encoding="utf-8")
     WHAT_DO_THEY_HAVE_OUTPUT_PATH.write_text(what_do_they_have_html, encoding="utf-8")
     LETTER_SOUNDS_OUTPUT_PATH.write_text(letter_sounds_html, encoding="utf-8")
     QUESTION_FLASHCARDS_OUTPUT_PATH.write_text(question_flashcards_html, encoding="utf-8")
@@ -638,6 +700,7 @@ def main() -> None:
     print(f"Wrote reading page to {READING_OUTPUT_PATH}")
     print(f"Wrote spelling page to {SPELLING_OUTPUT_PATH}")
     print(f"Wrote vocabulary page to {VOCABULARY_OUTPUT_PATH}")
+    print(f"Wrote music page to {MUSIC_OUTPUT_PATH}")
     print(f"Wrote what-do-they-have page to {WHAT_DO_THEY_HAVE_OUTPUT_PATH}")
     print(f"Wrote {len(letter_sounds)} buttons to {LETTER_SOUNDS_OUTPUT_PATH}")
     print(f"Wrote question flashcards page to {QUESTION_FLASHCARDS_OUTPUT_PATH}")

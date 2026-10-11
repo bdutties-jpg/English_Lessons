@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="English Playtime" />
+  <meta name="application-name" content="English Playtime" />
+  <meta name="theme-color" content="#c4b5fd" />
+  <meta name="app-version" content="20261011033918" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="../assets/icons/icon-512.png" />
+  <link rel="manifest" href="../site.webmanifest" />
+  <title>Music</title>
+  <style>
+    :root {
+      --ink: #1f2937;
+      --paper: #fffdf5;
+      --purple: #8b5cf6;
+      --purple-dark: #5b21b6;
+      --staff: #334155;
+      --shadow: rgba(49, 46, 129, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Trebuchet MS", "Comic Sans MS", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 12%, rgba(255, 255, 255, 0.85), transparent 24%),
+        radial-gradient(circle at 85% 24%, rgba(253, 224, 71, 0.46), transparent 18%),
+        linear-gradient(180deg, #c4b5fd 0%, #a5b4fc 43%, #fef3c7 100%);
+    }
+
+    .page {
+      width: min(100%, 1040px);
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    .topbar {
+      margin-bottom: 12px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 6px 18px rgba(31, 41, 55, 0.12);
+      color: #0f172a;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .back-link:focus-visible,
+    .staff-note:focus-visible {
+      outline: 4px solid rgba(255, 255, 255, 0.95);
+      outline-offset: 4px;
+    }
+
+    .hero {
+      text-align: center;
+      margin: 6px auto 24px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(2.3rem, 8vw, 4.2rem);
+      line-height: 1;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #312e81;
+      text-shadow: 0 3px 0 rgba(255, 255, 255, 0.7);
+    }
+
+    .subtitle {
+      margin: 12px auto 0;
+      max-width: 36rem;
+      font-size: clamp(1rem, 3.8vw, 1.25rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .music-card {
+      padding: clamp(14px, 3vw, 28px);
+      border: 4px solid rgba(255, 255, 255, 0.62);
+      border-radius: 32px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.72));
+      box-shadow: 0 16px 36px var(--shadow);
+    }
+
+    .music-tip {
+      margin: 0 0 12px;
+      text-align: center;
+      color: #4c1d95;
+      font-size: clamp(0.95rem, 3vw, 1.1rem);
+      font-weight: 800;
+    }
+
+    .staff {
+      --line-gap: clamp(32px, 8vw, 58px);
+      --note-size: clamp(44px, 8.5vw, 68px);
+      --note-head-height: clamp(32px, 6.12vw, 49px);
+      --stem-offset: clamp(22px, 4.25vw, 34px);
+      --stem-left-offset: clamp(15px, 2.975vw, 24px);
+      --stem-height: clamp(62px, 12.07vw, 97px);
+      --ledger-bottom: clamp(15px, 2.975vw, 24px);
+      --ledger-width: clamp(58px, 11.22vw, 90px);
+      position: relative;
+      min-width: 0;
+      height: clamp(230px, 57.6vw, 418px);
+      padding: 0 2px;
+      overflow: visible;
+    }
+
+    .staff-lines,
+    .notes-layer {
+      position: absolute;
+      inset: 0;
+    }
+
+    .staff-line {
+      position: absolute;
+      right: 0;
+      left: 0;
+      height: 3px;
+      border-radius: 999px;
+      background: var(--staff);
+      opacity: 0.86;
+    }
+
+    .staff-line:nth-child(1) { bottom: clamp(48px, 12vw, 87px); }
+    .staff-line:nth-child(2) { bottom: clamp(80px, 20vw, 145px); }
+    .staff-line:nth-child(3) { bottom: clamp(112px, 28vw, 203px); }
+    .staff-line:nth-child(4) { bottom: clamp(144px, 36vw, 261px); }
+    .staff-line:nth-child(5) { bottom: clamp(176px, 44vw, 319px); }
+
+    .notes-layer {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      align-items: end;
+      gap: 2px;
+    }
+
+    .staff-note {
+      position: relative;
+      justify-self: center;
+      width: min(100%, var(--note-size));
+      height: clamp(99px, 19.125vw, 153px);
+      margin-bottom: var(--note-bottom);
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 120ms ease, filter 120ms ease;
+    }
+
+    .staff-note:active,
+    .staff-note.is-playing {
+      filter: brightness(1.08) saturate(1.14);
+      transform: translateY(-7px) scale(1.06);
+    }
+
+    .note-position-0 { --note-bottom: clamp(26px, 7.75vw, 53px); }
+    .note-position-1 { --note-bottom: clamp(42px, 11.75vw, 82px); }
+    .note-position-2 { --note-bottom: clamp(58px, 15.75vw, 111px); }
+    .note-position-3 { --note-bottom: clamp(74px, 19.75vw, 140px); }
+    .note-position-4 { --note-bottom: clamp(90px, 23.75vw, 169px); }
+    .note-position-5 { --note-bottom: clamp(106px, 27.75vw, 198px); }
+    .note-position-6 { --note-bottom: clamp(122px, 31.75vw, 227px); }
+    .note-position-7 { --note-bottom: clamp(138px, 35.75vw, 256px); }
+
+    .note-head {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--note-size);
+      height: var(--note-head-height);
+      border: 3px solid rgba(49, 46, 129, 0.34);
+      border-radius: 50%;
+      background: var(--note-color);
+      box-shadow: inset 0 5px 0 rgba(255, 255, 255, 0.34), 0 5px 0 rgba(49, 46, 129, 0.16);
+      color: #fff;
+      font-size: clamp(0.78rem, 2.8vw, 1.05rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      text-shadow: 0 1px 1px rgba(49, 46, 129, 0.52);
+      transform: translateX(-50%) rotate(-14deg);
+    }
+
+    .note-stem {
+      position: absolute;
+      bottom: var(--stem-offset);
+      left: calc(50% + var(--stem-left-offset));
+      width: 5px;
+      height: var(--stem-height);
+      border-radius: 999px;
+      background: var(--note-color);
+      box-shadow: 1px 0 0 rgba(49, 46, 129, 0.24);
+    }
+
+    .ledger-line {
+      position: absolute;
+      bottom: var(--ledger-bottom);
+      left: 50%;
+      width: var(--ledger-width);
+      height: 3px;
+      border-radius: 999px;
+      background: var(--staff);
+      transform: translateX(-50%);
+    }
+
+    .staff-note:not(.has-ledger) .ledger-line {
+      display: none;
+    }
+
+    .key-guide {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 18px 0 0;
+      color: #475569;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .key-guide span {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(221, 214, 254, 0.7);
+    }
+
+    @media (max-width: 520px) {
+      .page {
+        padding-right: 10px;
+        padding-left: 10px;
+      }
+
+      .music-card {
+        padding: 12px 7px 18px;
+        border-radius: 24px;
+      }
+
+      .staff {
+        --line-gap: clamp(28px, 9vw, 42px);
+        --note-size: clamp(36px, 11vw, 52px);
+        --note-head-height: clamp(26px, 7.92vw, 37px);
+        --stem-offset: clamp(18px, 5.5vw, 26px);
+        --stem-left-offset: clamp(13px, 3.85vw, 18px);
+        --stem-height: clamp(51px, 15.62vw, 74px);
+        --ledger-bottom: clamp(13px, 3.85vw, 18px);
+        --ledger-width: clamp(48px, 14.52vw, 69px);
+        height: clamp(202px, 63vw, 302px);
+      }
+
+      .staff-line:nth-child(1) { bottom: clamp(42px, 13.5vw, 63px); }
+      .staff-line:nth-child(2) { bottom: clamp(70px, 22.5vw, 105px); }
+      .staff-line:nth-child(3) { bottom: clamp(98px, 31.5vw, 147px); }
+      .staff-line:nth-child(4) { bottom: clamp(126px, 40.5vw, 189px); }
+      .staff-line:nth-child(5) { bottom: clamp(154px, 49.5vw, 231px); }
+
+      .staff-note { height: clamp(81px, 24.75vw, 117px); }
+      .note-position-0 { --note-bottom: clamp(24px, 8vw, 37px); }
+      .note-position-1 { --note-bottom: clamp(38px, 12.5vw, 58px); }
+      .note-position-2 { --note-bottom: clamp(52px, 17vw, 79px); }
+      .note-position-3 { --note-bottom: clamp(66px, 21.5vw, 100px); }
+      .note-position-4 { --note-bottom: clamp(80px, 26vw, 121px); }
+      .note-position-5 { --note-bottom: clamp(94px, 30.5vw, 142px); }
+      .note-position-6 { --note-bottom: clamp(108px, 35vw, 163px); }
+      .note-position-7 { --note-bottom: clamp(122px, 39.5vw, 184px); }
+
+      .note-stem {
+        width: 4px;
+      }
+    }
+
+    @media (min-width: 700px) {
+      .page {
+        padding-top: 36px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="topbar">
+      <a class="back-link" href="../index.html" aria-label="Back to home page">⬅️🏡</a>
+    </div>
+    <header class="hero">
+      <h1 class="title" id="page-title"></h1>
+      <p class="subtitle" id="page-description"></p>
+    </header>
+    <section class="music-card" aria-label="Interactive musical staff">
+      <p class="music-tip">Tap more than one note to make your own chord!</p>
+      <div class="staff" id="staff" role="group" aria-label="Musical notes from low do to high do">
+        <div class="staff-lines" aria-hidden="true">
+          <span class="staff-line"></span>
+          <span class="staff-line"></span>
+          <span class="staff-line"></span>
+          <span class="staff-line"></span>
+          <span class="staff-line"></span>
+        </div>
+        <div class="notes-layer" id="notes-layer"></div>
+      </div>
+      <p class="key-guide"><span>🎹 Play any notes together</span></p>
+    </section>
+  </main>
+
+  <script>
+    const appVersion = "20261011033918";
+    const versionInfoPath = "../app_version.json";
+    const pageConfig = {
+  "title": "Music",
+  "description": "Tap the notes to hear do, re, mi. Play several notes together like a piano!",
+  "backAudio": "../assets/audio/Menu/Back%20to%20home.m4a?v=20261010-1"
+};
+    const musicNotes = [
+  {
+    "label": "do",
+    "ariaLabel": "Play low do",
+    "position": 0,
+    "hasLedger": true,
+    "audio": "../assets/audio/Music/Do%201.m4a?v=20261010-1"
+  },
+  {
+    "label": "re",
+    "ariaLabel": "Play re",
+    "position": 1,
+    "hasLedger": false,
+    "audio": "../assets/audio/Music/Re.m4a?v=20261010-1"
+  },
+  {
+    "label": "mi",
+    "ariaLabel": "Play mi",
+    "position": 2,
+    "hasLedger": false,
+    "audio": "../assets/audio/Music/Mi.m4a?v=20261010-1"
+  },
+  {
+    "label": "fa",
+    "ariaLabel": "Play fa",
+    "position": 3,
+    "hasLedger": false,
+    "audio": "../assets/audio/Music/Fa.m4a?v=20261010-1"
+  },
+  {
+    "label": "so",
+    "ariaLabel": "Play so",
+    "position": 4,
+    "hasLedger": false,
+    "audio": "../assets/audio/Music/So.m4a?v=20261010-1"
+  },
+  {
+    "label": "la",
+    "ariaLabel": "Play la",
+    "position": 5,
+    "hasLedger": false,
+    "audio": "../assets/audio/Music/La.m4a?v=20261010-1"
+  },
+  {
+    "label": "ti",
+    "ariaLabel": "Play ti",
+    "position": 6,
+    "hasLedger": false,
+    "audio": "../assets/audio/Music/Ti.m4a?v=20261010-1"
+  },
+  {
+    "label": "do",
+    "ariaLabel": "Play high do",
+    "position": 7,
+    "hasLedger": false,
+    "audio": "../assets/audio/Music/Do%202.m4a?v=20261010-1"
+  }
+];
+    const noteColors = ["#f97316", "#ef4444", "#ec4899", "#a855f7", "#6366f1", "#0ea5e9", "#14b8a6", "#22c55e"];
+    const pageTitle = document.getElementById("page-title");
+    const pageDescription = document.getElementById("page-description");
+    const notesLayer = document.getElementById("notes-layer");
+    const backLink = document.querySelector(".back-link");
+    const navigationPlayer = new Audio();
+    const activeNotePlayers = new Set();
+
+    function withVersion(href, version = appVersion) {
+      const url = new URL(href, window.location.href);
+      url.searchParams.set("v", version);
+      return url.toString();
+    }
+
+    async function ensureLatestVersion() {
+      try {
+        const response = await fetch(`${versionInfoPath}?t=${Date.now()}`, { cache: "no-store" });
+        if (!response.ok) {
+          return;
+        }
+
+        const latest = await response.json();
+        if (!latest.version || latest.version === appVersion) {
+          return;
+        }
+
+        window.location.replace(withVersion(window.location.pathname + window.location.search + window.location.hash, latest.version));
+      } catch (error) {
+        console.error("Unable to check app version", error);
+      }
+    }
+
+    async function playThenNavigate(audioPath, href) {
+      const destination = withVersion(href);
+      if (!audioPath) {
+        window.location.href = destination;
+        return;
+      }
+
+      navigationPlayer.pause();
+      navigationPlayer.currentTime = 0;
+      navigationPlayer.src = audioPath;
+
+      try {
+        await navigationPlayer.play();
+        navigationPlayer.addEventListener(
+          "ended",
+          () => {
+            window.location.href = destination;
+          },
+          { once: true }
+        );
+      } catch (error) {
+        console.error("Unable to play back audio", error);
+        window.location.href = destination;
+      }
+    }
+
+    function playNote(note, button) {
+      const player = new Audio(note.audio);
+      player.preload = "auto";
+      activeNotePlayers.add(player);
+      const activeCount = Number(button.dataset.activeCount || 0) + 1;
+      button.dataset.activeCount = String(activeCount);
+      button.classList.add("is-playing");
+
+      let finished = false;
+      const finish = () => {
+        if (finished) {
+          return;
+        }
+        finished = true;
+        activeNotePlayers.delete(player);
+        const remainingCount = Math.max(0, Number(button.dataset.activeCount || 1) - 1);
+        button.dataset.activeCount = String(remainingCount);
+        if (remainingCount === 0) {
+          button.classList.remove("is-playing");
+        }
+      };
+
+      player.addEventListener("ended", finish, { once: true });
+      player.addEventListener("error", finish, { once: true });
+      void player.play().catch((error) => {
+        finish();
+        console.error(`Unable to play ${note.label}`, error);
+      });
+    }
+
+    pageTitle.textContent = pageConfig.title;
+    pageDescription.textContent = pageConfig.description;
+    void ensureLatestVersion();
+
+    backLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      playThenNavigate(pageConfig.backAudio, backLink.getAttribute("href"));
+    });
+
+    musicNotes.forEach((note, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "staff-note";
+      button.classList.add(`note-position-${note.position}`);
+      button.style.setProperty("--note-color", noteColors[index % noteColors.length]);
+      button.setAttribute("aria-label", note.ariaLabel);
+      if (note.hasLedger) {
+        button.classList.add("has-ledger");
+      }
+      button.innerHTML = `
+        <span class="note-stem" aria-hidden="true"></span>
+        <span class="ledger-line" aria-hidden="true"></span>
+        <span class="note-head" aria-hidden="true">${note.label}</span>
+      `;
+      button.addEventListener("click", () => playNote(note, button));
+      notesLayer.appendChild(button);
+    });
+  </script>
+</body>
+</html>
