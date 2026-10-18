@@ -55,7 +55,7 @@ FILENAME_PATTERN = re.compile(r"^(?P<emoji>.+?)\s*-\s*(?P<text>.+)$")
 VOCABULARY_PATTERN = re.compile(r"^(?P<word>.+?)\s+(?P<emoji>\S+)$")
 APP_VERSION = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
 # Bump this only when audio files change and you need clients to fetch them again.
-AUDIO_ASSET_VERSION = "20261017-1"
+AUDIO_ASSET_VERSION = "20261017-2"
 
 
 @dataclass(frozen=True)

@@ -325,7 +325,12 @@
     let selectionRunId = 0;
     let partyAnimationFrame = null;
     let flyingPartyStars = [];
-    const activeCursorPlayers = new Set();
+    const cursorTickPlayers = Array.from({ length: 3 }, () => {
+      const player = new Audio();
+      player.preload = "auto";
+      return player;
+    });
+    let cursorTickPlayerIndex = 0;
 
     function withVersion(href, version = appVersion) {
       const url = new URL(href, window.location.href);
@@ -391,14 +396,20 @@
 
     function playCursorTick() {
       if (!vocabularyConfig.cursor_tick_sound) return;
-      const player = new Audio(vocabularyConfig.cursor_tick_sound);
-      activeCursorPlayers.add(player);
-      const cleanup = () => activeCursorPlayers.delete(player);
-      player.addEventListener("ended", cleanup, { once: true });
-      player.addEventListener("error", cleanup, { once: true });
+      const player = cursorTickPlayers[cursorTickPlayerIndex];
+      cursorTickPlayerIndex = (cursorTickPlayerIndex + 1) % cursorTickPlayers.length;
+      player.pause();
+      player.currentTime = 0;
       void player.play().catch((error) => {
-        cleanup();
         console.error("Unable to play cursor tick", error);
+      });
+    }
+
+    function preloadCursorTicks() {
+      if (!vocabularyConfig.cursor_tick_sound) return;
+      cursorTickPlayers.forEach((player) => {
+        player.src = vocabularyConfig.cursor_tick_sound;
+        player.load();
       });
     }
 
@@ -425,7 +436,10 @@
     }
 
     function renderRound() {
+      selectionRunId += 1;
+      isSelecting = false;
       tiles = createRoundTiles();
+      const roundTiles = tiles;
       vocabularyGrid.replaceChildren();
       tiles.forEach((tile) => {
         const wrapper = document.createElement("div");
@@ -451,6 +465,7 @@
       cursorIndex = 0;
       cursorArrow.style.transitionDuration = "0ms";
       window.requestAnimationFrame(() => {
+        if (tiles !== roundTiles || isCelebrating) return;
         moveCursorTo(0, 0, true);
         void selectNextTile();
       });
@@ -700,6 +715,7 @@
       event.preventDefault();
       void playThenNavigate(pageConfig.backAudio, backLink.getAttribute("href"));
     });
+    preloadCursorTicks();
     void ensureLatestVersion();
     renderRound();
   </script>

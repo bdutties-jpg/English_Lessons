@@ -7,7 +7,7 @@ VOCABULARY_CONFIG = {
     "selection_duration_ms": 1000,
 
     # Audio
-    "cursor_tick_sound": "assets/audio/UI_Sounds/click.wav",
+    "cursor_tick_sound": "assets/audio/UI_Sounds/click.m4a",
     "charge_sound": "assets/audio/UI_Sounds/video_game_bo.m4a",
     "star_celebration": "assets/audio/UI_Sounds/Magic ga.m4a",
     "star_party": "assets/audio/UI_Sounds/rocket-road.m4a",
