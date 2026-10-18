@@ -55,7 +55,7 @@ FILENAME_PATTERN = re.compile(r"^(?P<emoji>.+?)\s*-\s*(?P<text>.+)$")
 VOCABULARY_PATTERN = re.compile(r"^(?P<word>.+?)\s+(?P<emoji>\S+)$")
 APP_VERSION = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
 # Bump this only when audio files change and you need clients to fetch them again.
-AUDIO_ASSET_VERSION = "20261010-1"
+AUDIO_ASSET_VERSION = "20261017-1"
 
 
 @dataclass(frozen=True)
@@ -583,7 +583,7 @@ def render_spelling_html() -> str:
 def render_vocabulary_html() -> str:
     template = apply_app_version(VOCABULARY_TEMPLATE_PATH.read_text(encoding="utf-8"))
     vocabulary_config = dict(VOCABULARY_CONFIG)
-    for key in ("charge_sound", "star_celebration", "star_party"):
+    for key in ("cursor_tick_sound", "charge_sound", "star_celebration", "star_party"):
         audio_path = vocabulary_config.get(key)
         if audio_path:
             vocabulary_config[key] = encode_audio_path(ROOT_DIR / audio_path)
