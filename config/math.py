@@ -3,8 +3,10 @@ MATH_CONFIG = {
     "base_max_number": 10,
     "base_min_number": 0,
 
-    # Star Mechanics
-    "correct_answer_per_star": 3,
+    # Round Mechanics
+    "problems_per_round": 3,
+
+    # Progressive Difficulty Per Star
     "star_max_boost": 1,
     "star_min_boost": 0,
 

@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="English Playtime" />
   <meta name="application-name" content="English Playtime" />
   <meta name="theme-color" content="#a5f3fc" />
-  <meta name="app-version" content="20261101012330" />
+  <meta name="app-version" content="20261101021804" />
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="../assets/icons/icon-512.png" />
@@ -92,7 +92,7 @@
 
     .card {
       margin: 28px auto 0;
-      max-width: 42rem;
+      max-width: 46rem;
       padding: 22px 16px 20px;
       border-radius: 32px;
       background: rgba(255, 255, 255, 0.72);
@@ -100,120 +100,18 @@
       backdrop-filter: blur(6px);
     }
 
-    .problem-shell {
+    .problems-stack {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(90px, 112px) 74px;
-      gap: 14px;
-      align-items: center;
-      justify-content: center;
-      width: fit-content;
-      max-width: 100%;
+      gap: clamp(12px, 3vw, 20px);
       margin: 0 auto;
     }
 
-    .game-rail {
-      display: flex;
-      flex-direction: column;
+    .problem-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) clamp(132px, 36vw, 240px);
+      gap: clamp(8px, 2.5vw, 18px);
       align-items: center;
-      gap: 12px;
-      width: 74px;
-      align-self: stretch;
-      justify-content: center;
-    }
-
-    .goal-star-shell {
-      position: relative;
-      width: 54px;
-      height: 54px;
-      display: grid;
-      place-items: center;
-      filter: drop-shadow(0 6px 10px rgba(31, 41, 55, 0.18));
-    }
-
-    .goal-star {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      font-size: 2.45rem;
-      line-height: 1;
-      transition: opacity 240ms ease, transform 240ms ease, filter 240ms ease;
-    }
-
-    .goal-star-off {
-      color: #d1d5db;
-      text-shadow: 0 3px 0 rgba(255, 255, 255, 0.72);
-    }
-
-    .goal-star-on {
-      color: #fde047;
-      opacity: 0;
-      transform: scale(0.72);
-      text-shadow: 0 0 18px rgba(250, 204, 21, 0.92), 0 0 34px rgba(255, 255, 255, 0.92);
-    }
-
-    .goal-star-shell.lit .goal-star-on {
-      opacity: 1;
-      transform: scale(1.08);
-    }
-
-    .goal-star-shell.lit .goal-star-off {
-      opacity: 0.24;
-      transform: scale(0.88);
-    }
-
-    .thermo {
-      position: relative;
-      width: 38px;
-      height: 186px;
-      padding: 7px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(226, 232, 240, 0.94));
-      box-shadow: inset 0 3px 8px rgba(255, 255, 255, 0.92), 0 10px 20px rgba(31, 41, 55, 0.18);
-    }
-
-    .thermo-track {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      border-radius: 999px;
-      background: linear-gradient(180deg, #f3f4f6 0%, #d1d5db 100%);
-      border: 2px solid rgba(148, 163, 184, 0.55);
-    }
-
-    .thermo-fill {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 0%;
-      border-radius: 999px 999px 18px 18px;
-      background: linear-gradient(180deg, #fcd34d 0%, #fb7185 52%, #f97316 100%);
-      box-shadow: inset 0 -4px 8px rgba(255, 255, 255, 0.3), 0 0 14px rgba(251, 113, 133, 0.42);
-      transition: height 440ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease;
-    }
-
-    .thermo-bulb {
-      position: absolute;
-      left: 50%;
-      bottom: -12px;
-      width: 54px;
-      height: 54px;
-      border-radius: 999px;
-      transform: translateX(-50%);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(226, 232, 240, 0.94));
-      box-shadow: inset 0 4px 8px rgba(255, 255, 255, 0.92), 0 10px 18px rgba(31, 41, 55, 0.18);
-    }
-
-    .thermo-bulb::before {
-      content: "";
-      position: absolute;
-      inset: 7px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 35% 30%, #fde68a 0%, #fb7185 58%, #f97316 100%);
-      opacity: var(--bulb-glow, 0.22);
-      transition: opacity 220ms ease;
+      min-width: 0;
     }
 
     .star-bank-section {
@@ -278,8 +176,7 @@
     .party-mode .card,
     .party-mode .topbar,
     .party-mode .problem-text,
-    .party-mode .answers,
-    .party-mode .game-rail,
+    .party-mode .problem-answers,
     .party-mode .star-bank-section {
       animation: party-sway 860ms ease-in-out infinite alternate;
       transform-origin: center;
@@ -315,7 +212,7 @@
 
     .problem-text {
       min-width: 0;
-      font-size: clamp(2rem, 9vw, 4rem);
+      font-size: clamp(1.2rem, 6vw, 2.8rem);
       line-height: 1;
       font-weight: 700;
       letter-spacing: 0.04em;
@@ -324,26 +221,26 @@
       padding-right: 6px;
     }
 
-    .answers {
+    .problem-answers {
       display: grid;
-      gap: 10px;
-      width: min(112px, 24vw);
-      min-width: 90px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      min-width: 0;
     }
 
     .answer-button {
       position: relative;
-      aspect-ratio: 1 / 1;
+      min-height: clamp(34px, 10vw, 52px);
       width: 100%;
       border: none;
-      border-radius: 22px;
+      border-radius: 16px;
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.15)),
         var(--button-color, #fca5a5);
       box-shadow: 0 8px 0 rgba(255, 255, 255, 0.7), 0 12px 22px rgba(31, 41, 55, 0.16);
       color: #0f172a;
       cursor: pointer;
       font-family: inherit;
-      font-size: clamp(1.8rem, 8vw, 2.6rem);
+      font-size: clamp(1.15rem, 4.8vw, 2rem);
       font-weight: 900;
       transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease, background 120ms ease;
       overflow: visible;
@@ -480,32 +377,19 @@
     }
 
     @media (max-width: 420px) {
-      .problem-shell {
-        gap: 10px;
-        grid-template-columns: minmax(0, 1fr) minmax(82px, 96px) 62px;
+      .page {
+        padding-left: 10px;
+        padding-right: 10px;
       }
 
-      .problem-text {
-        font-size: clamp(1.8rem, 8.5vw, 2.6rem);
+      .card {
+        padding: 16px 10px;
+        border-radius: 24px;
       }
 
-      .answers {
-        width: min(96px, 27vw);
-        min-width: 84px;
-      }
-
-       .game-rail {
-        width: 62px;
-      }
-
-      .thermo {
-        width: 32px;
-        height: 164px;
-      }
-
-      .thermo-bulb {
-        width: 46px;
-        height: 46px;
+      .problem-row {
+        grid-template-columns: minmax(0, 1fr) 132px;
+        gap: 8px;
       }
     }
   </style>
@@ -520,22 +404,7 @@
       <p class="subtitle">toán học</p>
     </header>
     <section class="card">
-      <div class="problem-shell">
-        <div class="problem-text" id="problem-text">7 - 4 =</div>
-        <div class="answers" id="answers"></div>
-        <div class="game-rail" aria-label="Streak progress">
-          <div class="goal-star-shell" id="goal-star-shell" aria-hidden="true">
-            <span class="goal-star goal-star-off">★</span>
-            <span class="goal-star goal-star-on">★</span>
-          </div>
-          <div class="thermo" aria-hidden="true">
-            <div class="thermo-track">
-              <div class="thermo-fill" id="thermo-fill"></div>
-            </div>
-            <div class="thermo-bulb"></div>
-          </div>
-        </div>
-      </div>
+      <div class="problems-stack" id="problems-stack" aria-label="Three math problems"></div>
       <p class="status" id="status"></p>
     </section>
     <section class="star-bank-section" aria-label="Collected stars">
@@ -545,12 +414,12 @@
   </main>
 
   <script>
-    const appVersion = "20261101012330";
+    const appVersion = "20261101021804";
     const versionInfoPath = "../app_version.json";
     const mathConfig = {
   "base_max_number": 10,
   "base_min_number": 0,
-  "correct_answer_per_star": 3,
+  "problems_per_round": 3,
   "star_max_boost": 1,
   "star_min_boost": 0,
   "correct_answer": "../assets/audio/UI_Sounds/ding%20sparkle.m4a?v=20261017-2",
@@ -558,12 +427,9 @@
   "star_celebration": "../assets/audio/UI_Sounds/Magic%20ga.m4a?v=20261017-2",
   "star_party": "../assets/audio/UI_Sounds/rocket-road.m4a?v=20261017-2"
 };
-    const answersElement = document.getElementById("answers");
-    const problemTextElement = document.getElementById("problem-text");
+    const problemsStack = document.getElementById("problems-stack");
     const statusElement = document.getElementById("status");
     const backLink = document.querySelector(".back-link");
-    const thermoFill = document.getElementById("thermo-fill");
-    const goalStarShell = document.getElementById("goal-star-shell");
     const starsBank = document.getElementById("stars-bank");
     const palette = ["#fcd34d", "#93c5fd", "#f9a8d4"];
     const sparklePalette = ["#facc15", "#fb7185", "#60a5fa", "#34d399", "#c084fc"];
@@ -575,13 +441,13 @@
     const wrongAudio = mathConfig.wrong_answer;
     const magicAudio = mathConfig.star_celebration;
     const partyAudio = mathConfig.star_party;
-    const correctAnswersPerStar = Math.max(1, Number(mathConfig.correct_answer_per_star) || 1);
-    let currentProblem = null;
-    let streakCount = 0;
+    const problemsPerRound = Math.max(1, Number(mathConfig.problems_per_round) || 3);
+    let currentProblems = [];
+    let solvedProblemIndexes = new Set();
+    let isPerfectRound = true;
     let isResolving = false;
     let activeResolutionId = 0;
     let isPartyLockActive = false;
-    let roundFirstTry = true;
     let partyAnimationFrame = null;
     let flyingPartyStars = [];
 
@@ -733,14 +599,6 @@
       } catch (error) {
         console.error("Unable to play party audio", error);
       }
-    }
-
-    function setMeterProgress(stepCount) {
-      const clamped = Math.max(0, Math.min(stepCount, correctAnswersPerStar));
-      const ratio = clamped / correctAnswersPerStar;
-      thermoFill.style.height = `${ratio * 100}%`;
-      goalStarShell.classList.toggle("lit", ratio >= 1);
-      document.documentElement.style.setProperty("--bulb-glow", String(0.22 + ratio * 0.58));
     }
 
     function wait(ms) {
@@ -953,9 +811,9 @@
       document.body.classList.remove("party-mode");
     }
 
-    async function celebrateMilestone() {
+    async function celebrateMilestone(sourceElement) {
       const placeholder = addBankPlaceholder();
-      const startRect = goalStarShell.getBoundingClientRect();
+      const startRect = sourceElement.getBoundingClientRect();
       const endRect = placeholder.getBoundingClientRect();
       const floatingStar = document.createElement("span");
       floatingStar.className = "floating-star";
@@ -985,8 +843,6 @@
       });
 
       const magicPlayback = playMagicSound();
-  streakCount = 0;
-  setMeterProgress(0);
       await animationPromise;
       floatingStar.remove();
       finalizeBankStar(placeholder);
@@ -1104,7 +960,7 @@
     }
 
     function applyInteractionLock() {
-      answersElement.querySelectorAll(".answer-button").forEach((button) => {
+      problemsStack.querySelectorAll(".answer-button").forEach((button) => {
         button.disabled = isPartyLockActive;
       });
       backLink.setAttribute("aria-disabled", String(isPartyLockActive));
@@ -1115,22 +971,36 @@
       applyInteractionLock();
     }
 
-    function renderProblem() {
-      currentProblem = buildProblem();
-      roundFirstTry = true;
-      problemTextElement.textContent = currentProblem.text;
-      answersElement.innerHTML = "";
-      setStatus("", "");
+    function renderRound() {
+      currentProblems = Array.from({ length: problemsPerRound }, () => buildProblem());
+      solvedProblemIndexes = new Set();
+      isPerfectRound = true;
+      problemsStack.replaceChildren();
+      setStatus("Solve all three problems!", "");
 
-      currentProblem.answers.forEach((answer, index) => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "answer-button";
-        button.textContent = answer;
-        button.style.setProperty("--button-color", palette[index % palette.length]);
-        button.setAttribute("aria-label", `Answer ${answer}`);
-        button.addEventListener("click", () => handleAnswer(button, answer));
-        answersElement.appendChild(button);
+      currentProblems.forEach((problem, problemIndex) => {
+        const row = document.createElement("div");
+        const problemText = document.createElement("div");
+        const answers = document.createElement("div");
+
+        row.className = "problem-row";
+        problemText.className = "problem-text";
+        problemText.textContent = problem.text;
+        answers.className = "problem-answers";
+
+        problem.answers.forEach((answer, answerIndex) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "answer-button";
+          button.textContent = answer;
+          button.style.setProperty("--button-color", palette[answerIndex % palette.length]);
+          button.setAttribute("aria-label", `Answer ${answer} for ${problem.text}`);
+          button.addEventListener("click", () => { void handleAnswer(button, answer, problemIndex); });
+          answers.appendChild(button);
+        });
+
+        row.append(problemText, answers);
+        problemsStack.appendChild(row);
       });
 
       applyInteractionLock();
@@ -1158,23 +1028,17 @@
       }, 650);
     }
 
-    async function handleAnswer(button, answer) {
+    async function handleAnswer(button, answer, problemIndex) {
       if (isResolving || isPartyLockActive || button.disabled) {
         return;
       }
 
       stopMagicSound();
       const resolutionId = ++activeResolutionId;
-      const buttons = [...answersElement.querySelectorAll(".answer-button")];
-      if (answer === currentProblem.correctAnswer) {
+      const problem = currentProblems[problemIndex];
+      const buttons = [...button.parentElement.querySelectorAll(".answer-button")];
+      if (answer === problem.correctAnswer) {
         isResolving = true;
-        if (roundFirstTry) {
-          streakCount = Math.min(streakCount + 1, correctAnswersPerStar);
-          setMeterProgress(streakCount);
-        } else {
-          streakCount = 0;
-          setMeterProgress(0);
-        }
         button.classList.add("correct");
         burstSparkles(button);
         setStatus("Great job!", "good");
@@ -1182,59 +1046,62 @@
           item.disabled = true;
         });
         await playCorrectSound();
-        if (streakCount === correctAnswersPerStar) {
-          setStatus("Star earned!", "good");
-          const willTriggerParty = (getStarCount() + 1) % 7 === 0;
-          const milestonePromise = celebrateMilestone();
-          renderProblem();
-          if (willTriggerParty) {
-            setPartyInteractionLock(true);
-          } else {
+        if (resolutionId !== activeResolutionId) {
+          return;
+        }
+
+        solvedProblemIndexes.add(problemIndex);
+        if (solvedProblemIndexes.size < currentProblems.length) {
+          setStatus(`${solvedProblemIndexes.size} of ${currentProblems.length} solved!`, "good");
+          isResolving = false;
+          return;
+        }
+
+        if (!isPerfectRound) {
+          setStatus("Round complete! Try for a perfect round next time.", "");
+          await wait(850);
+          if (resolutionId === activeResolutionId) {
             isResolving = false;
-          }
-          const totalStars = await milestonePromise;
-          if (resolutionId !== activeResolutionId) {
-            return;
-          }
-          if (willTriggerParty && totalStars > 0 && totalStars % 7 === 0) {
-            setStatus("Star party!", "good");
-            await runStarParty();
-          }
-          if (willTriggerParty) {
-            setPartyInteractionLock(false);
-            isResolving = false;
+            renderRound();
           }
           return;
         }
-        if (resolutionId === activeResolutionId) {
-          isResolving = false;
+
+        setStatus("Perfect round! Star earned!", "good");
+        const willTriggerParty = (getStarCount() + 1) % 7 === 0;
+        if (willTriggerParty) {
+          setPartyInteractionLock(true);
         }
-        renderProblem();
+        const totalStars = await celebrateMilestone(button);
+        if (resolutionId !== activeResolutionId) {
+          return;
+        }
+        if (willTriggerParty && totalStars > 0 && totalStars % 7 === 0) {
+          setStatus("Star party!", "good");
+          await runStarParty();
+        }
+        if (willTriggerParty) {
+          setPartyInteractionLock(false);
+        }
+        isResolving = false;
+        renderRound();
         return;
       }
 
       isResolving = true;
-      roundFirstTry = false;
-      streakCount = 0;
-      setMeterProgress(0);
+      isPerfectRound = false;
       button.classList.remove("wrong");
       void button.offsetWidth;
       button.classList.add("wrong");
-      buttons.forEach((item) => {
-        item.disabled = true;
-      });
-      setStatus("Try again!", "bad");
+      button.disabled = true;
+      setStatus("Try another answer!", "bad");
       await playWrongSound();
-      buttons.forEach((item) => {
-        item.disabled = item === button;
-      });
       if (resolutionId === activeResolutionId) {
         isResolving = false;
       }
     }
 
-    setMeterProgress(0);
-    renderProblem();
+    renderRound();
   </script>
 </body>
 </html>
