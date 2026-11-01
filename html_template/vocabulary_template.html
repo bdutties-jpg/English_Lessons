@@ -112,16 +112,16 @@
       top: 0;
       left: 0;
       z-index: 2;
+      opacity: 0;
       color: #dc2626;
       font-size: clamp(2rem, 7vw, 3rem);
       line-height: 1;
       filter: drop-shadow(0 3px 0 rgba(255, 255, 255, 0.9)) drop-shadow(0 4px 6px rgba(127, 29, 29, 0.35));
       pointer-events: none;
       transform: translate3d(0, 0, 0) translateX(-50%);
-      transition-property: transform;
-      transition-timing-function: cubic-bezier(0.22, 0.8, 0.3, 1);
-      will-change: transform;
     }
+
+    .cursor-arrow.is-visible { opacity: 1; }
 
     .vocabulary-tile {
       min-width: 0;
@@ -318,13 +318,9 @@
     const sparklePalette = ["#fde047", "#fb7185", "#60a5fa", "#34d399", "#c084fc"];
     const buttonsPerRound = Math.max(1, Number(vocabularyConfig.buttons_per_round) || 4);
     const chargesPerButton = Math.max(1, Number(vocabularyConfig.charges_per_button) || 3);
-    const selectionDuration = Math.max(250, Number(vocabularyConfig.selection_duration_ms) || 1000);
     let tiles = [];
     let isCelebrating = false;
     let isSelecting = false;
-    let cursorIndex = 0;
-    let cursorPositions = [];
-    let selectionRunId = 0;
     let partyAnimationFrame = null;
     let flyingPartyStars = [];
     const cursorTickPlayer = new Audio();
@@ -430,11 +426,10 @@
     }
 
     function renderRound() {
-      selectionRunId += 1;
       isSelecting = false;
       tiles = createRoundTiles();
-      const roundTiles = tiles;
       vocabularyGrid.replaceChildren();
+      cursorArrow.classList.remove("is-visible");
       tiles.forEach((tile) => {
         const wrapper = document.createElement("div");
         const healthStack = document.createElement("div");
@@ -456,13 +451,8 @@
         wrapper.append(healthStack, button);
         vocabularyGrid.appendChild(wrapper);
       });
-      cursorIndex = 0;
-      cursorArrow.style.transitionDuration = "0ms";
       window.requestAnimationFrame(() => {
-        if (tiles !== roundTiles || isCelebrating) return;
-        measureCursorPositions();
-        moveCursorTo(0, 0, true);
-        void selectNextTile();
+        if (!isCelebrating) selectNextTile();
       });
     }
 
@@ -470,48 +460,19 @@
       return tiles.length > 0 && tiles.every((tile) => tile.charges >= chargesPerButton);
     }
 
-    function measureCursorPositions() {
+    function placeCursorUnder(tile) {
       const cursorAreaRect = cursorArrow.parentElement.getBoundingClientRect();
-      cursorPositions = tiles.map((tile) => {
-        const buttonRect = tile.button.getBoundingClientRect();
-        return buttonRect.left + buttonRect.width / 2 - cursorAreaRect.left;
-      });
-    }
-
-    function moveCursorTo(tileIndex, duration, instant = false) {
-      const position = cursorPositions[tileIndex];
-      if (!Number.isFinite(position)) return;
-      const isTeleport = instant || tileIndex < cursorIndex;
-      cursorArrow.style.transitionDuration = `${isTeleport ? 0 : duration}ms`;
+      const buttonRect = tile.button.getBoundingClientRect();
+      const position = buttonRect.left + buttonRect.width / 2 - cursorAreaRect.left;
       cursorArrow.style.transform = `translate3d(${position}px, 0, 0) translateX(-50%)`;
-      cursorIndex = tileIndex;
+      cursorArrow.classList.add("is-visible");
     }
 
-    function buildCursorPath(targetIndex) {
-      const path = [];
-      for (let index = 1; index < tiles.length; index += 1) {
-        path.push(index);
-      }
-      path.push(0);
-      for (let index = 1; index <= targetIndex; index += 1) {
-        path.push(index);
-      }
-      return path;
-    }
-
-    function getStepDurations(path) {
-      const moveCount = path.filter((index) => index !== 0).length;
-      const weights = Array.from({ length: moveCount }, (_, index) => 1 + index * 0.6);
-      const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-      return weights.map((weight) => Math.round((selectionDuration * weight) / totalWeight));
-    }
-
-    async function selectNextTile() {
+    function selectNextTile() {
       const selectableTiles = tiles.filter((tile) => tile.charges < chargesPerButton);
       if (isCelebrating || isSelecting || !selectableTiles.length) return;
 
       isSelecting = true;
-      const runId = ++selectionRunId;
       tiles.forEach((tile) => {
         tile.isSelected = false;
         tile.button.disabled = true;
@@ -519,31 +480,11 @@
       });
 
       const target = selectableTiles[Math.floor(Math.random() * selectableTiles.length)];
-      const path = buildCursorPath(target.index);
-      const stepDurations = getStepDurations(path);
-      let durationIndex = 0;
-      moveCursorTo(0, 0, true);
-
-      for (const tileIndex of path) {
-        if (runId !== selectionRunId) return;
-        if (tileIndex === 0) {
-          moveCursorTo(tileIndex, 0, true);
-          playCursorTick();
-          continue;
-        }
-
-        const duration = stepDurations[durationIndex];
-        durationIndex += 1;
-        moveCursorTo(tileIndex, duration);
-        await wait(duration);
-        if (runId !== selectionRunId) return;
-        playCursorTick();
-      }
-
-      if (runId !== selectionRunId) return;
       target.isSelected = true;
       target.button.disabled = false;
       target.button.classList.add("is-selected");
+      placeCursorUnder(target);
+      playCursorTick();
       isSelecting = false;
     }
 
@@ -568,7 +509,7 @@
         await completeRound(tile.button);
         return;
       }
-      void selectNextTile();
+      selectNextTile();
     }
 
     function addBankPlaceholder() {
@@ -714,9 +655,8 @@
       void playThenNavigate(pageConfig.backAudio, backLink.getAttribute("href"));
     });
     window.addEventListener("resize", () => {
-      if (!tiles.length) return;
-      measureCursorPositions();
-      moveCursorTo(cursorIndex, 0, true);
+      const selectedTile = tiles.find((tile) => tile.isSelected);
+      if (selectedTile) placeCursorUnder(selectedTile);
     });
     preloadCursorTicks();
     void ensureLatestVersion();
