@@ -61,8 +61,8 @@ APP_VERSION_PLACEHOLDER = "__APP_VERSION__"
 FILENAME_PATTERN = re.compile(r"^(?P<emoji>.+?)\s*-\s*(?P<text>.+)$")
 VOCABULARY_PATTERN = re.compile(r"^(?P<word>.+?)\s+(?P<emoji>\S+)$")
 APP_VERSION = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
-# Bump this only when audio files change and you need clients to fetch them again.
-AUDIO_ASSET_VERSION = "20261017-2"
+# Bump this when audio delivery behavior changes so installed iOS web apps fetch fresh media.
+AUDIO_ASSET_VERSION = "20261107-1"
 
 
 @dataclass(frozen=True)

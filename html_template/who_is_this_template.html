@@ -195,6 +195,11 @@
       <p class="prompt" id="prompt" aria-live="polite"></p>
     </section>
   </main>
+  <audio id="prompt-player" preload="auto" playsinline webkit-playsinline></audio>
+  <audio id="identity-player" preload="auto" playsinline webkit-playsinline></audio>
+  <audio id="question-player" preload="auto" playsinline webkit-playsinline></audio>
+  <audio id="reply-player" preload="auto" playsinline webkit-playsinline></audio>
+  <audio id="vocabulary-player" preload="auto" playsinline webkit-playsinline></audio>
 
   <script>
     const appVersion = "__APP_VERSION__";
@@ -206,7 +211,11 @@
     const personImage = document.getElementById("person-image");
     const heldEmoji = document.getElementById("held-emoji");
     const prompt = document.getElementById("prompt");
-    const player = new Audio();
+    const promptPlayer = document.getElementById("prompt-player");
+    const identityPlayer = document.getElementById("identity-player");
+    const questionPlayer = document.getElementById("question-player");
+    const replyPlayer = document.getElementById("reply-player");
+    const vocabularyPlayer = document.getElementById("vocabulary-player");
     const navigationPlayer = new Audio();
     const recentPeople = [];
     let activePerson = null;
@@ -233,7 +242,16 @@
       }
     }
 
-    function playAudioThen(audioPath, onComplete) {
+    function prepareAudio(player, audioPath) {
+      if (!audioPath || player.dataset.audioPath === audioPath) return;
+      player.pause();
+      player.currentTime = 0;
+      player.dataset.audioPath = audioPath;
+      player.src = audioPath;
+      player.load();
+    }
+
+    function playPreparedAudio(player, onComplete) {
       let completed = false;
       const finish = () => {
         if (completed) return;
@@ -241,16 +259,13 @@
         onComplete();
       };
 
-      if (!audioPath) {
+      if (!player.dataset.audioPath) {
         finish();
         return;
       }
 
       player.pause();
       player.currentTime = 0;
-      if (player.src !== new URL(audioPath, window.location.href).href) {
-        player.src = audioPath;
-      }
       player.onended = finish;
       player.onerror = finish;
       const playback = player.play();
@@ -290,9 +305,13 @@
       personStage.disabled = true;
       activePerson = chooseNextPerson();
       activeVocabulary = chooseVocabulary();
+      prepareAudio(identityPlayer, activePerson.thisIsAudio);
+      prepareAudio(questionPlayer, activePerson.questionAudio);
+      prepareAudio(replyPlayer, activePerson.replyAudio);
+      prepareAudio(vocabularyPlayer, activeVocabulary.audio);
       setStage(activePerson.faceImage, "Tap the person's face");
       prompt.textContent = "Listen...";
-      playAudioThen(pageConfig.whoIsThisAudio, () => {
+      playPreparedAudio(promptPlayer, () => {
         if (thisCycle !== cycleId) return;
         phase = "face";
         personStage.disabled = false;
@@ -305,10 +324,10 @@
       phase = "loading-hands";
       personStage.disabled = true;
       prompt.textContent = "Listen...";
-      playAudioThen(activePerson.thisIsAudio, () => {
+      playPreparedAudio(identityPlayer, () => {
         if (thisCycle !== cycleId) return;
         setStage(activePerson.handsImage, "Tap the person holding an object", activeVocabulary.emoji);
-        playAudioThen(activePerson.questionAudio, () => {
+        playPreparedAudio(questionPlayer, () => {
           if (thisCycle !== cycleId) return;
           phase = "hands";
           personStage.disabled = false;
@@ -322,9 +341,9 @@
       phase = "answering";
       personStage.disabled = true;
       prompt.textContent = "Listen...";
-      playAudioThen(activePerson.replyAudio, () => {
+      playPreparedAudio(replyPlayer, () => {
         if (thisCycle !== cycleId) return;
-        playAudioThen(activeVocabulary.audio, () => {
+        playPreparedAudio(vocabularyPlayer, () => {
           if (thisCycle !== cycleId) return;
           startCycle();
         });
@@ -363,9 +382,7 @@
       startButton.hidden = true;
       startCycle();
     });
-    player.preload = "auto";
-    player.src = pageConfig.whoIsThisAudio;
-    player.load();
+    prepareAudio(promptPlayer, pageConfig.whoIsThisAudio);
     void ensureLatestVersion();
   </script>
 </body>
