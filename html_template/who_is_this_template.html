@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="English Playtime" />
+  <meta name="application-name" content="English Playtime" />
+  <meta name="theme-color" content="#c4b5fd" />
+  <meta name="app-version" content="__APP_VERSION__" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="../assets/icons/icon-512.png" />
+  <link rel="manifest" href="../site.webmanifest" />
+  <title>Who Is This?</title>
+  <style>
+    :root {
+      --ink: #1f2937;
+      --paper: #fffef5;
+      --shadow: rgba(31, 41, 55, 0.18);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      font-family: "Trebuchet MS", "Comic Sans MS", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 16% 12%, rgba(255, 255, 255, 0.84), transparent 25%),
+        radial-gradient(circle at 84% 17%, rgba(255, 255, 255, 0.7), transparent 22%),
+        linear-gradient(180deg, #c4b5fd 0%, #a5b4fc 42%, #fde68a 100%);
+    }
+
+    .page {
+      width: min(100%, 960px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 6px 18px rgba(31, 41, 55, 0.12);
+      color: #0f172a;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .back-link:focus-visible,
+    .person-stage:focus-visible {
+      outline: 4px solid rgba(255, 255, 255, 0.92);
+      outline-offset: 4px;
+    }
+
+    .hero {
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(2.2rem, 8vw, 4rem);
+      line-height: 1;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #0f172a;
+      text-shadow: 0 3px 0 rgba(255, 255, 255, 0.65);
+    }
+
+    .subtitle {
+      margin: 12px auto 0;
+      max-width: 34rem;
+      font-size: clamp(1rem, 3.6vw, 1.25rem);
+      line-height: 1.35;
+      font-weight: 800;
+    }
+
+    .game-card {
+      display: grid;
+      justify-items: center;
+      gap: 16px;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: clamp(14px, 3vw, 24px);
+      border-radius: 32px;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 16px 32px var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+
+    .start-button {
+      min-height: 72px;
+      padding: 14px 28px;
+      border: 4px solid rgba(255, 255, 255, 0.84);
+      border-radius: 999px;
+      background: #fcd34d;
+      box-shadow: 0 8px 0 rgba(255, 255, 255, 0.62), 0 14px 26px var(--shadow);
+      color: #0f172a;
+      cursor: pointer;
+      font: inherit;
+      font-size: clamp(1.25rem, 5vw, 2rem);
+      font-weight: 900;
+    }
+
+    .start-button:active {
+      transform: translateY(5px) scale(0.99);
+      box-shadow: 0 3px 0 rgba(255, 255, 255, 0.72), 0 8px 16px var(--shadow);
+    }
+
+    .person-stage {
+      position: relative;
+      width: min(100%, 72dvh, 680px);
+      aspect-ratio: 1;
+      overflow: hidden;
+      padding: 0;
+      border: 6px solid rgba(255, 255, 255, 0.84);
+      border-radius: clamp(24px, 5vw, 40px);
+      background: var(--paper);
+      box-shadow: 0 12px 0 rgba(255, 255, 255, 0.62), 0 18px 34px var(--shadow);
+      cursor: pointer;
+      transition: transform 140ms ease, filter 140ms ease, box-shadow 140ms ease;
+    }
+
+    .person-stage:not(:disabled):active {
+      transform: translateY(5px) scale(0.99);
+      box-shadow: 0 5px 0 rgba(255, 255, 255, 0.72), 0 10px 20px var(--shadow);
+    }
+
+    .person-stage:disabled {
+      cursor: wait;
+      filter: saturate(0.82);
+    }
+
+    .person-stage img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .held-emoji {
+      position: absolute;
+      top: 86%;
+      left: 50%;
+      z-index: 1;
+      font-size: clamp(7rem, 26vmin, 14rem);
+      line-height: 1;
+      transform: translate(-50%, -75%);
+      filter: drop-shadow(0 3px 2px rgba(15, 23, 42, 0.25));
+      pointer-events: none;
+      animation: appear 180ms ease-out both;
+    }
+
+    .prompt {
+      min-height: 1.5em;
+      margin: 0;
+      text-align: center;
+      font-size: clamp(1.05rem, 4vw, 1.35rem);
+      font-weight: 900;
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translate(-50%, -75%) scale(0.5); }
+      to { opacity: 1; transform: translate(-50%, -75%) scale(1); }
+    }
+
+    @media (max-width: 480px) {
+      .page { padding-left: 10px; padding-right: 10px; }
+      .game-card { padding: 12px; border-radius: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div><a class="back-link" href="../index.html" aria-label="Back to home page">⬅️🏡</a></div>
+    <header class="hero">
+      <h1 class="title" id="page-title"></h1>
+      <p class="subtitle" id="page-description"></p>
+    </header>
+    <section class="game-card" aria-label="Who is this game">
+      <button class="start-button" id="start-button" type="button">▶️ Start</button>
+      <button class="person-stage" id="person-stage" type="button" disabled hidden>
+        <img id="person-image" alt="" />
+        <span class="held-emoji" id="held-emoji" aria-hidden="true" hidden></span>
+      </button>
+      <p class="prompt" id="prompt" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <script>
+    const appVersion = "__APP_VERSION__";
+    const versionInfoPath = "../app_version.json";
+    const pageConfig = __PAGE_CONFIG_JSON__;
+    const backLink = document.querySelector(".back-link");
+    const startButton = document.getElementById("start-button");
+    const personStage = document.getElementById("person-stage");
+    const personImage = document.getElementById("person-image");
+    const heldEmoji = document.getElementById("held-emoji");
+    const prompt = document.getElementById("prompt");
+    const player = new Audio();
+    const navigationPlayer = new Audio();
+    const recentPeople = [];
+    let activePerson = null;
+    let activeVocabulary = null;
+    let phase = "loading";
+    let cycleId = 0;
+
+    function withVersion(href, version = appVersion) {
+      const url = new URL(href, window.location.href);
+      url.searchParams.set("v", version);
+      return url.toString();
+    }
+
+    async function ensureLatestVersion() {
+      try {
+        const response = await fetch(`${versionInfoPath}?t=${Date.now()}`, { cache: "no-store" });
+        if (!response.ok) return;
+        const latest = await response.json();
+        if (latest.version && latest.version !== appVersion) {
+          window.location.replace(withVersion(window.location.pathname + window.location.search + window.location.hash, latest.version));
+        }
+      } catch (error) {
+        console.error("Unable to check app version", error);
+      }
+    }
+
+    async function playAudio(audioPath) {
+      if (!audioPath) return;
+      player.pause();
+      player.currentTime = 0;
+      player.src = audioPath;
+      try {
+        await player.play();
+        await new Promise((resolve) => {
+          player.addEventListener("ended", resolve, { once: true });
+          player.addEventListener("error", resolve, { once: true });
+        });
+      } catch (error) {
+        console.error("Unable to play game audio", error);
+      }
+    }
+
+    function chooseNextPerson() {
+      const choices = pageConfig.people.filter((person) => !recentPeople.includes(person.name));
+      const pool = choices.length ? choices : pageConfig.people;
+      const person = pool[Math.floor(Math.random() * pool.length)];
+      recentPeople.push(person.name);
+      if (recentPeople.length > 3) recentPeople.shift();
+      return person;
+    }
+
+    function chooseVocabulary() {
+      const vocabulary = pageConfig.vocabulary;
+      return vocabulary[Math.floor(Math.random() * vocabulary.length)];
+    }
+
+    function setStage(imagePath, altText, emoji = "") {
+      personImage.src = imagePath;
+      personImage.alt = altText;
+      heldEmoji.textContent = emoji;
+      heldEmoji.hidden = !emoji;
+    }
+
+    async function startCycle() {
+      const thisCycle = ++cycleId;
+      phase = "loading-face";
+      personStage.hidden = false;
+      personStage.disabled = true;
+      activePerson = chooseNextPerson();
+      activeVocabulary = chooseVocabulary();
+      setStage(activePerson.faceImage, "Tap the person's face");
+      prompt.textContent = "Listen...";
+      await playAudio(pageConfig.whoIsThisAudio);
+      if (thisCycle !== cycleId) return;
+      phase = "face";
+      personStage.disabled = false;
+      prompt.textContent = "Who is this? Tap the face!";
+    }
+
+    async function showHandsQuestion() {
+      const thisCycle = cycleId;
+      phase = "loading-hands";
+      personStage.disabled = true;
+      prompt.textContent = "Listen...";
+      await playAudio(activePerson.thisIsAudio);
+      if (thisCycle !== cycleId) return;
+      setStage(activePerson.handsImage, "Tap the person holding an object", activeVocabulary.emoji);
+      await playAudio(activePerson.questionAudio);
+      if (thisCycle !== cycleId) return;
+      phase = "hands";
+      personStage.disabled = false;
+      prompt.textContent = "What do they have? Tap the picture!";
+    }
+
+    async function answerHandsQuestion() {
+      const thisCycle = cycleId;
+      phase = "answering";
+      personStage.disabled = true;
+      prompt.textContent = "Listen...";
+      await playAudio(activePerson.replyAudio);
+      if (thisCycle !== cycleId) return;
+      await playAudio(activeVocabulary.audio);
+      if (thisCycle !== cycleId) return;
+      void startCycle();
+    }
+
+    async function playThenNavigate(audioPath, href) {
+      const destination = withVersion(href);
+      if (!audioPath) {
+        window.location.href = destination;
+        return;
+      }
+      navigationPlayer.pause();
+      navigationPlayer.currentTime = 0;
+      navigationPlayer.src = audioPath;
+      try {
+        await navigationPlayer.play();
+        navigationPlayer.addEventListener("ended", () => { window.location.href = destination; }, { once: true });
+      } catch (error) {
+        console.error("Unable to play back audio", error);
+        window.location.href = destination;
+      }
+    }
+
+    document.getElementById("page-title").textContent = pageConfig.title;
+    document.getElementById("page-description").textContent = pageConfig.description;
+    backLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      void playThenNavigate(pageConfig.backAudio, backLink.getAttribute("href"));
+    });
+    personStage.addEventListener("click", () => {
+      if (phase === "face") void showHandsQuestion();
+      if (phase === "hands") void answerHandsQuestion();
+    });
+    startButton.addEventListener("click", () => {
+      startButton.hidden = true;
+      void startCycle();
+    });
+    void ensureLatestVersion();
+  </script>
+</body>
+</html>

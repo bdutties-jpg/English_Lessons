@@ -1,4 +1,5 @@
 from .math import MATH_CONFIG
+from .multiplication import MULTIPLICATION_CONFIG
 from .reading import READING_CONFIG
 from .spelling import SPELLING_CONFIG
 from .vocabulary import VOCABULARY_CONFIG

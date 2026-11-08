@@ -101,17 +101,14 @@
     }
 
     .problems-stack {
-      display: grid;
-      gap: clamp(12px, 3vw, 20px);
+      display: table;
+      width: fit-content;
+      border-spacing: 0 clamp(12px, 3vw, 20px);
       margin: 0 auto;
     }
 
     .problem-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) clamp(132px, 36vw, 240px);
-      gap: clamp(8px, 2.5vw, 18px);
-      align-items: center;
-      min-width: 0;
+      display: table-row;
     }
 
     .star-bank-section {
@@ -211,7 +208,7 @@
     }
 
     .problem-text {
-      min-width: 0;
+      display: table-cell;
       font-size: clamp(1.2rem, 6vw, 2.8rem);
       line-height: 1;
       font-weight: 700;
@@ -219,13 +216,21 @@
       text-align: right;
       white-space: nowrap;
       padding-right: 6px;
+      vertical-align: middle;
+    }
+
+    .answers-cell {
+      display: table-cell;
+      width: clamp(132px, 36vw, 240px);
+      padding-left: clamp(8px, 2.5vw, 18px);
+      vertical-align: middle;
     }
 
     .problem-answers {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 6px;
-      min-width: 0;
+      width: 100%;
     }
 
     .answer-button {
@@ -387,9 +392,9 @@
         border-radius: 24px;
       }
 
-      .problem-row {
-        grid-template-columns: minmax(0, 1fr) 132px;
-        gap: 8px;
+      .answers-cell {
+        width: 132px;
+        padding-left: 8px;
       }
     }
   </style>
@@ -971,11 +976,13 @@
       currentProblems.forEach((problem, problemIndex) => {
         const row = document.createElement("div");
         const problemText = document.createElement("div");
+        const answersCell = document.createElement("div");
         const answers = document.createElement("div");
 
         row.className = "problem-row";
         problemText.className = "problem-text";
         problemText.textContent = problem.text;
+        answersCell.className = "answers-cell";
         answers.className = "problem-answers";
 
         problem.answers.forEach((answer, answerIndex) => {
@@ -989,7 +996,8 @@
           answers.appendChild(button);
         });
 
-        row.append(problemText, answers);
+        answersCell.appendChild(answers);
+        row.append(problemText, answersCell);
         problemsStack.appendChild(row);
       });
 

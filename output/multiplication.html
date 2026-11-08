@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="English Playtime" />
+  <meta name="application-name" content="English Playtime" />
+  <meta name="theme-color" content="#f9a8d4" />
+  <meta name="app-version" content="20261108020943" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="../assets/icons/icon-512.png" />
+  <link rel="manifest" href="../site.webmanifest" />
+  <title>Multiplication</title>
+  <style>
+    :root { --ink: #1f2937; --good: #16a34a; --bad: #ef4444; --shadow: rgba(31, 41, 55, 0.18); }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      font-family: "Trebuchet MS", "Comic Sans MS", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 14% 12%, rgba(255,255,255,.86), transparent 25%),
+        radial-gradient(circle at 86% 20%, rgba(255,255,255,.72), transparent 23%),
+        linear-gradient(180deg, #f9a8d4 0%, #c4b5fd 45%, #fde68a 100%);
+    }
+    .page { width: min(100%, 960px); min-height: 100vh; margin: 0 auto; padding: 24px 16px 40px; }
+    .back-link {
+      display: inline-flex; align-items: center; padding: 10px 14px; border-radius: 999px;
+      background: rgba(255,255,255,.82); box-shadow: 0 6px 18px rgba(31,41,55,.12);
+      color: #0f172a; text-decoration: none; font-size: .95rem; font-weight: 800;
+    }
+    .back-link:focus-visible, .answer-button:focus-visible, .magic-button:focus-visible, .dot-group:focus-visible { outline: 4px solid rgba(255,255,255,.92); outline-offset: 3px; }
+    .hero { margin: 24px 0 20px; text-align: center; }
+    .title { margin: 0; font-size: clamp(2.2rem, 8vw, 4rem); line-height: 1; text-transform: uppercase; letter-spacing: .04em; color: #0f172a; text-shadow: 0 3px 0 rgba(255,255,255,.65); }
+    .subtitle { margin: 12px auto 0; font-size: clamp(1.05rem, 4vw, 1.35rem); font-weight: 800; }
+    .card { max-width: 760px; margin: 0 auto; padding: clamp(14px, 3vw, 24px); border-radius: 32px; background: rgba(255,255,255,.72); box-shadow: 0 16px 32px var(--shadow); backdrop-filter: blur(6px); }
+    .game-layout { display: grid; grid-template-columns: minmax(0, 1fr) 74px; gap: clamp(12px, 3vw, 22px); align-items: start; }
+    .problem-area { min-width: 0; }
+    .problem-shell { display: grid; grid-template-columns: minmax(0, 1fr) clamp(132px, 36vw, 240px); gap: clamp(8px, 2.5vw, 18px); align-items: center; }
+    .problem-text { min-width: 0; padding-right: 6px; font-size: clamp(2rem, 9vw, 4rem); line-height: 1; font-weight: 700; letter-spacing: .04em; text-align: right; white-space: nowrap; }
+    .answers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+    .answer-button {
+      position: relative; min-height: clamp(40px, 12vw, 58px); width: 100%; border: none; border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.15)), var(--button-color, #fca5a5);
+      box-shadow: 0 8px 0 rgba(255,255,255,.7), 0 12px 22px rgba(31,41,55,.16); color: #0f172a;
+      cursor: pointer; font: inherit; font-size: clamp(1.15rem, 5vw, 2rem); font-weight: 900; transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+    }
+    .answer-button:active:not(:disabled) { transform: translateY(5px) scale(.98); box-shadow: 0 3px 0 rgba(255,255,255,.75), 0 8px 14px rgba(31,41,55,.18); }
+    .answer-button:disabled { cursor: default; filter: saturate(.72); }
+    .answer-button.correct { background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.18)), #86efac; color: #14532d; animation: correct-dance 700ms ease; }
+    .answer-button.wrong { background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.18)), #fca5a5; color: #7f1d1d; animation: wrong-shake 360ms ease; }
+    .game-rail { display: grid; justify-items: center; gap: 12px; }
+    .goal-star { font-size: 2.7rem; line-height: 1; color: #d1d5db; filter: drop-shadow(0 4px 8px rgba(31,41,55,.18)); transition: color 180ms ease, transform 180ms ease; }
+    .goal-star.lit { color: #fde047; transform: scale(1.12); text-shadow: 0 0 18px rgba(250,204,21,.9), 0 0 28px rgba(255,255,255,.9); }
+    .thermo { position: relative; width: 38px; height: 186px; padding: 7px; border-radius: 999px; background: linear-gradient(180deg, rgba(255,255,255,.94), rgba(226,232,240,.94)); box-shadow: inset 0 3px 8px rgba(255,255,255,.92), 0 10px 20px rgba(31,41,55,.18); }
+    .thermo-track { position: relative; width: 100%; height: 100%; overflow: hidden; border: 2px solid rgba(148,163,184,.55); border-radius: 999px; background: linear-gradient(180deg, #f3f4f6, #d1d5db); }
+    .thermo-fill { position: absolute; left: 0; right: 0; bottom: 0; height: 0%; border-radius: 999px 999px 18px 18px; background: linear-gradient(180deg, #fcd34d 0%, #fb7185 52%, #f97316 100%); box-shadow: inset 0 -4px 8px rgba(255,255,255,.3), 0 0 14px rgba(251,113,133,.42); transition: height 440ms cubic-bezier(.22,1,.36,1); }
+    .thermo-bulb { position: absolute; left: 50%; bottom: -12px; width: 54px; height: 54px; border-radius: 50%; transform: translateX(-50%); background: radial-gradient(circle at 35% 30%, #fde68a 0%, #fb7185 58%, #f97316 100%); opacity: var(--bulb-glow, .22); transition: opacity 220ms ease; }
+    .magic-button { width: 100%; margin-top: 20px; min-height: 64px; border: 4px solid rgba(255,255,255,.84); border-radius: 24px; background: #c4b5fd; box-shadow: 0 8px 0 rgba(255,255,255,.62), 0 14px 26px var(--shadow); color: #312e81; cursor: pointer; font: inherit; font-size: clamp(1.1rem, 4vw, 1.45rem); font-weight: 900; }
+    .magic-button:active:not(:disabled) { transform: translateY(5px) scale(.99); box-shadow: 0 3px 0 rgba(255,255,255,.72), 0 8px 16px var(--shadow); }
+    .magic-button:disabled { cursor: default; filter: saturate(.7); }
+    .groups { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; min-height: 8px; margin-top: 18px; }
+    .dot-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: clamp(64px, 16vw, 90px); aspect-ratio: 1; padding: 10px; border: 4px solid #7c3aed; border-radius: 18px; background: rgba(255,255,255,.85); box-shadow: 0 6px 12px rgba(76,29,149,.18); cursor: pointer; animation: group-appear 180ms ease-out both; }
+    .dot { width: 100%; aspect-ratio: 1; align-self: center; border-radius: 50%; background: #f97316; box-shadow: inset 0 2px 2px rgba(255,255,255,.65), 0 2px 0 rgba(154,52,18,.3); }
+    .status { min-height: 1.6em; margin: 18px 0 0; text-align: center; font-size: clamp(1rem, 3.8vw, 1.15rem); font-weight: 800; }
+    .status.good { color: var(--good); } .status.bad { color: var(--bad); }
+    .star-bank-section { margin-top: 18px; padding: 14px 10px 4px; }
+    .star-bank-label { margin-bottom: 8px; font-size: clamp(.95rem, 3.4vw, 1.05rem); font-weight: 900; color: #475569; letter-spacing: .03em; }
+    .stars-bank { display: flex; flex-wrap: wrap; gap: 8px 10px; min-height: 58px; }
+    .star-token { display: inline-grid; place-items: center; width: 38px; height: 38px; font-size: 2rem; line-height: 1; filter: drop-shadow(0 5px 10px rgba(250,204,21,.45)); animation: bank-star-dance 1700ms ease-in-out infinite; animation-delay: var(--dance-delay, 0ms); }
+    .star-token.placeholder { opacity: 0; animation: none; }
+    .floating-star { position: fixed; left: 0; top: 0; z-index: 40; font-size: 2.3rem; line-height: 1; pointer-events: none; transform: translate(-50%, -50%); filter: drop-shadow(0 0 8px rgba(255,255,255,.95)) drop-shadow(0 0 18px rgba(250,204,21,.7)); transition: left 900ms cubic-bezier(.22,1,.36,1), top 900ms cubic-bezier(.22,1,.36,1), transform 900ms cubic-bezier(.22,1,.36,1); }
+    .floating-star.is-dropping { transform: translate(-50%, -50%) scale(.86) rotate(540deg); }
+    @keyframes wrong-shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-10px) rotate(-3deg); } 40% { transform: translateX(10px) rotate(3deg); } 60% { transform: translateX(-8px) rotate(-2deg); } 80% { transform: translateX(8px) rotate(2deg); } }
+    @keyframes correct-dance { 0% { transform: scale(1); } 25% { transform: scale(1.2) rotate(-7deg); } 50% { transform: scale(1.28) rotate(7deg); } 75% { transform: scale(1.12) rotate(-4deg); } 100% { transform: scale(1.12); } }
+    @keyframes group-appear { from { opacity: 0; transform: scale(.5) rotate(-8deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+    @keyframes bank-star-dance { 0%,100% { transform: translateX(-1px) rotate(-4deg) translateY(0); } 50% { transform: translateX(1px) rotate(4deg) translateY(-3px); } }
+    @media (max-width: 420px) { .page { padding-left: 10px; padding-right: 10px; } .card { padding: 14px 10px; border-radius: 24px; } .game-layout { grid-template-columns: minmax(0, 1fr) 58px; gap: 10px; } .problem-shell { grid-template-columns: minmax(0, 1fr) 132px; gap: 8px; } .thermo { width: 32px; height: 164px; } .thermo-bulb { width: 46px; height: 46px; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div><a class="back-link" href="../index.html" aria-label="Back to home page">⬅️🏡</a></div>
+    <header class="hero"><h1 class="title">Multiplication</h1><p class="subtitle">phép nhân</p></header>
+    <section class="card">
+      <div class="game-layout">
+        <div class="problem-area">
+          <div class="problem-shell"><div class="problem-text" id="problem-text"></div><div class="answers" id="answers"></div></div>
+          <button class="magic-button" id="magic-button" type="button">✨ Make a group</button>
+          <div class="groups" id="groups" aria-label="Magic dot groups"></div>
+        </div>
+        <div class="game-rail" aria-label="Progress to the next star"><span class="goal-star" id="goal-star" aria-hidden="true">★</span><div class="thermo" aria-hidden="true"><div class="thermo-track"><div class="thermo-fill" id="thermo-fill"></div></div><div class="thermo-bulb"></div></div></div>
+      </div>
+      <p class="status" id="status" aria-live="polite"></p>
+    </section>
+    <section class="star-bank-section" aria-label="Collected stars"><div class="star-bank-label">Star Parade</div><div class="stars-bank" id="stars-bank"></div></section>
+  </main>
+
+  <script>
+    const appVersion = "20261108020943";
+    const versionInfoPath = "../app_version.json";
+    const multiplicationConfig = {
+  "base_min_factor": 1,
+  "base_max_factor": 4,
+  "star_max_boost": 1,
+  "correct_answer_per_star": 3,
+  "magic_click_sound": "../assets/audio/UI_Sounds/click.m4a?v=20261017-2",
+  "correct_answer": "../assets/audio/UI_Sounds/ding%20sparkle.m4a?v=20261017-2",
+  "wrong_answer": "../assets/audio/UI_Sounds/Uuugh.m4a?v=20261017-2",
+  "star_celebration": "../assets/audio/UI_Sounds/Magic%20ga.m4a?v=20261017-2",
+  "back_audio": "../assets/audio/Menu/Back%20to%20home.m4a?v=20261017-2"
+};
+    const problemText = document.getElementById("problem-text");
+    const answers = document.getElementById("answers");
+    const magicButton = document.getElementById("magic-button");
+    const groups = document.getElementById("groups");
+    const status = document.getElementById("status");
+    const thermoFill = document.getElementById("thermo-fill");
+    const goalStar = document.getElementById("goal-star");
+    const starsBank = document.getElementById("stars-bank");
+    const backLink = document.querySelector(".back-link");
+    const feedbackPlayer = new Audio();
+    const magicPlayer = new Audio();
+    const magicClickPlayer = new Audio();
+    const navigationPlayer = new Audio();
+    const palette = ["#fcd34d", "#93c5fd", "#f9a8d4"];
+    const correctAnswersPerStar = Math.max(1, Number(multiplicationConfig.correct_answer_per_star) || 3);
+    let currentProblem = null;
+    let streakCount = 0;
+    let hadWrongAnswer = false;
+    let isResolving = false;
+
+    function withVersion(href, version = appVersion) { const url = new URL(href, window.location.href); url.searchParams.set("v", version); return url.toString(); }
+    async function ensureLatestVersion() {
+      try { const response = await fetch(`${versionInfoPath}?t=${Date.now()}`, { cache: "no-store" }); if (!response.ok) return; const latest = await response.json(); if (latest.version && latest.version !== appVersion) window.location.replace(withVersion(window.location.pathname + window.location.search + window.location.hash, latest.version)); }
+      catch (error) { console.error("Unable to check app version", error); }
+    }
+    function wait(ms) { return new Promise((resolve) => window.setTimeout(resolve, ms)); }
+    function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function shuffle(items) { const copy = [...items]; for (let index = copy.length - 1; index > 0; index -= 1) { const swapIndex = randomInt(0, index); [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]]; } return copy; }
+    async function playAudio(player, audioPath, waitForEnd = false) {
+      if (!audioPath) return;
+      player.pause(); player.currentTime = 0; player.src = audioPath;
+      try { await player.play(); if (waitForEnd) await new Promise((resolve) => { player.addEventListener("ended", resolve, { once: true }); player.addEventListener("error", resolve, { once: true }); }); }
+      catch (error) { console.error("Unable to play audio", error); }
+    }
+    function setStatus(message, tone = "") { status.textContent = message; status.className = tone ? `status ${tone}` : "status"; }
+    function getStarCount() { return starsBank.querySelectorAll(".star-token:not(.placeholder)").length; }
+    function getMaxFactor() { return Math.max(2, Number(multiplicationConfig.base_max_factor) + getStarCount() * Number(multiplicationConfig.star_max_boost)); }
+    function setMeterProgress(stepCount) {
+      const ratio = Math.max(0, Math.min(stepCount, correctAnswersPerStar)) / correctAnswersPerStar;
+      thermoFill.style.height = `${ratio * 100}%`;
+      goalStar.classList.toggle("lit", ratio >= 1);
+      document.documentElement.style.setProperty("--bulb-glow", String(.22 + ratio * .58));
+    }
+    function buildProblem() {
+      const maxFactor = getMaxFactor();
+      let left = randomInt(Number(multiplicationConfig.base_min_factor), maxFactor);
+      let right = randomInt(Number(multiplicationConfig.base_min_factor), maxFactor);
+      while (left === 1 && right === 1) {
+        left = randomInt(Number(multiplicationConfig.base_min_factor), maxFactor);
+        right = randomInt(Number(multiplicationConfig.base_min_factor), maxFactor);
+      }
+      const correctAnswer = left * right;
+      const wrongAnswers = new Set();
+      const addNeighbor = (first, second) => { if (first >= 1 && first <= maxFactor && second >= 1 && second <= maxFactor) { const value = first * second; if (value !== correctAnswer) wrongAnswers.add(value); } };
+      [[left - 1, right], [left + 1, right], [left, right - 1], [left, right + 1]].forEach(([first, second]) => addNeighbor(first, second));
+      if (wrongAnswers.size < 2) throw new Error("Unable to create two nearby multiplication answers.");
+      return { left, right, correctAnswer, answers: shuffle([correctAnswer, ...shuffle([...wrongAnswers]).slice(0, 2)]) };
+    }
+    function renderProblem() {
+      currentProblem = buildProblem(); hadWrongAnswer = false; isResolving = false;
+      problemText.textContent = `${currentProblem.left} × ${currentProblem.right} =`;
+      answers.replaceChildren(); groups.replaceChildren(); setStatus("", ""); magicButton.disabled = false;
+      currentProblem.answers.forEach((answer, index) => {
+        const button = document.createElement("button"); button.type = "button"; button.className = "answer-button"; button.textContent = answer; button.style.setProperty("--button-color", palette[index % palette.length]); button.setAttribute("aria-label", `Answer ${answer}`); button.addEventListener("click", () => { void handleAnswer(button, answer); }); answers.appendChild(button);
+      });
+    }
+    function addDotGroup() {
+      if (isResolving || !currentProblem) return;
+      magicClickPlayer.pause();
+      magicClickPlayer.currentTime = 0;
+      void magicClickPlayer.play().catch((error) => console.error("Unable to play magic click", error));
+      const group = document.createElement("button"); group.type = "button"; group.className = "dot-group"; group.setAttribute("aria-label", `Remove a group of ${currentProblem.left} dots`);
+      for (let index = 0; index < currentProblem.left; index += 1) { const dot = document.createElement("span"); dot.className = "dot"; group.appendChild(dot); }
+      group.addEventListener("click", () => group.remove()); groups.appendChild(group);
+    }
+    function addBankPlaceholder() { const placeholder = document.createElement("span"); placeholder.className = "star-token placeholder"; placeholder.textContent = "⭐"; starsBank.appendChild(placeholder); return placeholder; }
+    function finalizeBankStar(placeholder) { placeholder.classList.remove("placeholder"); placeholder.style.setProperty("--dance-delay", `${(starsBank.children.length - 1) * 90}ms`); }
+    async function celebrateMilestone(sourceButton) {
+      const placeholder = addBankPlaceholder(); const startRect = sourceButton.getBoundingClientRect(); const endRect = placeholder.getBoundingClientRect(); const floatingStar = document.createElement("span");
+      floatingStar.className = "floating-star"; floatingStar.textContent = "⭐"; floatingStar.style.left = `${startRect.left + startRect.width / 2}px`; floatingStar.style.top = `${startRect.top + startRect.height / 2}px`; document.body.appendChild(floatingStar);
+      const animation = new Promise((resolve) => { floatingStar.addEventListener("transitionend", resolve, { once: true }); window.setTimeout(resolve, 1100); });
+      requestAnimationFrame(() => { floatingStar.classList.add("is-dropping"); floatingStar.style.left = `${endRect.left + endRect.width / 2}px`; floatingStar.style.top = `${endRect.top + endRect.height / 2}px`; });
+      const magicPlayback = playAudio(magicPlayer, multiplicationConfig.star_celebration, true); await animation; floatingStar.remove(); finalizeBankStar(placeholder); await magicPlayback;
+    }
+    async function handleAnswer(button, answer) {
+      if (isResolving || button.disabled) return;
+      if (answer !== currentProblem.correctAnswer) {
+        isResolving = true; hadWrongAnswer = true; streakCount = 0; setMeterProgress(0); button.classList.add("wrong"); button.disabled = true; setStatus("Try another answer!", "bad"); await playAudio(feedbackPlayer, multiplicationConfig.wrong_answer, true); isResolving = false; return;
+      }
+      isResolving = true; magicButton.disabled = true; [...answers.querySelectorAll(".answer-button")].forEach((item) => { item.disabled = true; }); button.classList.add("correct"); setStatus("Great job!", "good");
+      if (!hadWrongAnswer) { streakCount = Math.min(streakCount + 1, correctAnswersPerStar); setMeterProgress(streakCount); }
+      await playAudio(feedbackPlayer, multiplicationConfig.correct_answer, true);
+      if (streakCount === correctAnswersPerStar) { setStatus("Star earned!", "good"); streakCount = 0; setMeterProgress(0); await celebrateMilestone(button); }
+      await wait(180); renderProblem();
+    }
+    async function playThenNavigate(audioPath, href) { const destination = withVersion(href); if (!audioPath) { window.location.href = destination; return; } await playAudio(navigationPlayer, audioPath, true); window.location.href = destination; }
+    backLink.addEventListener("click", (event) => { event.preventDefault(); void playThenNavigate(multiplicationConfig.back_audio, backLink.getAttribute("href")); });
+    magicButton.addEventListener("click", addDotGroup);
+    magicClickPlayer.src = multiplicationConfig.magic_click_sound;
+    magicClickPlayer.preload = "auto";
+    magicClickPlayer.load();
+    void ensureLatestVersion(); setMeterProgress(0); renderProblem();
+  </script>
+</body>
+</html>

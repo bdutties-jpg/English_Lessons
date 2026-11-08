@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="English Playtime" />
+  <meta name="application-name" content="English Playtime" />
+  <meta name="theme-color" content="#c4b5fd" />
+  <meta name="app-version" content="20261108020943" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="../assets/icons/icon-512.png" />
+  <link rel="manifest" href="../site.webmanifest" />
+  <title>Who Is This?</title>
+  <style>
+    :root {
+      --ink: #1f2937;
+      --paper: #fffef5;
+      --shadow: rgba(31, 41, 55, 0.18);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      font-family: "Trebuchet MS", "Comic Sans MS", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 16% 12%, rgba(255, 255, 255, 0.84), transparent 25%),
+        radial-gradient(circle at 84% 17%, rgba(255, 255, 255, 0.7), transparent 22%),
+        linear-gradient(180deg, #c4b5fd 0%, #a5b4fc 42%, #fde68a 100%);
+    }
+
+    .page {
+      width: min(100%, 960px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 6px 18px rgba(31, 41, 55, 0.12);
+      color: #0f172a;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .back-link:focus-visible,
+    .person-stage:focus-visible {
+      outline: 4px solid rgba(255, 255, 255, 0.92);
+      outline-offset: 4px;
+    }
+
+    .hero {
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(2.2rem, 8vw, 4rem);
+      line-height: 1;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #0f172a;
+      text-shadow: 0 3px 0 rgba(255, 255, 255, 0.65);
+    }
+
+    .subtitle {
+      margin: 12px auto 0;
+      max-width: 34rem;
+      font-size: clamp(1rem, 3.6vw, 1.25rem);
+      line-height: 1.35;
+      font-weight: 800;
+    }
+
+    .game-card {
+      display: grid;
+      justify-items: center;
+      gap: 16px;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: clamp(14px, 3vw, 24px);
+      border-radius: 32px;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 16px 32px var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+
+    .start-button {
+      min-height: 72px;
+      padding: 14px 28px;
+      border: 4px solid rgba(255, 255, 255, 0.84);
+      border-radius: 999px;
+      background: #fcd34d;
+      box-shadow: 0 8px 0 rgba(255, 255, 255, 0.62), 0 14px 26px var(--shadow);
+      color: #0f172a;
+      cursor: pointer;
+      font: inherit;
+      font-size: clamp(1.25rem, 5vw, 2rem);
+      font-weight: 900;
+    }
+
+    .start-button:active {
+      transform: translateY(5px) scale(0.99);
+      box-shadow: 0 3px 0 rgba(255, 255, 255, 0.72), 0 8px 16px var(--shadow);
+    }
+
+    .person-stage {
+      position: relative;
+      width: min(100%, 72dvh, 680px);
+      aspect-ratio: 1;
+      overflow: hidden;
+      padding: 0;
+      border: 6px solid rgba(255, 255, 255, 0.84);
+      border-radius: clamp(24px, 5vw, 40px);
+      background: var(--paper);
+      box-shadow: 0 12px 0 rgba(255, 255, 255, 0.62), 0 18px 34px var(--shadow);
+      cursor: pointer;
+      transition: transform 140ms ease, filter 140ms ease, box-shadow 140ms ease;
+    }
+
+    .person-stage:not(:disabled):active {
+      transform: translateY(5px) scale(0.99);
+      box-shadow: 0 5px 0 rgba(255, 255, 255, 0.72), 0 10px 20px var(--shadow);
+    }
+
+    .person-stage:disabled {
+      cursor: wait;
+      filter: saturate(0.82);
+    }
+
+    .person-stage img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .held-emoji {
+      position: absolute;
+      top: 86%;
+      left: 50%;
+      z-index: 1;
+      font-size: clamp(7rem, 26vmin, 14rem);
+      line-height: 1;
+      transform: translate(-50%, -75%);
+      filter: drop-shadow(0 3px 2px rgba(15, 23, 42, 0.25));
+      pointer-events: none;
+      animation: appear 180ms ease-out both;
+    }
+
+    .prompt {
+      min-height: 1.5em;
+      margin: 0;
+      text-align: center;
+      font-size: clamp(1.05rem, 4vw, 1.35rem);
+      font-weight: 900;
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translate(-50%, -75%) scale(0.5); }
+      to { opacity: 1; transform: translate(-50%, -75%) scale(1); }
+    }
+
+    @media (max-width: 480px) {
+      .page { padding-left: 10px; padding-right: 10px; }
+      .game-card { padding: 12px; border-radius: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div><a class="back-link" href="../index.html" aria-label="Back to home page">⬅️🏡</a></div>
+    <header class="hero">
+      <h1 class="title" id="page-title"></h1>
+      <p class="subtitle" id="page-description"></p>
+    </header>
+    <section class="game-card" aria-label="Who is this game">
+      <button class="start-button" id="start-button" type="button">▶️ Start</button>
+      <button class="person-stage" id="person-stage" type="button" disabled hidden>
+        <img id="person-image" alt="" />
+        <span class="held-emoji" id="held-emoji" aria-hidden="true" hidden></span>
+      </button>
+      <p class="prompt" id="prompt" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <script>
+    const appVersion = "20261108020943";
+    const versionInfoPath = "../app_version.json";
+    const pageConfig = {
+  "title": "Who Is This?",
+  "description": "Listen, then tap the picture to hear the answer.",
+  "backAudio": "../assets/audio/Menu/Back%20to%20home.m4a?v=20261017-2",
+  "people": [
+    {
+      "name": "my grandma",
+      "image": "../assets/people/hands/my%20grandma.jpeg",
+      "handsImage": "../assets/people/hands/my%20grandma.jpeg",
+      "faceImage": "../assets/people/faces/my%20grandma.jpeg",
+      "thisIsAudio": "../assets/audio/this%20is/people/This%20is%20my%20grandma.m4a?v=20261017-2",
+      "questionAudio": "../assets/audio/Vocabulary/person%20has/Question/What%20does%20your%20grandma%20have%3F.m4a?v=20261017-2",
+      "replyText": "My grandma has a",
+      "replyAudio": "../assets/audio/Vocabulary/person%20has/Reply/My%20grandma%20has%20a.m4a?v=20261017-2"
+    },
+    {
+      "name": "my grandpa",
+      "image": "../assets/people/hands/my%20grandpa.jpeg",
+      "handsImage": "../assets/people/hands/my%20grandpa.jpeg",
+      "faceImage": "../assets/people/faces/my%20grandpa.jpeg",
+      "thisIsAudio": "../assets/audio/this%20is/people/This%20is%20my%20grandpa.m4a?v=20261017-2",
+      "questionAudio": "../assets/audio/Vocabulary/person%20has/Question/What%20does%20your%20grandpa%20have%3F.m4a?v=20261017-2",
+      "replyText": "My grandpa has a",
+      "replyAudio": "../assets/audio/Vocabulary/person%20has/Reply/My%20grandpa%20has%20a.m4a?v=20261017-2"
+    },
+    {
+      "name": "my mom",
+      "image": "../assets/people/hands/my%20mom.jpeg",
+      "handsImage": "../assets/people/hands/my%20mom.jpeg",
+      "faceImage": "../assets/people/faces/my%20mom.jpeg",
+      "thisIsAudio": "../assets/audio/this%20is/people/This%20is%20my%20mom.m4a?v=20261017-2",
+      "questionAudio": "../assets/audio/Vocabulary/person%20has/Question/What%20does%20your%20mom%20have%3F.m4a?v=20261017-2",
+      "replyText": "My mom has a",
+      "replyAudio": "../assets/audio/Vocabulary/person%20has/Reply/My%20mom%20has%20a.m4a?v=20261017-2"
+    },
+    {
+      "name": "my dad",
+      "image": "../assets/people/hands/my%20dad.jpeg",
+      "handsImage": "../assets/people/hands/my%20dad.jpeg",
+      "faceImage": "../assets/people/faces/my%20dad.jpeg",
+      "thisIsAudio": "../assets/audio/this%20is/people/This%20is%20my%20dad.m4a?v=20261017-2",
+      "questionAudio": "../assets/audio/Vocabulary/person%20has/Question/What%20does%20your%20dad%20have%3F.m4a?v=20261017-2",
+      "replyText": "My dad has a",
+      "replyAudio": "../assets/audio/Vocabulary/person%20has/Reply/My%20dad%20has%20a.m4a?v=20261017-2"
+    },
+    {
+      "name": "Bo",
+      "image": "../assets/people/hands/Bo.jpeg",
+      "handsImage": "../assets/people/hands/Bo.jpeg",
+      "faceImage": "../assets/people/faces/Bo.jpeg",
+      "thisIsAudio": "../assets/audio/this%20is/people/This%20is%20me.m4a?v=20261017-2",
+      "questionAudio": "../assets/audio/Vocabulary/person%20has/Question/What%20do%20you%20have%3F.m4a?v=20261017-2",
+      "replyText": "I have a",
+      "replyAudio": "../assets/audio/Vocabulary/person%20has/Reply/I%20have%20a.m4a?v=20261017-2"
+    },
+    {
+      "name": "Strawberry",
+      "image": "../assets/people/hands/Strawberry.jpeg",
+      "handsImage": "../assets/people/hands/Strawberry.jpeg",
+      "faceImage": "../assets/people/faces/Strawberry.jpeg",
+      "thisIsAudio": "../assets/audio/this%20is/people/This%20is%20Strawberry.m4a?v=20261017-2",
+      "questionAudio": "../assets/audio/Vocabulary/person%20has/Question/What%20does%20strawberry%20have%3F.m4a?v=20261017-2",
+      "replyText": "Strawberry has a",
+      "replyAudio": "../assets/audio/Vocabulary/person%20has/Reply/Strawberry%20has%20a.m4a?v=20261017-2"
+    },
+    {
+      "name": "my brother",
+      "image": "../assets/people/hands/my%20brother.jpeg",
+      "handsImage": "../assets/people/hands/my%20brother.jpeg",
+      "faceImage": "../assets/people/faces/my%20brother.jpeg",
+      "thisIsAudio": "../assets/audio/this%20is/people/This%20is%20my%20brother.m4a?v=20261017-2",
+      "questionAudio": "../assets/audio/Vocabulary/person%20has/Question/What%20does%20your%20brother%20have%3F.m4a?v=20261017-2",
+      "replyText": "My brother has a",
+      "replyAudio": "../assets/audio/Vocabulary/person%20has/Reply/My%20brother%20has%20a.m4a?v=20261017-2"
+    },
+    {
+      "name": "uncle Ha",
+      "image": "../assets/people/hands/uncle%20Ha.jpeg",
+      "handsImage": "../assets/people/hands/uncle%20Ha.jpeg",
+      "faceImage": "../assets/people/faces/uncle%20Ha.jpeg",
+      "thisIsAudio": "../assets/audio/this%20is/people/This%20is%20my%20uncle%20Ha.m4a?v=20261017-2",
+      "questionAudio": "../assets/audio/Vocabulary/person%20has/Question/What%20does%20uncle%20Ha%20have%3F.m4a?v=20261017-2",
+      "replyText": "Uncle Ha has a",
+      "replyAudio": "../assets/audio/Vocabulary/person%20has/Reply/Uncle%20Ha%20has%20a.m4a?v=20261017-2"
+    },
+    {
+      "name": "aunt Chin",
+      "image": "../assets/people/hands/aunt%20Chin.JPG",
+      "handsImage": "../assets/people/hands/aunt%20Chin.JPG",
+      "faceImage": "../assets/people/faces/aunt%20Chin.JPG",
+      "thisIsAudio": "../assets/audio/this%20is/people/This%20is%20my%20aunt%20Chin.m4a?v=20261017-2",
+      "questionAudio": "../assets/audio/Vocabulary/person%20has/Question/What%20does%20aunt%20Chin%20have%3F.m4a?v=20261017-2",
+      "replyText": "Aunt Chin has a",
+      "replyAudio": "../assets/audio/Vocabulary/person%20has/Reply/Aunt%20Chin%20has%20a.m4a?v=20261017-2"
+    },
+    {
+      "name": "Teacher",
+      "image": "../assets/people/hands/Teacher.jpeg",
+      "handsImage": "../assets/people/hands/Teacher.jpeg",
+      "faceImage": "../assets/people/faces/Teacher.jpeg",
+      "thisIsAudio": "../assets/audio/this%20is/people/This%20is%20Teacher.m4a?v=20261017-2",
+      "questionAudio": "../assets/audio/Vocabulary/person%20has/Question/What%20does%20Teacher%20have%3F.m4a?v=20261017-2",
+      "replyText": "Teacher has a",
+      "replyAudio": "../assets/audio/Vocabulary/person%20has/Reply/Teacher%20has%20a.m4a?v=20261017-2"
+    },
+    {
+      "name": "Bong",
+      "image": "../assets/people/hands/Bong.jpeg",
+      "handsImage": "../assets/people/hands/Bong.jpeg",
+      "faceImage": "../assets/people/faces/Bong.jpeg",
+      "thisIsAudio": "../assets/audio/this%20is/people/This%20is%20Bong.m4a?v=20261017-2",
+      "questionAudio": "../assets/audio/Vocabulary/person%20has/Question/What%20does%20Bong%20have%3F.m4a?v=20261017-2",
+      "replyText": "Bong has a",
+      "replyAudio": "../assets/audio/Vocabulary/person%20has/Reply/Bong%20has%20a.m4a?v=20261017-2"
+    },
+    {
+      "name": "the cat",
+      "image": "../assets/people/hands/the%20cat.jpeg",
+      "handsImage": "../assets/people/hands/the%20cat.jpeg",
+      "faceImage": "../assets/people/faces/the%20cat.jpeg",
+      "thisIsAudio": "../assets/audio/this%20is/people/This%20is%20the%20cat.m4a?v=20261017-2",
+      "questionAudio": "../assets/audio/Vocabulary/person%20has/Question/What%20does%20the%20cat%20have%3F.m4a?v=20261017-2",
+      "replyText": "The cat has a",
+      "replyAudio": "../assets/audio/Vocabulary/person%20has/Reply/The%20cat%20has%20a.m4a?v=20261017-2"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "Ball",
+      "emoji": "🏀",
+      "audio": "../assets/audio/Vocabulary/Ball%20%F0%9F%8F%80.m4a?v=20261017-2"
+    },
+    {
+      "word": "Banana",
+      "emoji": "🍌",
+      "audio": "../assets/audio/Vocabulary/Banana%20%F0%9F%8D%8C.m4a?v=20261017-2"
+    },
+    {
+      "word": "Boat",
+      "emoji": "🚤",
+      "audio": "../assets/audio/Vocabulary/Boat%20%F0%9F%9A%A4.m4a?v=20261017-2"
+    },
+    {
+      "word": "Burger",
+      "emoji": "🍔",
+      "audio": "../assets/audio/Vocabulary/Burger%20%F0%9F%8D%94.m4a?v=20261017-2"
+    },
+    {
+      "word": "Car",
+      "emoji": "🚗",
+      "audio": "../assets/audio/Vocabulary/Car%20%F0%9F%9A%97.m4a?v=20261017-2"
+    },
+    {
+      "word": "Carrot",
+      "emoji": "🥕",
+      "audio": "../assets/audio/Vocabulary/Carrot%20%F0%9F%A5%95.m4a?v=20261017-2"
+    },
+    {
+      "word": "Cat",
+      "emoji": "🐱",
+      "audio": "../assets/audio/Vocabulary/Cat%20%F0%9F%90%B1.m4a?v=20261017-2"
+    },
+    {
+      "word": "Chicken",
+      "emoji": "🐓",
+      "audio": "../assets/audio/Vocabulary/Chicken%20%F0%9F%90%93.m4a?v=20261017-2"
+    },
+    {
+      "word": "Coconut",
+      "emoji": "🥥",
+      "audio": "../assets/audio/Vocabulary/Coconut%20%F0%9F%A5%A5.m4a?v=20261017-2"
+    },
+    {
+      "word": "Cookie",
+      "emoji": "🍪",
+      "audio": "../assets/audio/Vocabulary/Cookie%20%F0%9F%8D%AA.m4a?v=20261017-2"
+    },
+    {
+      "word": "Cow",
+      "emoji": "🐮",
+      "audio": "../assets/audio/Vocabulary/Cow%20%F0%9F%90%AE.m4a?v=20261017-2"
+    },
+    {
+      "word": "Dinosaur",
+      "emoji": "🦖",
+      "audio": "../assets/audio/Vocabulary/Dinosaur%20%F0%9F%A6%96.m4a?v=20261017-2"
+    },
+    {
+      "word": "Dog",
+      "emoji": "🐶",
+      "audio": "../assets/audio/Vocabulary/Dog%20%F0%9F%90%B6.m4a?v=20261017-2"
+    },
+    {
+      "word": "Fire",
+      "emoji": "🔥",
+      "audio": "../assets/audio/Vocabulary/Fire%20%F0%9F%94%A5.m4a?v=20261017-2"
+    },
+    {
+      "word": "Flowers",
+      "emoji": "🌻",
+      "audio": "../assets/audio/Vocabulary/Flowers%20%F0%9F%8C%BB.m4a?v=20261017-2"
+    },
+    {
+      "word": "Fox",
+      "emoji": "🦊",
+      "audio": "../assets/audio/Vocabulary/Fox%20%F0%9F%A6%8A.m4a?v=20261017-2"
+    },
+    {
+      "word": "Frog",
+      "emoji": "🐸",
+      "audio": "../assets/audio/Vocabulary/Frog%20%F0%9F%90%B8.m4a?v=20261017-2"
+    },
+    {
+      "word": "Hand",
+      "emoji": "🤚🏼",
+      "audio": "../assets/audio/Vocabulary/Hand%20%F0%9F%A4%9A%F0%9F%8F%BC.m4a?v=20261017-2"
+    },
+    {
+      "word": "Hat",
+      "emoji": "👒",
+      "audio": "../assets/audio/Vocabulary/Hat%20%F0%9F%91%92.m4a?v=20261017-2"
+    },
+    {
+      "word": "Jar",
+      "emoji": "🫙",
+      "audio": "../assets/audio/Vocabulary/Jar%20%F0%9F%AB%99.m4a?v=20261017-2"
+    },
+    {
+      "word": "Kite",
+      "emoji": "🪁",
+      "audio": "../assets/audio/Vocabulary/Kite%20%F0%9F%AA%81.m4a?v=20261017-2"
+    },
+    {
+      "word": "Lemon",
+      "emoji": "🍋",
+      "audio": "../assets/audio/Vocabulary/Lemon%20%F0%9F%8D%8B.m4a?v=20261017-2"
+    },
+    {
+      "word": "Monkey",
+      "emoji": "🐒",
+      "audio": "../assets/audio/Vocabulary/Monkey%20%F0%9F%90%92.m4a?v=20261017-2"
+    },
+    {
+      "word": "Mouse",
+      "emoji": "🐭",
+      "audio": "../assets/audio/Vocabulary/Mouse%20%F0%9F%90%AD.m4a?v=20261017-2"
+    },
+    {
+      "word": "Panda",
+      "emoji": "🐼",
+      "audio": "../assets/audio/Vocabulary/Panda%20%F0%9F%90%BC.m4a?v=20261017-2"
+    },
+    {
+      "word": "Peach",
+      "emoji": "🍑",
+      "audio": "../assets/audio/Vocabulary/Peach%20%F0%9F%8D%91.m4a?v=20261017-2"
+    },
+    {
+      "word": "Pie",
+      "emoji": "🥧",
+      "audio": "../assets/audio/Vocabulary/Pie%20%F0%9F%A5%A7.m4a?v=20261017-2"
+    },
+    {
+      "word": "Pig",
+      "emoji": "🐷",
+      "audio": "../assets/audio/Vocabulary/Pig%20%F0%9F%90%B7.m4a?v=20261017-2"
+    },
+    {
+      "word": "Pizza",
+      "emoji": "🍕",
+      "audio": "../assets/audio/Vocabulary/Pizza%20%F0%9F%8D%95.m4a?v=20261017-2"
+    },
+    {
+      "word": "Potato",
+      "emoji": "🥔",
+      "audio": "../assets/audio/Vocabulary/Potato%20%F0%9F%A5%94.m4a?v=20261017-2"
+    },
+    {
+      "word": "Rabbit",
+      "emoji": "🐰",
+      "audio": "../assets/audio/Vocabulary/Rabbit%20%F0%9F%90%B0.m4a?v=20261017-2"
+    },
+    {
+      "word": "Robot",
+      "emoji": "🤖",
+      "audio": "../assets/audio/Vocabulary/Robot%20%F0%9F%A4%96.m4a?v=20261017-2"
+    },
+    {
+      "word": "Sandwich",
+      "emoji": "🥪",
+      "audio": "../assets/audio/Vocabulary/Sandwich%20%F0%9F%A5%AA.m4a?v=20261017-2"
+    },
+    {
+      "word": "Shirt",
+      "emoji": "👕",
+      "audio": "../assets/audio/Vocabulary/Shirt%20%F0%9F%91%95.m4a?v=20261017-2"
+    },
+    {
+      "word": "Skateboard",
+      "emoji": "🛹",
+      "audio": "../assets/audio/Vocabulary/Skateboard%20%F0%9F%9B%B9.m4a?v=20261017-2"
+    },
+    {
+      "word": "Strawberry cake",
+      "emoji": "🍰",
+      "audio": "../assets/audio/Vocabulary/Strawberry%20cake%20%F0%9F%8D%B0.m4a?v=20261017-2"
+    },
+    {
+      "word": "Strawberry",
+      "emoji": "🍓",
+      "audio": "../assets/audio/Vocabulary/Strawberry%20%F0%9F%8D%93.m4a?v=20261017-2"
+    },
+    {
+      "word": "Taco",
+      "emoji": "🌮",
+      "audio": "../assets/audio/Vocabulary/Taco%20%F0%9F%8C%AE.m4a?v=20261017-2"
+    },
+    {
+      "word": "Tent",
+      "emoji": "⛺️",
+      "audio": "../assets/audio/Vocabulary/Tent%20%E2%9B%BA%EF%B8%8F.m4a?v=20261017-2"
+    },
+    {
+      "word": "Tire",
+      "emoji": "🛞",
+      "audio": "../assets/audio/Vocabulary/Tire%20%F0%9F%9B%9E.m4a?v=20261017-2"
+    },
+    {
+      "word": "Trophy",
+      "emoji": "🏆",
+      "audio": "../assets/audio/Vocabulary/Trophy%20%F0%9F%8F%86.m4a?v=20261017-2"
+    },
+    {
+      "word": "Truck",
+      "emoji": "🚚",
+      "audio": "../assets/audio/Vocabulary/Truck%20%F0%9F%9A%9A.m4a?v=20261017-2"
+    },
+    {
+      "word": "Waffle",
+      "emoji": "🧇",
+      "audio": "../assets/audio/Vocabulary/Waffle%20%F0%9F%A7%87.m4a?v=20261017-2"
+    },
+    {
+      "word": "Watermelon",
+      "emoji": "🍉",
+      "audio": "../assets/audio/Vocabulary/Watermelon%20%F0%9F%8D%89.m4a?v=20261017-2"
+    }
+  ],
+  "whoIsThisAudio": "../assets/audio/this%20is/people/Who%20is%20this%3F.m4a?v=20261017-2"
+};
+    const backLink = document.querySelector(".back-link");
+    const startButton = document.getElementById("start-button");
+    const personStage = document.getElementById("person-stage");
+    const personImage = document.getElementById("person-image");
+    const heldEmoji = document.getElementById("held-emoji");
+    const prompt = document.getElementById("prompt");
+    const player = new Audio();
+    const navigationPlayer = new Audio();
+    const recentPeople = [];
+    let activePerson = null;
+    let activeVocabulary = null;
+    let phase = "loading";
+    let cycleId = 0;
+
+    function withVersion(href, version = appVersion) {
+      const url = new URL(href, window.location.href);
+      url.searchParams.set("v", version);
+      return url.toString();
+    }
+
+    async function ensureLatestVersion() {
+      try {
+        const response = await fetch(`${versionInfoPath}?t=${Date.now()}`, { cache: "no-store" });
+        if (!response.ok) return;
+        const latest = await response.json();
+        if (latest.version && latest.version !== appVersion) {
+          window.location.replace(withVersion(window.location.pathname + window.location.search + window.location.hash, latest.version));
+        }
+      } catch (error) {
+        console.error("Unable to check app version", error);
+      }
+    }
+
+    async function playAudio(audioPath) {
+      if (!audioPath) return;
+      player.pause();
+      player.currentTime = 0;
+      player.src = audioPath;
+      try {
+        await player.play();
+        await new Promise((resolve) => {
+          player.addEventListener("ended", resolve, { once: true });
+          player.addEventListener("error", resolve, { once: true });
+        });
+      } catch (error) {
+        console.error("Unable to play game audio", error);
+      }
+    }
+
+    function chooseNextPerson() {
+      const choices = pageConfig.people.filter((person) => !recentPeople.includes(person.name));
+      const pool = choices.length ? choices : pageConfig.people;
+      const person = pool[Math.floor(Math.random() * pool.length)];
+      recentPeople.push(person.name);
+      if (recentPeople.length > 3) recentPeople.shift();
+      return person;
+    }
+
+    function chooseVocabulary() {
+      const vocabulary = pageConfig.vocabulary;
+      return vocabulary[Math.floor(Math.random() * vocabulary.length)];
+    }
+
+    function setStage(imagePath, altText, emoji = "") {
+      personImage.src = imagePath;
+      personImage.alt = altText;
+      heldEmoji.textContent = emoji;
+      heldEmoji.hidden = !emoji;
+    }
+
+    async function startCycle() {
+      const thisCycle = ++cycleId;
+      phase = "loading-face";
+      personStage.hidden = false;
+      personStage.disabled = true;
+      activePerson = chooseNextPerson();
+      activeVocabulary = chooseVocabulary();
+      setStage(activePerson.faceImage, "Tap the person's face");
+      prompt.textContent = "Listen...";
+      await playAudio(pageConfig.whoIsThisAudio);
+      if (thisCycle !== cycleId) return;
+      phase = "face";
+      personStage.disabled = false;
+      prompt.textContent = "Who is this? Tap the face!";
+    }
+
+    async function showHandsQuestion() {
+      const thisCycle = cycleId;
+      phase = "loading-hands";
+      personStage.disabled = true;
+      prompt.textContent = "Listen...";
+      await playAudio(activePerson.thisIsAudio);
+      if (thisCycle !== cycleId) return;
+      setStage(activePerson.handsImage, "Tap the person holding an object", activeVocabulary.emoji);
+      await playAudio(activePerson.questionAudio);
+      if (thisCycle !== cycleId) return;
+      phase = "hands";
+      personStage.disabled = false;
+      prompt.textContent = "What do they have? Tap the picture!";
+    }
+
+    async function answerHandsQuestion() {
+      const thisCycle = cycleId;
+      phase = "answering";
+      personStage.disabled = true;
+      prompt.textContent = "Listen...";
+      await playAudio(activePerson.replyAudio);
+      if (thisCycle !== cycleId) return;
+      await playAudio(activeVocabulary.audio);
+      if (thisCycle !== cycleId) return;
+      void startCycle();
+    }
+
+    async function playThenNavigate(audioPath, href) {
+      const destination = withVersion(href);
+      if (!audioPath) {
+        window.location.href = destination;
+        return;
+      }
+      navigationPlayer.pause();
+      navigationPlayer.currentTime = 0;
+      navigationPlayer.src = audioPath;
+      try {
+        await navigationPlayer.play();
+        navigationPlayer.addEventListener("ended", () => { window.location.href = destination; }, { once: true });
+      } catch (error) {
+        console.error("Unable to play back audio", error);
+        window.location.href = destination;
+      }
+    }
+
+    document.getElementById("page-title").textContent = pageConfig.title;
+    document.getElementById("page-description").textContent = pageConfig.description;
+    backLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      void playThenNavigate(pageConfig.backAudio, backLink.getAttribute("href"));
+    });
+    personStage.addEventListener("click", () => {
+      if (phase === "face") void showHandsQuestion();
+      if (phase === "hands") void answerHandsQuestion();
+    });
+    startButton.addEventListener("click", () => {
+      startButton.hidden = true;
+      void startCycle();
+    });
+    void ensureLatestVersion();
+  </script>
+</body>
+</html>

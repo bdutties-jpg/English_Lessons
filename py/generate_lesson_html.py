@@ -14,7 +14,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from config import MATH_CONFIG, READING_CONFIG, SPELLING_CONFIG, VOCABULARY_CONFIG, WHAT_DO_THEY_HAVE_CONFIG
+from config import MATH_CONFIG, MULTIPLICATION_CONFIG, READING_CONFIG, SPELLING_CONFIG, VOCABULARY_CONFIG, WHAT_DO_THEY_HAVE_CONFIG
 
 SHORT_SENTENCES_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Short sentences"
 LETTER_SOUNDS_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Letters" / "Learning"
@@ -24,24 +24,30 @@ UI_SOUNDS_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "UI_Sounds"
 VOCABULARY_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "Vocabulary"
 PERSON_HAS_QUESTION_AUDIO_DIR = VOCABULARY_AUDIO_DIR / "person has" / "Question"
 PERSON_HAS_REPLY_AUDIO_DIR = VOCABULARY_AUDIO_DIR / "person has" / "Reply"
-PEOPLE_DIR = ROOT_DIR / "assets" / "people"
+PEOPLE_HANDS_DIR = ROOT_DIR / "assets" / "people" / "hands"
+PEOPLE_FACES_DIR = ROOT_DIR / "assets" / "people" / "faces"
+THIS_IS_PEOPLE_AUDIO_DIR = ROOT_DIR / "assets" / "audio" / "this is" / "people"
 QUESTION_FLASHCARDS_MD_PATH = ROOT_DIR / "assets" / "md" / "Question_Flashcards.md"
 TEMPLATE_PATH = ROOT_DIR / "html_template" / "lesson_template.html"
 HOME_TEMPLATE_PATH = ROOT_DIR / "html_template" / "home_template.html"
 MATH_TEMPLATE_PATH = ROOT_DIR / "html_template" / "math_template.html"
+MULTIPLICATION_TEMPLATE_PATH = ROOT_DIR / "html_template" / "multiplication_template.html"
 READING_TEMPLATE_PATH = ROOT_DIR / "html_template" / "reading_template.html"
 SPELLING_TEMPLATE_PATH = ROOT_DIR / "html_template" / "spelling_template.html"
 VOCABULARY_TEMPLATE_PATH = ROOT_DIR / "html_template" / "vocabulary_template.html"
 MUSIC_TEMPLATE_PATH = ROOT_DIR / "html_template" / "music_template.html"
 WHAT_DO_THEY_HAVE_TEMPLATE_PATH = ROOT_DIR / "html_template" / "what_do_they_have_template.html"
+WHO_IS_THIS_TEMPLATE_PATH = ROOT_DIR / "html_template" / "who_is_this_template.html"
 QUESTION_FLASHCARDS_TEMPLATE_PATH = ROOT_DIR / "html_template" / "question_flashcards_template.html"
 OUTPUT_PATH = ROOT_DIR / "output" / "short_sentences.html"
 MATH_OUTPUT_PATH = ROOT_DIR / "output" / "math.html"
+MULTIPLICATION_OUTPUT_PATH = ROOT_DIR / "output" / "multiplication.html"
 READING_OUTPUT_PATH = ROOT_DIR / "output" / "reading.html"
 SPELLING_OUTPUT_PATH = ROOT_DIR / "output" / "spelling.html"
 VOCABULARY_OUTPUT_PATH = ROOT_DIR / "output" / "vocabulary.html"
 MUSIC_OUTPUT_PATH = ROOT_DIR / "output" / "music.html"
 WHAT_DO_THEY_HAVE_OUTPUT_PATH = ROOT_DIR / "output" / "what_do_they_have.html"
+WHO_IS_THIS_OUTPUT_PATH = ROOT_DIR / "output" / "who_is_this.html"
 LETTER_SOUNDS_OUTPUT_PATH = ROOT_DIR / "output" / "letter_sounds.html"
 QUESTION_FLASHCARDS_OUTPUT_PATH = ROOT_DIR / "output" / "question_flashcards.html"
 INDEX_PATH = ROOT_DIR / "index.html"
@@ -50,6 +56,7 @@ PLACEHOLDER = "__LESSONS_JSON__"
 MENU_PLACEHOLDER = "__MENU_JSON__"
 PAGE_CONFIG_PLACEHOLDER = "__PAGE_CONFIG_JSON__"
 MATH_CONFIG_PLACEHOLDER = "__MATH_CONFIG_JSON__"
+MULTIPLICATION_CONFIG_PLACEHOLDER = "__MULTIPLICATION_CONFIG_JSON__"
 APP_VERSION_PLACEHOLDER = "__APP_VERSION__"
 FILENAME_PATTERN = re.compile(r"^(?P<emoji>.+?)\s*-\s*(?P<text>.+)$")
 VOCABULARY_PATTERN = re.compile(r"^(?P<word>.+?)\s+(?P<emoji>\S+)$")
@@ -327,11 +334,17 @@ def build_person_has_people() -> list[dict[str, str]]:
         return unicodedata.normalize("NFC", text).casefold()
 
     person_images = sorted(
-        (path for path in PEOPLE_DIR.iterdir() if path.suffix.casefold() in {".jpeg", ".jpg", ".png", ".webp"}),
+        (path for path in PEOPLE_HANDS_DIR.iterdir() if path.suffix.casefold() in {".jpeg", ".jpg", ".png", ".webp"}),
         key=lambda path: path.stem.casefold(),
     )
     if not person_images:
-        raise FileNotFoundError(f"No people images found in {PEOPLE_DIR}")
+        raise FileNotFoundError(f"No people images found in {PEOPLE_HANDS_DIR}")
+
+    face_images = {
+        normalized_key(path.stem): path
+        for path in PEOPLE_FACES_DIR.iterdir()
+        if path.suffix.casefold() in {".jpeg", ".jpg", ".png", ".webp"}
+    }
 
     person_order = [normalized_key(name) for name in WHAT_DO_THEY_HAVE_CONFIG.get("person_order", [])]
     if len(person_order) != len(set(person_order)):
@@ -360,6 +373,10 @@ def build_person_has_people() -> list[dict[str, str]]:
         normalized_key(path.stem): path
         for path in PERSON_HAS_REPLY_AUDIO_DIR.glob("*.m4a")
     }
+    this_is_audio = {
+        normalized_key(path.stem): path
+        for path in THIS_IS_PEOPLE_AUDIO_DIR.glob("*.m4a")
+    }
     people: list[dict[str, str]] = []
 
     for image_path in person_images:
@@ -367,23 +384,40 @@ def build_person_has_people() -> list[dict[str, str]]:
         if normalized_key(name) in {normalized_key("Bơ"), "bo"}:
             question_text = "What do you have?"
             reply_text = "I have a"
+            this_is_text = "This is me"
         else:
             question_name = f"your {name[3:]}" if normalized_key(name).startswith("my ") else name
             question_text = f"What does {question_name} have?"
             reply_name = f"{name[:1].upper()}{name[1:]}"
             reply_text = f"{reply_name} has a"
+            this_is_name = f"my {name}" if normalized_key(name).startswith(("aunt ", "uncle ")) else name
+            this_is_text = f"This is {this_is_name}"
 
         question_path = question_audio.get(normalized_key(question_text))
         reply_path = reply_audio.get(normalized_key(reply_text))
-        if not question_path or not reply_path:
+        this_is_path = this_is_audio.get(normalized_key(this_is_text))
+        face_path = face_images.get(normalized_key(name))
+        if not question_path or not reply_path or not this_is_path or not face_path:
+            missing_items = []
+            if not face_path:
+                missing_items.append(f"face image for '{name}'")
+            if not question_path:
+                missing_items.append(f"'{question_text}.m4a'")
+            if not reply_path:
+                missing_items.append(f"'{reply_text}.m4a'")
+            if not this_is_path:
+                missing_items.append(f"'{this_is_text}.m4a'")
             raise FileNotFoundError(
-                f"Missing person-has audio for '{name}'. Expected '{question_text}.m4a' and '{reply_text}.m4a'."
+                f"Missing people-game asset for '{name}': {', '.join(missing_items)}."
             )
 
         people.append(
             {
                 "name": name,
                 "image": encode_relative_path(image_path),
+                "handsImage": encode_relative_path(image_path),
+                "faceImage": encode_relative_path(face_path),
+                "thisIsAudio": encode_audio_path(this_is_path),
                 "questionAudio": encode_audio_path(question_path),
                 "replyText": reply_text,
                 "replyAudio": encode_audio_path(reply_path),
@@ -453,6 +487,13 @@ def render_home_html() -> str:
             "audio": menu_audio.get("math", ""),
         },
         {
+            "emoji": "✖️",
+            "title": "Multiplication",
+            "subtitle": "phép nhân",
+            "href": "output/multiplication.html",
+            "audio": "",
+        },
+        {
             "emoji": "📖",
             "title": "Reading",
             "subtitle": "đọc",
@@ -481,6 +522,13 @@ def render_home_html() -> str:
             "audio": menu_audio.get("music", ""),
         },
         {
+            "emoji": "👤❓",
+            "title": "Who Is This?",
+            "subtitle": "Đây là ai?",
+            "href": "output/who_is_this.html",
+            "audio": "",
+        },
+        {
             "emoji": "👐🏼",
             "title": "What Do They Have?",
             "subtitle": "Họ có gì?",
@@ -504,6 +552,22 @@ def render_math_html() -> str:
         if audio_path:
             math_config[key] = encode_audio_path(ROOT_DIR / audio_path)
     return template.replace(MATH_CONFIG_PLACEHOLDER, json.dumps(math_config, ensure_ascii=False, indent=2))
+
+
+def render_multiplication_html() -> str:
+    template = apply_app_version(MULTIPLICATION_TEMPLATE_PATH.read_text(encoding="utf-8"))
+    if MULTIPLICATION_CONFIG_PLACEHOLDER not in template:
+        raise ValueError(f"Template is missing placeholder {MULTIPLICATION_CONFIG_PLACEHOLDER}")
+    multiplication_config = dict(MULTIPLICATION_CONFIG)
+    multiplication_config["back_audio"] = encode_audio_path(MENU_AUDIO_DIR / "Back to home.m4a")
+    for key in ("magic_click_sound", "correct_answer", "wrong_answer", "star_celebration"):
+        audio_path = multiplication_config.get(key)
+        if audio_path:
+            multiplication_config[key] = encode_audio_path(ROOT_DIR / audio_path)
+    return template.replace(
+        MULTIPLICATION_CONFIG_PLACEHOLDER,
+        json.dumps(multiplication_config, ensure_ascii=False, indent=2),
+    )
 
 
 def render_reading_html() -> str:
@@ -619,6 +683,21 @@ def render_music_html() -> str:
 
 def render_what_do_they_have_html() -> str:
     template = apply_app_version(WHAT_DO_THEY_HAVE_TEMPLATE_PATH.read_text(encoding="utf-8"))
+    vocabulary = build_what_do_they_have_vocabulary()
+    page_config = {
+        "title": "What Do They Have?",
+        "subtitle": "Họ có gì?",
+        "description": "Choose a person, then listen and answer.",
+        "backAudio": encode_audio_path(MENU_AUDIO_DIR / "Back to home.m4a"),
+        "people": build_person_has_people(),
+        "vocabulary": vocabulary,
+    }
+    if PAGE_CONFIG_PLACEHOLDER not in template:
+        raise ValueError(f"Template is missing placeholder {PAGE_CONFIG_PLACEHOLDER}")
+    return template.replace(PAGE_CONFIG_PLACEHOLDER, json.dumps(page_config, ensure_ascii=False, indent=2))
+
+
+def build_what_do_they_have_vocabulary() -> list[dict[str, str]]:
     excluded_vocabulary = {
         word.casefold() for word in WHAT_DO_THEY_HAVE_CONFIG.get("excluded_vocabulary", [])
     }
@@ -627,13 +706,21 @@ def render_what_do_they_have_html() -> str:
     ]
     if not vocabulary:
         raise ValueError("What Do They Have? needs at least one vocabulary item after exclusions.")
+    return vocabulary
+
+
+def render_who_is_this_html() -> str:
+    template = apply_app_version(WHO_IS_THIS_TEMPLATE_PATH.read_text(encoding="utf-8"))
+    who_is_this_audio = THIS_IS_PEOPLE_AUDIO_DIR / "Who is this?.m4a"
+    if not who_is_this_audio.exists():
+        raise FileNotFoundError(f"Missing Who Is This audio at {who_is_this_audio}")
     page_config = {
-        "title": "What Do They Have?",
-        "subtitle": "Họ có gì?",
-        "description": "Choose a person, then listen and answer.",
+        "title": "Who Is This?",
+        "description": "Listen, then tap the picture to hear the answer.",
         "backAudio": encode_audio_path(MENU_AUDIO_DIR / "Back to home.m4a"),
         "people": build_person_has_people(),
-        "vocabulary": vocabulary,
+        "vocabulary": build_what_do_they_have_vocabulary(),
+        "whoIsThisAudio": encode_audio_path(who_is_this_audio),
     }
     if PAGE_CONFIG_PLACEHOLDER not in template:
         raise ValueError(f"Template is missing placeholder {PAGE_CONFIG_PLACEHOLDER}")
@@ -673,20 +760,24 @@ def main() -> None:
     )
     home_html = render_home_html()
     math_html = render_math_html()
+    multiplication_html = render_multiplication_html()
     reading_html = render_reading_html()
     spelling_html = render_spelling_html()
     vocabulary_html = render_vocabulary_html()
     music_html = render_music_html()
     what_do_they_have_html = render_what_do_they_have_html()
+    who_is_this_html = render_who_is_this_html()
     question_flashcards_html = render_question_flashcards_html()
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_PATH.write_text(lesson_html, encoding="utf-8")
     MATH_OUTPUT_PATH.write_text(math_html, encoding="utf-8")
+    MULTIPLICATION_OUTPUT_PATH.write_text(multiplication_html, encoding="utf-8")
     READING_OUTPUT_PATH.write_text(reading_html, encoding="utf-8")
     SPELLING_OUTPUT_PATH.write_text(spelling_html, encoding="utf-8")
     VOCABULARY_OUTPUT_PATH.write_text(vocabulary_html, encoding="utf-8")
     MUSIC_OUTPUT_PATH.write_text(music_html, encoding="utf-8")
     WHAT_DO_THEY_HAVE_OUTPUT_PATH.write_text(what_do_they_have_html, encoding="utf-8")
+    WHO_IS_THIS_OUTPUT_PATH.write_text(who_is_this_html, encoding="utf-8")
     LETTER_SOUNDS_OUTPUT_PATH.write_text(letter_sounds_html, encoding="utf-8")
     QUESTION_FLASHCARDS_OUTPUT_PATH.write_text(question_flashcards_html, encoding="utf-8")
     INDEX_PATH.write_text(home_html, encoding="utf-8")
@@ -696,8 +787,10 @@ def main() -> None:
     )
     print(f"Wrote {len(lessons)} buttons to {OUTPUT_PATH}")
     print(f"Wrote math page to {MATH_OUTPUT_PATH}")
+    print(f"Wrote multiplication page to {MULTIPLICATION_OUTPUT_PATH}")
     print(f"Wrote reading page to {READING_OUTPUT_PATH}")
     print(f"Wrote spelling page to {SPELLING_OUTPUT_PATH}")
+    print(f"Wrote Who Is This page to {WHO_IS_THIS_OUTPUT_PATH}")
     print(f"Wrote vocabulary page to {VOCABULARY_OUTPUT_PATH}")
     print(f"Wrote music page to {MUSIC_OUTPUT_PATH}")
     print(f"Wrote what-do-they-have page to {WHAT_DO_THEY_HAVE_OUTPUT_PATH}")
