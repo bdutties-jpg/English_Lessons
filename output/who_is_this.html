@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="English Playtime" />
   <meta name="application-name" content="English Playtime" />
   <meta name="theme-color" content="#c4b5fd" />
-  <meta name="app-version" content="20261108020943" />
+  <meta name="app-version" content="20261108031344" />
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="../assets/icons/icon-512.png" />
@@ -197,7 +197,7 @@
   </main>
 
   <script>
-    const appVersion = "20261108020943";
+    const appVersion = "20261108031344";
     const versionInfoPath = "../app_version.json";
     const pageConfig = {
   "title": "Who Is This?",
@@ -582,19 +582,32 @@
       }
     }
 
-    async function playAudio(audioPath) {
-      if (!audioPath) return;
+    function playAudioThen(audioPath, onComplete) {
+      let completed = false;
+      const finish = () => {
+        if (completed) return;
+        completed = true;
+        onComplete();
+      };
+
+      if (!audioPath) {
+        finish();
+        return;
+      }
+
       player.pause();
       player.currentTime = 0;
-      player.src = audioPath;
-      try {
-        await player.play();
-        await new Promise((resolve) => {
-          player.addEventListener("ended", resolve, { once: true });
-          player.addEventListener("error", resolve, { once: true });
+      if (player.src !== new URL(audioPath, window.location.href).href) {
+        player.src = audioPath;
+      }
+      player.onended = finish;
+      player.onerror = finish;
+      const playback = player.play();
+      if (playback) {
+        playback.catch((error) => {
+          console.error("Unable to play game audio", error);
+          finish();
         });
-      } catch (error) {
-        console.error("Unable to play game audio", error);
       }
     }
 
@@ -619,7 +632,7 @@
       heldEmoji.hidden = !emoji;
     }
 
-    async function startCycle() {
+    function startCycle() {
       const thisCycle = ++cycleId;
       phase = "loading-face";
       personStage.hidden = false;
@@ -628,38 +641,43 @@
       activeVocabulary = chooseVocabulary();
       setStage(activePerson.faceImage, "Tap the person's face");
       prompt.textContent = "Listen...";
-      await playAudio(pageConfig.whoIsThisAudio);
-      if (thisCycle !== cycleId) return;
-      phase = "face";
-      personStage.disabled = false;
-      prompt.textContent = "Who is this? Tap the face!";
+      playAudioThen(pageConfig.whoIsThisAudio, () => {
+        if (thisCycle !== cycleId) return;
+        phase = "face";
+        personStage.disabled = false;
+        prompt.textContent = "Who is this? Tap the face!";
+      });
     }
 
-    async function showHandsQuestion() {
+    function showHandsQuestion() {
       const thisCycle = cycleId;
       phase = "loading-hands";
       personStage.disabled = true;
       prompt.textContent = "Listen...";
-      await playAudio(activePerson.thisIsAudio);
-      if (thisCycle !== cycleId) return;
-      setStage(activePerson.handsImage, "Tap the person holding an object", activeVocabulary.emoji);
-      await playAudio(activePerson.questionAudio);
-      if (thisCycle !== cycleId) return;
-      phase = "hands";
-      personStage.disabled = false;
-      prompt.textContent = "What do they have? Tap the picture!";
+      playAudioThen(activePerson.thisIsAudio, () => {
+        if (thisCycle !== cycleId) return;
+        setStage(activePerson.handsImage, "Tap the person holding an object", activeVocabulary.emoji);
+        playAudioThen(activePerson.questionAudio, () => {
+          if (thisCycle !== cycleId) return;
+          phase = "hands";
+          personStage.disabled = false;
+          prompt.textContent = "What do they have? Tap the picture!";
+        });
+      });
     }
 
-    async function answerHandsQuestion() {
+    function answerHandsQuestion() {
       const thisCycle = cycleId;
       phase = "answering";
       personStage.disabled = true;
       prompt.textContent = "Listen...";
-      await playAudio(activePerson.replyAudio);
-      if (thisCycle !== cycleId) return;
-      await playAudio(activeVocabulary.audio);
-      if (thisCycle !== cycleId) return;
-      void startCycle();
+      playAudioThen(activePerson.replyAudio, () => {
+        if (thisCycle !== cycleId) return;
+        playAudioThen(activeVocabulary.audio, () => {
+          if (thisCycle !== cycleId) return;
+          startCycle();
+        });
+      });
     }
 
     async function playThenNavigate(audioPath, href) {
@@ -687,13 +705,16 @@
       void playThenNavigate(pageConfig.backAudio, backLink.getAttribute("href"));
     });
     personStage.addEventListener("click", () => {
-      if (phase === "face") void showHandsQuestion();
-      if (phase === "hands") void answerHandsQuestion();
+      if (phase === "face") showHandsQuestion();
+      if (phase === "hands") answerHandsQuestion();
     });
     startButton.addEventListener("click", () => {
       startButton.hidden = true;
-      void startCycle();
+      startCycle();
     });
+    player.preload = "auto";
+    player.src = pageConfig.whoIsThisAudio;
+    player.load();
     void ensureLatestVersion();
   </script>
 </body>
